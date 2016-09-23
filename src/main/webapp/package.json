@@ -1,0 +1,51 @@
+{
+  "name": "kfuture",
+  "version": "1.0.0",
+  "author": "DynTech",
+  "description": "App for KFuture services",
+  "scripts": {
+    "start": "concurrently \"npm run tsc:w\"",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "typings": "typings",
+    "postinstall": "typings install"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@angular/common": "2.0.0",
+    "@angular/compiler": "2.0.0",
+    "@angular/core": "2.0.0",
+    "@angular/forms": "2.0.0",
+    "@angular/http": "2.0.0",
+    "@angular/platform-browser": "2.0.0",
+    "@angular/platform-browser-dynamic": "2.0.0",
+    "@angular/router": "3.0.0",
+    "@angular/upgrade": "2.0.0",
+    "angular2-cookie": "1.2.3",
+    "angular2-in-memory-web-api": "0.0.20",
+    "bootstrap": "3.3.6",
+    "core-js": "2.4.1",
+    "dragula": "3.7.2",
+    "file-saver": "1.3.2",
+    "font-awesome": "^4.6.3",
+    "jquery": "2.2.4",
+    "jquery-ui": "^1.12.0",
+    "jquery-ui-timepicker-addon": "^1.6.1",
+    "ng2-bootstrap": "1.1.5",
+    "ng2-dragula": "^1.2.0",
+    "ng2-translate": "2.4.3",
+    "primeng": "1.0.0-beta.15",
+    "primeui": "4.1.15",
+    "reflect-metadata": "0.1.3",
+    "rxjs": "5.0.0-beta.12",
+    "systemjs": "0.19.27",
+    "zone.js": "0.6.23"
+  },
+  "devDependencies": {
+    "concurrently": "^2.2.0",
+    "typescript": "^2.0.2",
+    "typings": "^1.3.2"
+  },
+  "repository": {},
+  "sasslintConfig": "sass-lint.yml"
+}

@@ -1,0 +1,229 @@
+<div class="box-full_size overflow-auto" #box>
+    <div id="cmp-admin-create_report" class="app_content-container-cmp container">
+        <div id="admin-create_report-wrapper">
+            <h2>Create report1</h2>
+            <div id="report-settings" class="container-fluid row">
+                <div class="col-md-3 form-group padding_left-0">
+                    <label for="report-name">Name</label>
+                    <input type="text" class="form-control" id="report-name" placeholder="Report name" [(ngModel)]="reportProfile.reportName">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label for="report-desc">Description</label>
+                    <input type="text" class="form-control" id="report-desc" placeholder="Report description" [(ngModel)]="reportProfile.reportDescription">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label for="report-desc">Report type</label>
+                    <select class="form-control" [(ngModel)]="reportProfile.type">
+                        <option value="sync">Synchronous</option>
+                        <option value="async">Asynchronous</option>
+                    </select>
+                </div>
+                <div class="col-md-3 form-group submit">
+                    <button type="button" class="btn btn-primary" [disabled]="!isReportProfileValid(reportProfile, reportFile)" (click)="createReportSubmit(reportProfile)">Create</button>
+                </div>
+                <div class="col-xs-4 file clearfix">
+                    <label for="file-input" class="file-label"><span class="glyphicon glyphicon-file"></span></label>
+                    <input type="file" id="file-input" accept=".jrxml" (change)="onChangeFile($event)">
+                    <div class="file-info">
+                        <div *ngIf="reportFile && reportFile.files[0]">
+                            <div class="file-info-name">{{reportFile.files[0].size | bytes}}</div>
+                            <div class="file-info-size">{{reportFile.files[0].name | trimExtension | shortText: 24:'.jrxml'}}</div>
+                        </div>
+                        <div class="file-info-message" *ngIf="!reportFile || !reportFile.files[0]">No file selected</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create report canvas-->
+            <div id="create_report-creating_canvas">
+                <div class="create_report-prev-add_row row">
+                    <div class="create_report-between-add_row btn btn-success" *ngIf="!bMoveMode && !currentChangingParameter.bEditMode && reportProfile.parameters[0].length != 0" (click)="addRowBegining(reportProfile.parameters)"
+                        tooltip="Add new row here" tooltipPlacement="left">
+                        <!-- Add row in between -->
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </div>
+                </div>
+
+                <div class="create_report-row container-fluid row" *ngFor="let fieldRow of reportProfile.parameters; let row = index" [dragula]="'bag-main'"
+                    [dragulaModel]="fieldRow" [ngClass]="{'create_report-row-padded': reportProfile.parameters.length > 1, 'last': row + 1 == reportProfile.parameters.length}">
+
+                    <!-- Row -->
+                    <div class="create_report-field col-md-4" *ngFor="let field of fieldRow; let column = index" attr.position="{{row}}-{{column}}"
+                        [ngClass]="{'fourth_element': (column)%3 == 0}">
+
+                        <div class="create_report-between-add_icon btn btn-success" *ngIf="!bMoveMode && !currentChangingParameter.bEditMode" (click)="addFieldBetween(fieldRow, column)"
+                            tooltip="Add new parameter here">
+                            <!-- Between add icon -->
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </div>
+
+
+                        <!-- Field input -->
+                        <div class="input-group" [ngClass]="{'width-full': !currentChangingParameter.bEditMode}">
+                            <span class="input-group-btn z-index-1">
+                            <button class="btn btn-default create_report-field-move_icon" type="button"><span class="glyphicon glyphicon-move"></span></button>
+                            </span>
+                            <input type="text" class="form-control" placeholder="Parameter name*" [(ngModel)]="field.paramName" [disabled]="!isFieldInEditMode(currentChangingParameter, row, column)">
+                            <!-- Remove field button -->
+                            <span class="input-group-btn" *ngIf="!bMoveMode && !currentChangingParameter.bEditMode"></span>
+                        </div>
+
+                        <!-- Field properties -->
+                        <div class="parameter_properties clearfix">
+                            
+                            <div class="parameter_properties-edit" *ngIf="isFieldInEditMode(currentChangingParameter, row, column)">
+                                <div class="col-md-6 parameter-type padding_sides-0">
+                                    <div class="property-box">
+                                        <label>Parameter type</label>
+                                        <div class="radio">
+                                            <label><input type="radio" name="parameterType-{{row + '_' + column}}" #radioTypeInteger value="Integer" (click)="field.type = radioTypeInteger.value" [checked]="field.type == radioTypeInteger.value">Integer</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="parameterType-{{row + '_' + column}}" #radioTypeDecimal value="Decimal" (click)="field.type = radioTypeDecimal.value" [checked]="field.type == radioTypeDecimal.value">Decimal</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="parameterType-{{row + '_' + column}}" #radopTypeText value="String" (click)="field.type = radopTypeText.value" [checked]="field.type == radopTypeText.value">Text</label>
+                                        </div>
+                                        <!--<div class="radio">
+                                            <label><input type="radio" name="parameterType-{{row + '_' + column}}" #radopTypeDate value="Date" (click)="field.type = radopTypeDate.value" [checked]="field.type == radopTypeDate.value">Date</label>
+                                        </div>-->
+                                    </div>
+                                    <div class="property-box">
+                                        <label>Required</label>
+                                        <div class="radio">
+                                            <label><input type="radio" name="parameterRequired-{{row + '_' + column}}" value="true" (change)="field.mandatory = true" [checked]="field.mandatory">True</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="parameterRequired-{{row + '_' + column}}" value="false" (change)="field.mandatory = false" [checked]="!field.mandatory">False</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 parameter-limit padding_sides-0">
+                                    <div class="form-group">
+                                        <label for="min">Min {{minMaxValueTypeCheck(field.type)}}</label>
+                                        <input type="number" id="min" class="form-control" placeholder="Min value/length" [(ngModel)]="field.minValue">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="max">Max {{minMaxValueTypeCheck(field.type)}}</label>
+                                        <input type="number" id="max" class="form-control" placeholder="Min value/length" [(ngModel)]="field.maxValue">
+                                    </div>
+                                </div>
+
+                                <div class="container-fluid row parameter-default_value">
+                                    <div class="form-group col-md-7 padding_sides-0">
+                                        <label>Default value</label>
+                                        <input type="text" class="form-control" placeholder="Default value" [(ngModel)]="field.paramValue">
+                                    </div>
+                                </div>
+
+                                <div class="container-fluid row parameter-desc">
+                                    <label>Parameter description</label>
+                                    <textarea class="form-control" placeholder="Parameter description" [(ngModel)]="field.paramDescription"></textarea>
+                                </div>
+
+                                <div class="container-fluid row controls">
+                                    <button type="button" class="btn btn-success" (click)="deactivateEditMode()">Done</button>
+                                </div>
+                            </div>
+
+                            <div class="parameter_properties-preview" *ngIf="!isFieldInEditMode(currentChangingParameter, row, column)">
+                                <div class="col-md-6 parameter-type padding_sides-0">
+                                    <div class="property-box">
+                                        <label>Parameter type</label>
+                                        <div>
+                                            {{field.type == 'String' ? 'Text' : field.type}}
+                                        </div>
+                                    </div>
+                                    <div class="property-box">
+                                        <label>Required</label>
+                                        <div>
+                                            {{field.mandatory}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 parameter-limit padding_sides-0">
+                                    <div class="form-group">
+                                        <label for="min">Min {{minMaxValueTypeCheck(field.type)}}</label>
+                                        <div>
+                                            {{field.minValue}}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="max">Max {{minMaxValueTypeCheck(field.type)}}</label>
+                                        <div>
+                                            {{field.maxValue}}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="container-fluid row parameter-default_value">
+                                    <div class="form-group col-md-7 padding_sides-0">
+                                        <label>Default value</label>
+                                        <div>
+                                            {{field.paramValue}}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="container-fluid row parameter-desc">
+                                    <label>Parameter description</label>
+                                    <div>
+                                        {{field.paramDescription}}
+                                    </div>
+                                </div>
+
+                                <div class="container-fluid row controls" *ngIf="!bMoveMode && !bRowMoveMode">
+                                    <div class="col-xs-6 text-left padding_sides-0">
+                                        <button class="btn btn-danger create_report-field-remove_icon" type="button" *ngIf="!currentChangingParameter.bEditMode"  (click)="bMoveMode || removeField(reportProfile.parameters, row, column)" tooltip="Remove this parameter">Remove</button>
+                                    </div>
+
+                                    <div class="col-xs-6 text-right padding_sides-0">
+                                        <button type="button" class="btn btn-primary" (click)="activateEditMode(row, column)" tooltip="Edit this parameter" tooltipPlacement="left">Edit</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="create_report-last-add_icon btn btn-success" *ngIf="column == fieldRow.length - 1 && !bMoveMode && !currentChangingParameter.bEditMode"
+                            (click)="addField(reportProfile.parameters, row)" tooltip="Add new parameter here" tooltipPlacement="bottom">
+                            <!-- Between add icon -->
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-1 create_report-add_icon-box" *ngIf="!bMoveMode && !currentChangingParameter.bEditMode && fieldRow.length == 0"
+                        tooltip="Add first parameter">
+                        <!-- Add field button -->
+                        <div class="create_report-add_icon btn btn-success" (click)="addField(reportProfile.parameters, row)">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </div>
+                    </div>
+
+                    <div class="create_report-row-controls" *ngIf="reportProfile.parameters.length > 1 && !bMoveMode && !currentChangingParameter.bEditMode"
+                        tooltip="Remove row" (click)="removeRow(reportProfile.parameters, row)">
+                        <!-- Row controls -->
+                        <button class="create_report-row-remove btn btn-danger" type="button" *ngIf="!bMoveMode">
+                            <!-- Remove row button -->
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </div>
+
+                    <div class="create_report-between-add_row btn btn-success" *ngIf="showAddRowBetween(reportProfile.parameters, row) && !bMoveMode && !currentChangingParameter.bEditMode"
+                        (click)="addRowBetween(reportProfile.parameters, row)" tooltip="Add new row in between" tooltipPlacement="left">
+                        <!-- Add row in between -->
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-1 row" *ngIf="isBeforeRowPopulated(reportProfile.parameters) && !bMoveMode && !currentChangingParameter.bEditMode"
+                    (click)="addRow(reportProfile.parameters)" [tooltip]="'Add new row'">
+                    <!-- Add row button -->
+                    <div class="create_report-add_icon-row btn btn-success create_report-add_row">
+                        <span class="glyphicon glyphicon-list"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

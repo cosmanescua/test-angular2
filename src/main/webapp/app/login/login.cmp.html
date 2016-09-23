@@ -1,0 +1,27 @@
+<!--<div class="cmp-global_loader"></div>-->
+<div id="cmp-login" class="app_content-container-cmp box-full_size">
+    <div id="login-wrapper">
+        <form>
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1">
+                    <span class="glyphicon glyphicon-user"></span>
+                    </span>
+                    <input type="text" class="form-control" name="username" placeholder="Username" [(ngModel)]="loginModel.username" required>
+                </div>
+                <br>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1">
+                    <span class="glyphicon glyphicon-lock"></span>
+                    </span>
+                    <input type="text" class="form-control" name="password" placeholder="Password" [(ngModel)]="loginModel.password" required>
+                </div>
+            </div>
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary" (click)="login()">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>

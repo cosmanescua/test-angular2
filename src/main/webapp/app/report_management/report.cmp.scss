@@ -1,0 +1,20 @@
+#cmp-report_management {
+    .report_management-list {
+        &-item {
+            border-bottom: 1px solid #eaeaea;
+            font-size: 16px;
+            padding: 10px;
+            cursor: pointer;
+            &:nth-child(even) {
+                background: #f9f9f9;
+            }
+            &:hover{
+                background: #f3f3f3;
+            }
+        }
+    }
+    hr {
+        margin-bottom: 14px;
+        margin-top: 14px;
+    }
+}

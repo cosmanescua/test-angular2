@@ -1,0 +1,21 @@
+#cmp-login {
+    #login-wrapper {
+        position: absolute;
+        width: 290px;
+        height: 402px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        margin: auto;
+        /****/
+
+        input.ng-valid[required].ng-dirty {
+            border-right: 5px solid #42A948;
+        }
+
+        input.ng-invalid.ng-dirty {
+            border-right: 5px solid #a94442;
+        }
+    }
+}

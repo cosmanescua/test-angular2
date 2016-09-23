@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+    
+    <!-- Enable annotations -->    
+    <context:annotation-config/>
+    
+	<context:component-scan base-package="it.kirey.kfuture.interceptors" />
+	<context:component-scan base-package="it.kirey.kfuture.exception" />
+	<context:component-scan base-package="it.kirey.kfuture.service" />
+	<!-- <context:component-scan base-package="it.kirey.kfuture.dao" /> -->
+	<context:component-scan base-package="it.kirey.kfuture.jasper" />
+	<context:component-scan base-package="it.kirey.kfuture.util" />
+	
+	<bean id="modelMapper" class="org.modelmapper.ModelMapper"></bean>
+	<bean id="transformer" class="it.kirey.kfuture.util.ObjectTransformer"></bean>
+
+   <!-- Property file used for value substitution -->
+    <context:property-placeholder location="classpath:application.properties"/>
+
+</beans>
+    

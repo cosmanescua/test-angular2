@@ -1,0 +1,74 @@
+<div id="cmp-report_management" class="app_content-container-cmp height-100percent container cmp-padding_top_bottom">
+    <div *ngIf="isLoading" class="cmp-global_loader">
+        <img src="app/assets/images/loader.gif" class="cmp-global_loader-img" alt="Loading...">
+    </div>
+    <p-growl [value]="messages" sticky="sticky"></p-growl>
+    <div id="report_management-wrapper">
+        <div id="report_management-list" class="col-md-5 padding_sides-0 panel panel-info">
+            <div class="panel-heading">
+                <h3>Reports</h3>
+            </div>
+            <div class="panel-body">
+                <div *ngIf="!reports">
+                    <p>Loading...</p>
+                </div>
+                <div *ngIf="reports">
+                    <!--[scrollHeight]="'478px'"-->
+                    <p-dataScroller [value]="reports" [rows]="10" [inline]="true" [scrollHeight]="'400px'">
+                        <template let-report>
+                            <div [ngClass]="{'report_management-list-item': true, 'ui-state-active': selectedReport==report}" (click)="selectReport(report.id)">
+                                {{report.reportName}} <small>{{report.reportDescription || ''}}</small>
+                            </div>
+                        </template>
+                    </p-dataScroller>
+                </div>
+            </div>
+            <div class="panel-footer text-center">
+                <p-selectButton [options]="types" [(ngModel)]="selectedType" (onChange)="onTypeChange()"></p-selectButton>
+            </div>
+        </div>
+
+        <div id="report_management-form" (ngSubmit)="submit(form)" class="col-md-7">
+            <div *ngIf="selectedReport && form && formLoaded" class="panel panel-info">
+                <div class="panel-heading">
+                    <h3>Report Form</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" [formGroup]="form">
+                        <div class="form-group" *ngFor="let input of selectedReport.parameters" [ngClass]="{'has-error': !form.controls[input.paramName].valid}">
+                            <label [attr.for]="input.paramName" class="col-sm-2 control-label">{{input.paramName | capital}}:</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" [formControlName]="input.paramName" [type]="transformFieldType(input.type)">
+                                <control-messages [control]="form.controls[input.paramName]"></control-messages>
+                            </div>
+                        </div>
+                        <div class="form-group" [ngClass]="{'has-error': !form.controls['format'].valid}">
+                            <label for="format" class="col-sm-2 control-label">Format:</label>
+                            <div class="col-sm-10">
+                                <select formControlName="format" class="form-control" required>
+                                    <option [value]="''">Select format</option>
+                                    <option [value]="'pdf'">PDF</option>
+                                    <option [value]="'xls'">Excel</option>
+                                </select>
+                                <control-messages [control]="form.controls['format']"></control-messages>
+                            </div>
+                        </div>
+                        <div class="form-group" *ngIf="selectedReport.type=='async'" [ngClass]="{'has-error': !form.controls['deadline'].valid}">
+                            <label for="deadline" class="col-sm-2 control-label">Deadline:</label>
+                            <div class="col-sm-10">
+                                <p-calendar formControlName="deadline" minDate="0d" dateFormat="yy-mm-dd" timeFormat="HH:mm:ss"></p-calendar>
+                                <control-messages [control]="form.controls['deadline']"></control-messages>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-footer text-center">
+                    <input *ngIf="selectedReport.type=='sync'" type="button" class="btn btn-primary" value="Print" [disabled]="!form.valid" (click)="printReport()"
+                    />
+                    <input *ngIf="selectedReport.type=='async'" type="button" class="btn btn-primary" value="Book" [disabled]="!form.valid" (click)="addBooking()"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

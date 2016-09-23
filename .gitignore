@@ -1,0 +1,13 @@
+.classpath
+.project
+.settings/
+.tern-project
+target/
+src/main/webapp/node_modules/
+src/main/webapp/.vscode/
+src/main/webapp/app/.sass-cache/
+*.map
+src/main/webapp/node_modules/
+UML-Security-01.ucls
+*npm-debug.log*
+.springBeans

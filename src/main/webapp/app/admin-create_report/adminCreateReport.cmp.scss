@@ -1,0 +1,504 @@
+@import '../sassMixins';
+
+@mixin removeFieldIcon() {
+    background: #fd8a87;
+    border-color: #fd8a87;
+    padding: 6px 4px;
+}
+
+@mixin moveFieldIcon() {
+    font-size: 14px;
+    padding: 7px 6px 5px;
+}
+
+$greenButtonBackground-color: rgb(102, 193, 102);
+
+#cmp-admin-create_report {
+    padding-bottom: 20px;
+    // background: rgb(250, 250, 250);
+    
+    #admin-create_report-wrapper {
+        height: 100%;
+        // padding-top: 19px;
+        position: relative;
+    }
+}
+
+#report-settings {
+    .submit {
+        padding-top: 25px;
+    }
+
+    .file {
+        margin-bottom: 14px;
+        padding-left: 0;
+
+        #file-input {
+            display: none;
+        }
+
+        .file-label {
+            background: rgb(51, 122, 183);
+            border: 1px solid rgb(51, 122, 183);
+            border-radius: 4px 0 0 4px;;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            float: left;
+            font-size: 22px;
+            margin: 0;
+            padding: 11px 39px 6px;
+
+            &:hover {
+                background: rgb(97, 157, 208);
+                border: 1px solid rgb(68, 137, 195);
+            }
+        }
+
+        .file-info {   
+            border-radius:  0 4px 4px 0;
+
+            background: rgb(159, 199, 232);
+            color: rgb(35, 35, 35);
+            float: left;
+            height: 50px;
+            overflow: hidden;
+            padding: 5px 15px 5px 10px;
+        }
+
+        .file-info-message {
+            float: left;
+            padding: 10px 0;
+        }
+
+        .file-info-size {
+            float: left;
+            width: 59%;
+        }
+    }
+}
+
+.create_report {
+    // Field
+    &-field {
+        padding-left: 20px;
+        padding-right: 20px;
+        margin: 18px 0;
+
+        &.fourth_element {
+            clear: both;
+            padding-left: 30px;
+
+            .create_report-between-add_icon {
+                left: 2px;
+            }
+        }
+
+        .width-full input{
+            width: 101%;
+        }
+
+        &-remove_icon {
+            padding: 6px 4px;
+        }
+
+        &-move_icon {
+            @include moveFieldIcon();
+        }
+
+        &-move_overlay {
+            background: rgba(255, 255, 255, .54);
+            @include border-radius(3px);
+            cursor: pointer;
+            height: 100%;
+            left: 0;
+            margin: 0 auto;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            z-index: 3;
+
+            &-out, 
+            &-in {
+                bottom: 0;
+                font-size: 22px;
+                height: 23px;
+                left: 0;
+                margin: auto;
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 23px;
+            }
+
+            &-out {
+                color: rgb(92, 184, 92);
+            }
+
+            &-in {
+                color: rgba(119, 119, 119, .74);
+            }
+
+            &:hover {
+                background: rgba(255, 255, 255, .11);
+            }
+
+            &:hover .create_report-field-move_overlay-in {
+                color: rgb(92, 184, 92);
+            }
+        }
+
+        .out {
+            .create_report-field-move_overlay {
+                box-shadow: 0 0 1px 0 rgba(51, 51, 51, .5), 0 0 7px 0 rgb(0, 0, 0);
+            }
+
+            .create_report-field-move_overlay-in {
+                display: none;
+            }
+        }
+        
+        .in {
+            .create_report-field-move_overlay {
+                box-shadow: 0 0 1px 0 rgba(51, 51, 51, .5);
+            }
+
+            .create_report-field-move_overlay-out {
+                display: none;
+            }
+        }
+
+        // Properties
+        .parameter_properties {
+            background: rgb(248, 248, 248);
+            border: 1px solid rgb(222, 222, 222);
+            padding: 10px;
+            position: relative;
+            top: -2px;
+            width: 100%;
+            z-index: 0;
+
+            .property-box {
+                margin-bottom: 14px;
+            }
+
+            .parameter-type {
+                label {
+                    margin-bottom: 0;
+                }
+                .radio {
+                    margin: 0;
+
+                    &:first-child {
+                        margin-bottom: 2px;
+                    }
+                }
+            }
+
+            .parameter-desc {
+                textarea {
+                    height: 40px;
+                    max-height: 63px;
+                    max-width: 100%;
+                }
+            }
+
+            .controls {
+                padding-top: 11px;
+            }
+
+            .parameter_properties-preview {
+                label {
+                    margin-bottom: 0;
+                }
+
+                .property-box, 
+                .form-group {
+                    margin-bottom: 7px !important;
+                }
+            }
+        }
+    }
+
+    &-add_icon {
+        @include border-radius(50%);
+        background-color: $greenButtonBackground-color;
+        border-color: $greenButtonBackground-color;
+        color: #fff;
+        float: left;
+        font-size: 11px;
+        height: 21px;
+        left: -13px;
+        padding: 3px 5px;
+        position: relative;
+        top: 21px;
+        width: 21px;
+    } 
+
+    &-add_icon-row {
+        @include border-radius(50%);
+        background-color: $greenButtonBackground-color;
+        border-color: $greenButtonBackground-color;
+        color: #fff;
+        float: left;
+        font-size: 15px;
+        height: 33px;
+        padding: 6px 9px;
+        width: 35px;
+    }
+
+    &-add_row {
+        width: 36px;
+    }
+
+    &-row {
+        border-bottom: 1px solid #dedede;
+        min-height: 61px;
+        padding: 0;
+        position: relative;
+
+        &:first-child {
+            border-top: 1px solid #dedede;
+
+            .create_report-row-between-move {
+                padding: 10px 13px 21px;
+                top: -22px;
+            }
+        }
+
+        &-between-move,
+        &-move_to_end {
+            border-right: 1px solid rgb(222, 222, 222);
+            color: rgb(157, 157, 157);
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 6;
+
+            &:hover {
+                color: rgb(92, 184, 92);
+            }
+        }
+
+        &-between-move {
+            left: 0;
+            padding: 24px 13px;
+            position: absolute;
+            top: -36px;
+        }
+
+        &-move_to_end {
+            left: -15px;
+            padding: 24px 13px 7px;
+            top: -46px;
+        }
+        
+        &-controls {
+            background: rgb(234, 234, 234);
+            // border-bottom: 3px solid rgb(255, 255, 255);
+            // border-top: 3px solid rgb(255, 255, 255);
+            bottom: 0;
+            cursor: pointer;
+            height: 100%;
+            left: 0;
+            margin: auto 0;
+            padding: 8px 9px;
+            position: absolute;
+            top: 0;
+            width: 27px;
+        
+            &:hover {
+                background: rgb(255, 102, 98);
+
+                .create_report-row-remove {
+                    color: #fff;
+                }
+            }
+
+            // &:after {
+            //     background: #cccccc;
+            //     content: '';
+            //     height: 100%;
+            //     position: absolute;
+            //     right: 0;
+            //     top: 0;
+            //     width: 1px;
+            // }
+        }
+
+        &-remove {
+            background: transparent!important;
+            border: none;
+            bottom: 0;
+            color: rgb(255, 102, 98);
+            font-size: 19px;
+            height: 28px;
+            left: 0;
+            margin: auto;
+            padding: 4px 4px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 27px;
+        }
+
+        &-move {
+            background: transparent;
+            border: none;
+            font-size: 19px;
+            height: 28px;
+            left: 0;
+            margin: 0 auto;
+            padding: 4px 5px;
+            position: absolute;
+            right: 0;
+            top: 30px;
+            width: 32px;
+        }
+
+        &-active {
+            border-color: rgb(191, 191, 191);
+            box-shadow: 0 0 5px 1px rgba(51, 51, 51, .58);
+            z-index: 6;
+            
+            .create_report-row-move_overlay {
+                background: rgba(255, 255, 255, .73) !important;
+                
+            }
+        }
+
+        &:hover .create_report-row-move-in {
+            color: rgb(92, 184, 92);
+        }
+        
+        
+        &.last {
+            margin-bottom: 10px;
+        }
+        
+        &-move_overlay {
+            background: rgba(255, 255, 255, .73);
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 4;
+
+            &:hover .create_report-row-move_overlay-in {
+                color: rgb(92, 184, 92) !important;
+            }
+
+            &-in, 
+            &-out {
+                bottom: 0;
+                color: rgba(119, 119, 119, 0.74);
+                font-size: 24px;
+                height: 27px;
+                left: 0;
+                margin: auto;
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 26px;
+            }
+            
+
+            &-out {
+                color: rgb(92, 184, 92);
+            }
+
+            &-in {
+                color: rgba(119, 119, 119, .74);
+                cursor: pointer;
+            }
+
+            &.out {
+                .create_report-row-move_overlay-in {
+                    display: none;
+                }
+            }
+            
+            &.in {
+                .create_report-row-move_overlay-out {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    &-between {
+        &-add_icon {
+            @include border-radius(50%);
+            font-size: 11px;
+            height: 21px;
+            left: -10px;
+            padding: 3px 5px;
+            position: absolute;
+            text-align: center;
+            top: 7px;
+            width: 21px;
+            z-index: 1;
+        }
+
+        &-move {
+            color: rgb(157, 157, 157);
+            cursor: pointer;
+            font-size: 14px;
+            height: 20px;
+            left: -10px;
+            padding: 2px;
+            position: absolute;
+            text-align: center;
+            top: 6px;
+            width: 20px;
+
+            &:hover {
+                border: 1px dotted rgb(51, 51, 51);
+                color: rgb(92, 184, 92);
+                height: 100%;
+                left: -14px;
+                top: -1px;
+                width: 36px;
+            }
+        }
+
+        &-add_row {
+            background: $greenButtonBackground-color;
+            border-radius: 50%;
+            bottom: -8px;
+            font-size: 7px;
+            height: 16px;
+            padding: 2px 4px;
+            position: absolute;
+            right: 0;
+            width: 16px;
+            z-index: 1;
+        }
+    }
+    
+    &-last-add_icon { 
+        @include border-radius(50%);
+        font-size: 11px;
+        height: 21px;
+        padding: 3px 5px;
+        position: absolute;
+        right: -10px;
+        text-align: center;
+        top: 7px;
+        width: 21px;
+    }
+
+    &-move_to_last {
+        float: left;
+        position: relative;
+    }
+
+    &-row-padded {
+        padding-left: 33px;
+    }
+
+    &-prev-add_row {
+        border-bottom: 1px solid rgb(222, 222, 222);
+        position: relative;
+    }
+}

@@ -1,0 +1,22 @@
+[
+    {
+        "username":"JohnR",
+        "email":"johnr@email.com",
+        "age":40
+    },
+    {
+        "username":"ChristianF",
+        "email":"chris@email.com",
+        "age":20
+    },
+    {
+        "username":"MariaR",
+        "email":"mariar@email.com",
+        "age":27
+    },
+    {
+        "username":"DanaP",
+        "email":"danap@email.com",
+        "age":33
+    }
+]

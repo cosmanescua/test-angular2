@@ -1,0 +1,38 @@
+<div class="row">
+    <div class="panel panel-default tablePanel">
+        <div class="panel-heading" >This is a test page</div>
+        <div class="panel-body">
+            <p>This page displays a few users from a json file</p>
+            <div class="row">
+                <div class="col-md-2">Filter:</div>
+                <div class="cold-md-4">
+                    <input type="text" [(ngModel)]='usersFilterValue' />
+                </div>
+            </div>
+            <div class="row" *ngIf="usersFilterValue">
+                <div class="col-md-2">Filtered by:</div>
+                <div class="cold-md-4"> {{usersFilterValue}}</div>
+            </div>
+        </div>
+        <div class="wrapper">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Age</th>
+                    </tr>
+                </thead>
+                <tbody class="container" [dragula]="'bag-one'">
+                    <tr *ngFor="let user of (users | usersFilter:usersFilterValue) ;let i=index">
+                        <td>{{i+1}}</td>
+                        <td>{{user.username}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.age}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

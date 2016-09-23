@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+	<context:component-scan base-package="it.kirey.kfuture.dao" />
+	<context:component-scan base-package="it.kirey.kfuture.service" />
+	<context:component-scan base-package="it.kirey.kfuture.jobs"/>
+	<context:component-scan base-package="it.kirey.kfuture.schedulerController"/>
+	
+
+	<!-- Enables the caching through annotations -->
+	<cache:annotation-driven />
+
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"
+		p:cacheManager-ref="ehcache" />
+
+	<bean id="ehcache"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
+		p:configLocation="classpath:/META-INF/config/ehcache.xml" p:shared="true" />
+
+	<!-- Local DataSource -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${database.driverClassName}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+	</bean>
+
+	<!-- Session Factory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="configLocation" value="classpath:hibernate.cfg.xml"/> -->
+		<property name="hibernateProperties">
+			<map>
+				<entry key="hibernate.default_schema" value="${database.username}" />
+				<entry key="hibernate.hbm2ddl.auto" value="${hibernate.hbm2ddl.auto}" />
+				<entry key="show_sql" value="true" />
+				<entry key="hibernate.dialect" value="${hibernate.dialect}" />
+				<entry key="transaction.factory_class" value="org.hibernate.transaction.JDBCTransactionFactory" />
+			</map>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>it.kirey.kfuture.entity</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Definition for interceptiors -->
+	<bean id="loggerTaskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="1" />
+		<property name="maxPoolSize" value="1" />
+	</bean>
+	
+<!-- 	<bean id="interceptorLogging" class="it.kirey.kfuture.interceptors.InterceptorLogging" /> -->
+
+<!--  	<aop:config proxy-target-class="true"> -->
+<!-- 		<aop:aspect id="loggingAspect" ref="interceptorLogging"> -->
+			<!--@Around-->
+<!-- 			<aop:pointcut id="loggingCommon" -->
+<!-- 				expression="execution(* it.kirey.kfuture..*.*(..)) &amp;&amp; !execution(* it.kirey.kfuture.dao.ILoggerDao.*(..))   -->
+<!-- 				&amp;&amp; !execution(* it.kirey.kfuture.security.*.*(..))  &amp;&amp; !execution(* it.kirey.kfuture.entity.*.*(..))" /> -->
+<!-- 			<aop:around method="aroundMethod" pointcut-ref="loggingCommon" /> -->
+ <!-- 			<aop:after method="after" pointcut-ref="loggingCommon" /> --> 
+<!-- 		</aop:aspect> -->
+<!-- 	</aop:config>  -->
+	<!--  uncomment this if there is after method in InterceptorLogging class-->
+
+	<!-- Transaction management -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- cache configuration with SimpleCacheManager -->
+	<!-- <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager"> 
+		<property name="caches"> <set> <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" 
+		name="langProperties"/> </set> </property> </bean> -->
+		
+	<bean id="multipartResolver"
+	  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	  <property name="maxUploadSize" value="300000000" />
+	</bean>
+
+
+</beans>

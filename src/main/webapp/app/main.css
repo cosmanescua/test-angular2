@@ -1,0 +1,64 @@
+.nav > li > a.active {
+  background: #fff;
+  box-shadow: 0 0 0px 1px #dedede inset; }
+.nav > li > a:focus {
+  outline: none;
+  background: #fff !important; }
+
+#app_content-container {
+  height: 100%;
+  padding: 51px 0 0;
+  position: absolute;
+  width: 100%;
+  overflow: hidden; }
+
+.app_content-container-cmp {
+  position: relative;
+  top: 0; }
+  .app_content-container-cmp.cmp-padding_top_bottom {
+    padding-bottom: 20px;
+    padding-top: 20px; }
+  .app_content-container-cmp.cmp-padding_top {
+    padding-top: 20px; }
+  .app_content-container-cmp.cmp-padding_bottom {
+    padding-top: 20px; }
+
+.cmp-global_loader {
+  background: url(../app/assets/images/loader.gif) rgba(255, 255, 255, 0.56) no-repeat center;
+  background-size: 121px;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 999999; }
+
+.box-full_size {
+  height: 100%;
+  width: 100%; }
+
+.padding_sides-0 {
+  padding-left: 0;
+  padding-right: 0; }
+
+.padding_left-0 {
+  padding-left: 0; }
+
+.margin_top_bottom-0 {
+  margin-bottom: 0;
+  margin-top: 0; }
+
+.height-100percent {
+  height: 100%; }
+
+.overflow-auto {
+  overflow-x: hidden;
+  overflow-y: auto; }
+
+.width-full {
+  width: 100%; }
+
+.z-index-1 {
+  z-index: 1; }
+
+/*# sourceMappingURL=main.css.map */

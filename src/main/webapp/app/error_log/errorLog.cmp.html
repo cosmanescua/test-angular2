@@ -1,0 +1,29 @@
+<div id="cmp-error_log" class="app_content-container-cmp box-full_size overflow-auto">
+    <div id="error_log-wrapper" class="container-fluid">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Username</th>
+                    <th>Date Thrown</th>
+                    <th>Message</th>
+                    <th>Name</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr *ngFor="let log of logs" >
+                    <td [innerText]="log.id"></td>
+                    <td [innerText]="log.username"></td>
+                    <td [innerText]="log.dateThrown | date: 'dd.MM.yyyy. - HH:mm'"></td>
+                    <td [innerText]="log.message"></td>
+                    <td [innerText]="log.name"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!--<div *ngIf="error">
+            <span [innerHtml]="error.trace"></span>
+        </div>-->
+    </div>
+</div>
