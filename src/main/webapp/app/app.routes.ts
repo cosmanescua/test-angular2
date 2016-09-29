@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'admin/create_report', loadChildren: 'app/admin-create_report/adminCreateReport.module#AdminCreateReportModule'},
   //test path
   { path:'usersTest',loadChildren:'app/users/users.module#UsersModule'},
- // { path:'usersTest',component:UsersCmp},
+  { path:'clientsTest',loadChildren:'app/clients/clients.module#ClientsModule'},
   { path: '**', redirectTo: 'login' }
    
 ];

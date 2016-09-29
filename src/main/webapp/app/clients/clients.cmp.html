@@ -1,0 +1,145 @@
+<!--html template for client component-->
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <h1>New Client</h1>
+            <!--when the client form is submitted the inputs are cleared using reset method-->
+            <form id="clientForm" (ngSubmit)="onSubmit(); clientForm.reset();" #clientForm="ngForm">
+                <!--firstname-->
+                <div class="form-group">
+                    <label for="firstName">Firstname</label>
+                    <input type="text" class="form-control" required [(ngModel)]="newClient.firstName" name="firstName" #firstName="ngModel">
+                    <div [hidden]="firstName.valid || firstName.pristine" class="alert alert-danger">
+                        Firstname is required
+                    </div>
+                </div>
+
+                <!--lastname-->
+                <div class="form-group">
+                    <label for="lastName">Lastname</label>
+                    <input type="text" class="form-control" id="lastName" required [(ngModel)]="newClient.lastName" name="lastName" #lastName="ngModel">
+                    <div [hidden]="lastName.valid || lastName.pristine" class="alert alert-danger">
+                        Lastname is required
+                    </div>
+                </div>
+
+                <!--email-->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" class="form-control" id="email" required [(ngModel)]="newClient.email" name="email" #email="ngModel">
+                    <div [hidden]="email.valid || email.pristine" class="alert alert-danger">
+                        Invalid email
+                    </div>
+                </div>
+
+                <!--phone number-->
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" pattern="[0-9]{10}" class="form-control" id="phone" required [(ngModel)]="newClient.phone" name="phone" #phone="ngModel">
+                    <div [hidden]="phone.valid || phone.pristine" class="alert alert-danger">
+                        Phone must contain exactly 10 numbers
+                    </div>
+                </div>
+
+                <!--address-->
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control" id="address" [(ngModel)]="newClient.address" name="address" #address="ngModel">
+                </div>
+
+                <!--birthdate-->
+                <div class="form-group">
+                    <label for="dateBirth">Birthdate</label>
+                    <input type="date" class="form-control" id="dateBirth" required [ngModel]="newClient.dateBirth | date:'yyyy-MM-dd'" (ngModelChange)="newClient.dateBirth = $event" name="dateBirth" #dateBirth="ngModel">
+                    <div [hidden]="dateBirth.valid || dateBirth.pristine" class="alert alert-danger">
+                    Birthdate is required
+                </div>
+                </div>
+                
+                <!--gender-->
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select class="form-control" id="gender" [(ngModel)]="newClient.gender" name="gender" #gender="ngModel">
+                        <option *ngFor="let g of genders" [value]="g">{{g}}</option>
+                    </select>
+                </div>
+
+                <!--country-->
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <select class="form-control" id="country" [(ngModel)]="newClient.country" name="country" #country="ngModel">
+                        <option *ngFor="let c of countries" [value]="c">{{c}}</option>
+                    </select>
+                </div>
+
+                <!--submit form-->
+                <button type="submit" class="btn btn-primary" [disabled]="!clientForm.form.valid">Submit</button>
+            </form>
+        </div>
+        <!--clients list-->
+        <div class="col-md-8">
+            <h1>Clients list</h1>
+            <p-dataTable [value]="clients">
+                <p-column field="firstName" header="Firstname"></p-column>
+                <p-column field="lastName" header="LastName"></p-column>
+                <p-column field="email" header="Email"></p-column>
+                <p-column field="address" header="Address"></p-column>
+                <!--this column contains buttons for managing the clients: delete, edit(update), view details-->
+                <p-column styleClass="col-button">
+                    <template pTemplate type="header">
+                        Operations
+                    </template>
+                    <template let-client="rowData" pTemplate type="body">
+                        <button type="button" title="Delete" pButton icon="fa-trash" (click)="delete(client)"></button>
+                        <button type="button" title="Edit" pButton icon="fa-edit" (click)="update(client)"></button>
+                        <button type="button" title="Details" pButton icon="fa-search-plus" (click)="details(client)"></button>
+                    </template>
+                </p-column>
+            </p-dataTable>
+        </div>
+    </div>
+</div>
+
+<!--modal window that displays when the user presses the Details button, this window contains the details of the selected client-->
+<p-dialog header="Client Details" [(visible)]="displayDialog" [responsive]="true" showEffect="fade" [modal]="true">
+    <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="selectedClient">
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4">Firstname: </div>
+            <div class="ui-grid-col-8">{{selectedClient.firstName}}</div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4">Lastname: </div>
+            <div class="ui-grid-col-8">{{selectedClient.lastName}}</div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4">Email: </div>
+           <div class="ui-grid-col-8">{{selectedClient.email}}</div>
+        </div>
+        <div class="ui-grid-row">
+           <div class="ui-grid-col-4">Address: </div>
+           <div class="ui-grid-col-8">{{selectedClient.address}}</div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4">Phone: </div>
+           <div class="ui-grid-col-8">{{selectedClient.phone}}</div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4">Birthdate: </div>
+           <div class="ui-grid-col-8">{{selectedClient.dateBirth | date:"yyyy-MM-dd"}}</div>
+        </div>
+        <div class="ui-grid-row">
+            <div class="ui-grid-col-4">Gender: </div>
+           <div class="ui-grid-col-8">{{selectedClient.gender}}</div>
+        </div>
+          <div class="ui-grid-row">
+            <div class="ui-grid-col-4">Country: </div>
+           <div class="ui-grid-col-8">{{selectedClient.country}}</div>
+        </div>
+    </div>
+    <footer>
+        <!--button for closing the modal window-->
+        <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+             <button type="button" pButton icon="fa-close" (click)="closeDialog()"></button>
+        </div>
+    </footer>
+</p-dialog>

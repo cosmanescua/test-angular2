@@ -11,6 +11,7 @@
         http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
         http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd">
 	
+	<context:component-scan base-package="it.kirey.kfuture.dao.impl" />
 	<context:component-scan base-package="it.kirey.kfuture.dao" />
 	<context:component-scan base-package="it.kirey.kfuture.service" />
 	<context:component-scan base-package="it.kirey.kfuture.jobs"/>

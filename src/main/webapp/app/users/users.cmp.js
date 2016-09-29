@@ -1,4 +1,4 @@
-System.register(["@angular/core", './users.service', '../dtShared/dt.service'], function(exports_1, context_1) {
+System.register(["@angular/core", './users.service', '../dtShared/dt.service', 'ng2-dragula/ng2-dragula'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(["@angular/core", './users.service', '../dtShared/dt.service'], 
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, users_service_1, dt_service_1;
+    var core_1, users_service_1, dt_service_1, ng2_dragula_1;
     var UsersCmp;
     return {
         setters:[
@@ -22,13 +22,18 @@ System.register(["@angular/core", './users.service', '../dtShared/dt.service'], 
             },
             function (dt_service_1_1) {
                 dt_service_1 = dt_service_1_1;
+            },
+            function (ng2_dragula_1_1) {
+                ng2_dragula_1 = ng2_dragula_1_1;
             }],
         execute: function() {
             UsersCmp = (function () {
-                function UsersCmp(_usersSevice, _dtService) {
+                function UsersCmp(_usersSevice, _dtService, _dragulaService) {
                     this._usersSevice = _usersSevice;
                     this._dtService = _dtService;
+                    this._dragulaService = _dragulaService;
                     this.usersFilterValue = "";
+                    this.restResp = "";
                 }
                 ;
                 UsersCmp.prototype.getUsers = function () {
@@ -42,7 +47,7 @@ System.register(["@angular/core", './users.service', '../dtShared/dt.service'], 
                     //at the initialization time call getUsers to populate users array
                     this.getUsers();
                     //set the title of the page
-                    this.__setInitPageTitle("Test- display users");
+                    this.__setInitPageTitle("Test-display users");
                 };
                 ;
                 UsersCmp.prototype.__setInitPageTitle = function (title) {
@@ -54,7 +59,7 @@ System.register(["@angular/core", './users.service', '../dtShared/dt.service'], 
                         templateUrl: 'app/users/users.cmp.html',
                         styleUrls: ['app/users/users.cmp.css']
                     }), 
-                    __metadata('design:paramtypes', [users_service_1.UsersService, dt_service_1.DTService])
+                    __metadata('design:paramtypes', [users_service_1.UsersService, dt_service_1.DTService, ng2_dragula_1.DragulaService])
                 ], UsersCmp);
                 return UsersCmp;
             }());

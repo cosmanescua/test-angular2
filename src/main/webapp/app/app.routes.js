@@ -18,7 +18,7 @@ System.register(['@angular/router'], function(exports_1, context_1) {
                 { path: 'admin/create_report', loadChildren: 'app/admin-create_report/adminCreateReport.module#AdminCreateReportModule' },
                 //test path
                 { path: 'usersTest', loadChildren: 'app/users/users.module#UsersModule' },
-                // { path:'usersTest',component:UsersCmp},
+                { path: 'clientsTest', loadChildren: 'app/clients/clients.module#ClientsModule' },
                 { path: '**', redirectTo: 'login' }
             ];
             exports_1("ROUTING", ROUTING = router_1.RouterModule.forRoot(routes));

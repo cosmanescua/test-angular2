@@ -5,14 +5,16 @@ import { DTViewCmpIf } from '../dtShared/dt.viewCmpIf';
 import { DTService } from '../dtShared/dt.service';
 import { DragulaService, DragulaModule } from 'ng2-dragula/ng2-dragula';
 import {UsersFilterNamePipe} from '../shared/pipes/usersNameFilter.pipe';
+import {ClientsService} from '../clients/clients.service';
 @Component({
     templateUrl: 'app/users/users.cmp.html',
     styleUrls:['app/users/users.cmp.css']
 
 })
-export class UsersCmp implements OnInit,DTViewCmpIf{
+export class UsersCmp implements DTViewCmpIf{
     users: User[];
     usersFilterValue: string="";
+    restResp: string="";
     constructor(private _usersSevice: UsersService,
                 private _dtService: DTService,
                 private _dragulaService:DragulaService){
@@ -34,5 +36,5 @@ export class UsersCmp implements OnInit,DTViewCmpIf{
      __setInitPageTitle(title: string) {
         this._dtService.setPageTitle(title);
     };
-    
-}
+     
+} 

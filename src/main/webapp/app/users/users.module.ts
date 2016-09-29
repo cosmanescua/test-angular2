@@ -10,6 +10,7 @@ import { UsersFilterNamePipe } from '../shared/pipes/usersNameFilter.pipe';
 
 import { UtilityModule } from '../shared/modules/utility.module';
 import {UsersService} from '../users/users.service';
+import {ClientsService} from '../clients/clients.service';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import {UsersService} from '../users/users.service';
     ],
     providers: [
         UsersService,
-        DragulaService
+        DragulaService,
+        ClientsService
     ],
 })
 export class UsersModule { }
