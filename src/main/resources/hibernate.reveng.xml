@@ -24,7 +24,7 @@
 	
 	
 <!-- 	<table-filter match-name="AM_TASK_SCHEDULERS" /> -->
-	<table-filter match-name="TEST_CLIENTS" />
+	<table-filter match-name="TEST_FILE_MANAGEMENT" />
 
 	
 </hibernate-reverse-engineering>

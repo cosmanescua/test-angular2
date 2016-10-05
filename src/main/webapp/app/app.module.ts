@@ -12,6 +12,7 @@ import { UtilityModule } from './shared/modules/utility.module';
 
 
 import { AppService } from './shared/services/app.service';
+// import {FileUploader,FileSelectDirective} from 'ng2-file-upload';
 
 
 @NgModule({
@@ -22,7 +23,7 @@ import { AppService } from './shared/services/app.service';
         UtilityModule
     ],
     declarations: [
-        AppCmp,
+        AppCmp
     ],
     bootstrap: [AppCmp],
     providers: [

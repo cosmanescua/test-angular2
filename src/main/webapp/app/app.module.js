@@ -39,6 +39,7 @@ System.register(['@angular/core', '@angular/platform-browser', '@angular/common'
                 app_service_1 = app_service_1_1;
             }],
         execute: function() {
+            // import {FileUploader,FileSelectDirective} from 'ng2-file-upload';
             AppModule = (function () {
                 function AppModule() {
                 }
@@ -51,7 +52,7 @@ System.register(['@angular/core', '@angular/platform-browser', '@angular/common'
                             utility_module_1.UtilityModule
                         ],
                         declarations: [
-                            app_cmp_1.AppCmp,
+                            app_cmp_1.AppCmp
                         ],
                         bootstrap: [app_cmp_1.AppCmp],
                         providers: [

@@ -13,6 +13,7 @@ const routes: Routes = [
   //test path
   { path:'usersTest',loadChildren:'app/users/users.module#UsersModule'},
   { path:'clientsTest',loadChildren:'app/clients/clients.module#ClientsModule'},
+  { path:'filesTest',loadChildren:'app/test_file_upload/filesTest.module#FilesTestModule'},
   { path: '**', redirectTo: 'login' }
    
 ];

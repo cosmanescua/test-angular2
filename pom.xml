@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.dyntech</groupId>
-	<artifactId>KFutureDemo</artifactId>
+	<artifactId>RoxanaDemo</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>KFutureDemo</name>
+	<name>RoxanaDemo</name>
 
 
 	<properties>

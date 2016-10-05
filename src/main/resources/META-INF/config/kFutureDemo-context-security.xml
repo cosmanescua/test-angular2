@@ -38,8 +38,10 @@
 		<!-- <security:intercept-url pattern="/products" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" /> -->
 		<security:intercept-url pattern="/rest/user/authenticate" access="permitAll()" />
 		<security:intercept-url method="POST" pattern="/property" access="permitAll()" />
+		<security:intercept-url method="GET" pattern="/rest/downloadFile/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 		<security:intercept-url method="GET" pattern="/rest/**"	access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 		<security:intercept-url method="PUT" pattern="/rest/**"	access="hasRole('ROLE_ADMIN')" />
+		<security:intercept-url method="POST" pattern="/rest/testFileUpload" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 		<security:intercept-url method="POST" pattern="/rest/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_PLAYER')" />
 		<security:intercept-url method="DELETE"	pattern="/rest/**" access="hasRole('ROLE_ADMIN')" />
 		

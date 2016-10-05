@@ -5,12 +5,12 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
-        <property name="hibernate.connection.password">KFUTURE1</property>
-        <property name="hibernate.connection.url">jdbc:oracle:thin:@192.168.60.12:1521:XE</property>
-        <property name="hibernate.connection.username">KFUTURE1</property>
-        <property name="hibernate.default_schema">KFUTURE1</property>
+        <property name="hibernate.connection.password">KFUTURE</property>
+        <property name="hibernate.connection.url">jdbc:oracle:thin:@192.168.60.12:1521:INA2013</property>
+        <property name="hibernate.connection.username">KFUTURE</property>
+        <property name="hibernate.default_schema">KFUTURE</property>
         <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
-        <mapping class="it.kirey.kfuture.entity.TestClients" />
+        <!--  <mapping class="it.kirey.kfuture.entity.TestClients" />-->
         
     </session-factory>
 </hibernate-configuration>
