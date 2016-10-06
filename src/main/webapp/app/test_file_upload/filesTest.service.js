@@ -38,16 +38,18 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Observable'], function(
                 };
                 TestFilesService.prototype.downloadFile = function (id) {
                     var _this = this;
-                    var options = new http_1.RequestOptions({ responseType: http_1.ResponseContentType.ArrayBuffer });
+                    var options = new http_1.RequestOptions({ responseType: http_1.ResponseContentType.Blob });
                     return this._http.get(this._baseUrl + 'downloadFile/' + id, options)
                         .map(function (response) { return _this.handleResponse(response); })
-                        .do(function (data) { return data = data; })
                         .catch(this.handleError);
                 };
+                //this throws error "The request body isn't either a blob or an array buffer"
                 TestFilesService.prototype.handleResponse = function (response) {
                     var contentType = response.headers.get("content-type");
-                    console.log(response);
-                    return new Blob([response.text()], { type: contentType });
+                    // console.log(response.arrayBuffer());
+                    console.log(contentType);
+                    //console.log(response.blob());
+                    return new Blob([response.blob()], { type: contentType });
                 };
                 //error handler method
                 TestFilesService.prototype.handleError = function (error) {

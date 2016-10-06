@@ -1,6 +1,7 @@
 package it.kirey.kfuture.restController;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.google.common.io.ByteArrayDataInput;
 
 import it.kirey.kfuture.dao.ITestFileManagementDao;
 import it.kirey.kfuture.entity.TestClients;
@@ -72,8 +76,30 @@ public class FilesManagementController {
 		ArrayList<TestFileManagement> files=filesManagement.getAllFiles();
 		return new ResponseEntity<ArrayList<TestFileManagement>>(files, HttpStatus.OK);	
 	}
-	@RequestMapping(value="/downloadFile/{id}", method=RequestMethod.GET,produces ={MediaType.APPLICATION_OCTET_STREAM_VALUE})
-	public void downloadFile(HttpSession session,HttpServletResponse response,@PathVariable int id) throws Exception {
+	@RequestMapping(value="/downloadFile/{id}", method=RequestMethod.GET,produces={MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	public ResponseEntity<byte[]> downloadFile(@PathVariable int id) throws Exception {
+	    	TestFileManagement testFile=filesManagement.findFileById(id);
+	        String filePathToBeServed =testFile.getFilepath(); 
+	        File fileToDownload = new File(filePathToBeServed);
+	        InputStream inputStream=new FileInputStream(fileToDownload);
+//	        ByteArrayOutputStream ous = null;
+//	        InputStream ios = null;
+//	        try {
+//	            byte[] buffer = new byte[4096];
+//	            ous = new ByteArrayOutputStream();
+//	            ios = new FileInputStream(fileToDownload);
+//	            int read = 0;
+//	            while ((read = ios.read(buffer)) != -1) {
+//	                ous.write(buffer, 0, read);
+//	            }
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentLength(fileToDownload.length());
+	        headers.setContentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(fileToDownload.getName())));
+	        return new ResponseEntity<byte[]>(IOUtils.toByteArray(inputStream),headers,HttpStatus.OK);
+	 
+	}
+	@RequestMapping(value="/downloadFileOk/{id}", method=RequestMethod.GET,produces ={MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	public void downloadFile2(HttpSession session,HttpServletResponse response,@PathVariable int id) throws Exception {
 	    try {
 	    	TestFileManagement testFile=filesManagement.findFileById(id);
 	        String filePathToBeServed =testFile.getFilepath(); 

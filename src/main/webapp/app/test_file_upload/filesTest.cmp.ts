@@ -21,8 +21,10 @@ constructor(private _cookieService:CookieService,
 ){
   this.uploader=new FileUploader({url: URL, authToken : this._cookieService.get('X-Auth-Token')});
   this._token=this._cookieService.get('X-Auth-Token');
+  let This=this;
   this.uploader.onSuccessItem=function(){
-   console.log("upload success")
+        //repopulate files list
+        This.getAllFiles();
   }
 }
  fileOverBase(e:any):void {
@@ -47,14 +49,18 @@ constructor(private _cookieService:CookieService,
   downloadFile(file){
       this._testFileService.downloadFile(file.id).subscribe(
         function(data){
-          let a = $("<a style='display: none;'/>");
-          let url = window.URL.createObjectURL(data);
-          a.attr("href", url);
-          a.attr("download",file.filename);
-          $("body").append(a);
-          a[0].click();
-          window.URL.revokeObjectURL(url);
-          a.remove();},
+          // let a = $("<a style='display: none;'/>");
+          // let url = window.URL.createObjectURL(data);
+          // a.attr("href", url);
+          // a.attr("download",file.filename);
+          // $("body").append(a);
+          // a[0].click();
+          // window.URL.revokeObjectURL(url);
+          // a.remove();
+          console.log(data);
+          var fileURL = window.URL.createObjectURL(data);
+          window.open(fileURL);
+        },
         function(error){console.log(error)},
         function(){
             console.log("download completed");     

@@ -37,8 +37,10 @@ System.register(['@angular/core', 'ng2-file-upload', 'angular2-cookie/core', './
                     this.hasAnotherDropZoneOver = false;
                     this.uploader = new ng2_file_upload_1.FileUploader({ url: URL, authToken: this._cookieService.get('X-Auth-Token') });
                     this._token = this._cookieService.get('X-Auth-Token');
+                    var This = this;
                     this.uploader.onSuccessItem = function () {
-                        console.log("upload success");
+                        //repopulate files list
+                        This.getAllFiles();
                     };
                 }
                 TestFilesCmp.prototype.fileOverBase = function (e) {
@@ -59,14 +61,17 @@ System.register(['@angular/core', 'ng2-file-upload', 'angular2-cookie/core', './
                 //not working
                 TestFilesCmp.prototype.downloadFile = function (file) {
                     this._testFileService.downloadFile(file.id).subscribe(function (data) {
-                        var a = $("<a style='display: none;'/>");
-                        var url = window.URL.createObjectURL(data);
-                        a.attr("href", url);
-                        a.attr("download", file.filename);
-                        $("body").append(a);
-                        a[0].click();
-                        window.URL.revokeObjectURL(url);
-                        a.remove();
+                        // let a = $("<a style='display: none;'/>");
+                        // let url = window.URL.createObjectURL(data);
+                        // a.attr("href", url);
+                        // a.attr("download",file.filename);
+                        // $("body").append(a);
+                        // a[0].click();
+                        // window.URL.revokeObjectURL(url);
+                        // a.remove();
+                        console.log(data);
+                        var fileURL = window.URL.createObjectURL(data);
+                        window.open(fileURL);
                     }, function (error) { console.log(error); }, function () {
                         console.log("download completed");
                     });
