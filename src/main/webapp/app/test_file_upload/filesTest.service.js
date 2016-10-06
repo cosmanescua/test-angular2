@@ -38,14 +38,15 @@ System.register(['@angular/core', '@angular/http', 'rxjs/Observable'], function(
                 };
                 TestFilesService.prototype.downloadFile = function (id) {
                     var _this = this;
-                    return this._http.get(this._baseUrl + 'downloadFile/' + id)
+                    var options = new http_1.RequestOptions({ responseType: http_1.ResponseContentType.ArrayBuffer });
+                    return this._http.get(this._baseUrl + 'downloadFile/' + id, options)
                         .map(function (response) { return _this.handleResponse(response); })
                         .do(function (data) { return data = data; })
                         .catch(this.handleError);
                 };
                 TestFilesService.prototype.handleResponse = function (response) {
                     var contentType = response.headers.get("content-type");
-                    console.log(response.arrayBuffer());
+                    console.log(response);
                     return new Blob([response.text()], { type: contentType });
                 };
                 //error handler method

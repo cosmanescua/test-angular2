@@ -118,7 +118,7 @@
         <div class="list-group" style="width:50%">
             <li *ngFor="let file of files" class="list-group-item">
                  <span style="min-width:80%;max-width:80%;display: inline-block;">{{file.filename}}</span>
-                 <!--<button class="btn"><a href="rest/downloadFile/{{file.id}}?token={{getToken()}}" target="_parent">Download</a></button> -->
+                 <button class="btn"><a href="rest/downloadFile/{{file.id}}?token={{getToken()}}" target="_parent">Download OK</a></button>
                  <button class="btn" (click)="downloadFile(file)">Download</button>
             </li>
         </div>

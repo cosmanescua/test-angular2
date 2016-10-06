@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Headers, RequestOptions, Http, Response,ResponseType} from '@angular/http';
+import {Headers, RequestOptions, Http, Response,ResponseType,ResponseContentType} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 @Injectable()
 export class TestFilesService{
@@ -12,7 +12,8 @@ export class TestFilesService{
             .catch(this.handleError);
     }
     downloadFile(id:number):Observable<any>{
-         return this._http.get(this._baseUrl + 'downloadFile/'+id)
+        let options = new RequestOptions({responseType: ResponseContentType.ArrayBuffer});
+         return this._http.get(this._baseUrl + 'downloadFile/'+id,options)
             .map((response: Response) => this.handleResponse(response))
             .do(data=>data=data)
             .catch(this.handleError);
@@ -20,7 +21,7 @@ export class TestFilesService{
 
     handleResponse(response:Response){
         let contentType=response.headers.get("content-type");
-        console.log(response.arrayBuffer());
+        console.log(response);
         return new Blob([response.text()],{type : contentType});
     }
      //error handler method

@@ -1,6 +1,7 @@
 package it.kirey.kfuture.restController;
 
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -76,12 +78,29 @@ public class FilesManagementController {
 	    	TestFileManagement testFile=filesManagement.findFileById(id);
 	        String filePathToBeServed =testFile.getFilepath(); 
 	        File fileToDownload = new File(filePathToBeServed);
-	        InputStream inputStream = new FileInputStream(fileToDownload);
-	        response.setContentType(URLConnection.guessContentTypeFromName(fileToDownload.getName()));
-	        response.setHeader("Content-Disposition", "attachment; filename=\""+testFile.getFilename()+"\""); 
-	        IOUtils.copy(inputStream, response.getOutputStream());
-	        response.flushBuffer();
-	        inputStream.close();
+//	        InputStream inputStream = new FileInputStream(fileToDownload);
+//	        System.out.println("File to download size: "+(int)fileToDownload.length());
+//	        response.setContentType(URLConnection.guessContentTypeFromName(fileToDownload.getName()));
+//	        response.setCharacterEncoding("UTF-8");
+//	        response.setHeader("Content-Disposition", "attachment; filename=\""+testFile.getFilename()+"\""); 
+//	        IOUtils.copy(inputStream, response.getOutputStream());
+//	        System.out.println("Buffer size"+response.getBufferSize());
+//	        response.flushBuffer();
+//	        response.getOutputStream().close();
+//	        inputStream.close();
+	        response.setContentLength((int) fileToDownload.length());
+	        response.setCharacterEncoding("UTF-16");
+	        response.setHeader("Content-Disposition", "attachment; filename="
+	                + fileToDownload.getName());
+	        ServletOutputStream outStream = response.getOutputStream();
+	        byte[] bbuf = new byte[(int) fileToDownload.length()];
+	        InputStream in = new FileInputStream(fileToDownload);
+	        int length = 0;
+	        while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+	            outStream.write(bbuf, 0, length);
+	        }
+	        in.close();
+	        outStream.flush();
 	    } catch (Exception e){
 	        e.printStackTrace();
 	    }
