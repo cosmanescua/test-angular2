@@ -1,29 +1,36 @@
-<div id="cmp-error_log" class="app_content-container-cmp box-full_size overflow-auto">
-    <div id="error_log-wrapper" class="container-fluid">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Username</th>
-                    <th>Date Thrown</th>
-                    <th>Message</th>
-                    <th>Name</th>
-                </tr>
+<div class="box-full_size overflow-auto" #box>
+    <div id="cmp-error_log" class="app_content-container-cmp container">
+        <div>
+            <h2 class="view-header">Error Log <img src="app/assets/images/loader.gif" style="width: 28px;" *ngIf="loadingState"></h2>
+            <button type="button" class="btn btn-primary" (click)="causeException()" [disabled]="loadingState">Cause exception</button>
+        </div>
+        <div id="error_log-wrapper" class="container-fluid row">
+            <table class="table table-striped table-hover main_table" *ngIf="logs.length" >
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Username</th>
+                        <th>Date Thrown</th>
+                        <th>Message</th>
+                        <th>Name</th>
+                    </tr>
 
-            </thead>
-            <tbody>
-                <tr *ngFor="let log of logs" >
-                    <td [innerText]="log.id"></td>
-                    <td [innerText]="log.username"></td>
-                    <td [innerText]="log.dateThrown | date: 'dd.MM.yyyy. - HH:mm'"></td>
-                    <td [innerText]="log.message"></td>
-                    <td [innerText]="log.name"></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!--<div *ngIf="error">
-            <span [innerHtml]="error.trace"></span>
-        </div>-->
+                </thead>
+                <tbody>
+                    <tr *ngFor="let log of logs" (click)="selectErrorLog(log)">
+                        <td>{{log.id}}</td>
+                        <td>{{log.amUserAccounts.username}}</td>
+                        <td class="text-center">
+                            <b>{{log.thrownDate | date: 'dd.MM.yyyy.'}}</b>
+                            <div>
+                                {{log.thrownDate | date: 'HH:mm'}}
+                            </div>
+                        </td>
+                        <td class="word_break-all">{{log.message}}</td>
+                        <td class="word_break-all">{{log.errorName}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

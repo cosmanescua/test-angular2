@@ -5,29 +5,26 @@ import { DTService } from '../dtShared/dt.service';
 
 import { DragulaService } from 'ng2-dragula/ng2-dragula';
 
-import { AdminCreateReportService } from '../admin-create_report/adminCreateReport.service';
+import { AdminCreateReportService } from './adminCreateReport.service';
 
 import { AppService } from '../shared/services/app.service';
 
-import {TranslateService} from 'ng2-translate/ng2-translate';
-
+import { TranslateService } from 'ng2-translate/ng2-translate';
 
 declare var $: JQueryStatic;
 
 @Component({
-    templateUrl: 'app/admin-create_report/adminCreateReport.cmp.html',
+    moduleId: module.id,
+    templateUrl: 'adminCreateReport.cmp.html',
     // styleUrls: ['app/admin-create_report/adminCreateReport.css'],
 
     encapsulation: ViewEncapsulation.None
 })
 export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
     reportProfile: any; // Report's full data
-
     bMoveMode: boolean; // State of dragging
-
     currentChangingParameter: any; // Info about current changing parameters 
-
-    reportFile: any;
+    reportFile: any; // 
 
     /*--------- Constructor --------*/
     constructor(private _dtService: DTService,
@@ -68,7 +65,7 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
             if (tempChildCount == 0) {
                 let tempPrevContainerIndex = $(value[3]).index() - 1;
 
-                vm.reportProfile.parameters.splice(tempPrevContainerIndex, 1);
+                vm.reportProfile.amReportParameterses.splice(tempPrevContainerIndex, 1);
 
             }
 
@@ -98,19 +95,19 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
 
 
 
-          // this language will be used as a fallback when a translation isn't found in the current language
+        // this language will be used as a fallback when a translation isn't found in the current language
         translate.setDefaultLang('prevod2');
 
-         // the lang to use, if the lang isn't available, it will use the current loader to get them
+        // the lang to use, if the lang isn't available, it will use the current loader to get them
         translate.use('prevod2');
     }
 
     /*--------- App logic --------*/
 
-    promenaJezika(){
+    promenaJezika() {
         console.log('click');
-        
-        this._appService.langChange('en');
+
+        // this._appService.langChange('en');
     }
 
     /**
@@ -123,22 +120,22 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
         let vm = this;
 
         reader.onload = function () {
-            var arrayBuffer = reader.result
+            var arrayBuffer = reader.result;
             var bytes = new Uint8Array(arrayBuffer);
             // resolve(bytes);
             let tempReportProfile = vm._dtService.copy(reportProfileRef);
-            tempReportProfile.parameters = vm.parameterMatrixToArray(reportProfileRef.parameters);
+            tempReportProfile.amReportParameterses = vm.parameterMatrixToArray(reportProfileRef.amReportParameterses);
 
             // Rest
-            vm._dtService.setRestMessageContent('AdminCreateReport', 'CreateReportSubmit', 'Neka poruka');
-            tempReportProfile.file = vm.fileByteToArray(bytes);
+            vm._dtService.setRestMessageContent('AdminCreateReport', 'CreateReportSubmit');
+            tempReportProfile.amReportBlobs.fileBlob = vm.fileByteToArray(bytes);
 
             // console.log(JSON.stringify(tempReportProfile))
 
             vm._adminCreateReportService.createReport(tempReportProfile).subscribe(data => {
-                
+
             }, error => {
-                
+
             })
         }
 
@@ -195,13 +192,13 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
      */
     addField(fieldsMatrixRef: any, row: number): void {
         fieldsMatrixRef[row].push({
-            paramName: '',
+            name: '',
             type: '',
-            paramDescription: '',
+            description: '',
             minValue: null,
             maxValue: null,
-            mandatory: false,
-            paramValue: ''
+            isMandatory: false,
+            defaultValue: ''
         })
     }
 
@@ -210,7 +207,15 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
      * @author DynTech
      */
     addFieldBetween(rowRef: any[], index: number) {
-        rowRef.splice(index, 0, { name: 'field izmedju' })
+        rowRef.splice(index, 0, {
+            name: '',
+            type: '',
+            description: '',
+            minValue: null,
+            maxValue: null,
+            isMandatory: false,
+            defaultValue: ''
+        })
     }
 
     /**
@@ -311,15 +316,19 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
      * @author DynTech
      */
     isReportProfileValid(reportProfileRef: any, reportFile: any): boolean {
-        for (let row of reportProfileRef.parameters) {
+        if(this.bMoveMode || this.currentChangingParameter.bEditMode) {
+            return false;
+        }
+
+        for (let row of reportProfileRef.amReportParameterses) {
             for (let column of row) {
-                if (column.paramName == '') {
+                if (column.name == '') {
                     return false;
                 }
             }
         }
 
-        if (reportProfileRef.reportName == '' || reportProfileRef.reportDescription == '') {
+        if (reportProfileRef.name == '' || reportProfileRef.description == '') {
             return false;
         }
 
@@ -327,6 +336,7 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
     }
 
     /*--------- Utility --------*/
+
     /**
      * Converter from string to boolean
      * @author DynTech
@@ -343,10 +353,17 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
         let tempResult = [];
         let tempMatrix = this._dtService.copy(matrix);
 
-        for (let row of matrix) {
+        let tempCoordinates = [0, 0]
+
+        for (let row of tempMatrix) {
             for (let column of row) {
+                column.position = tempCoordinates[0] + ',' + tempCoordinates[1]
                 tempResult.push(column);
+                tempCoordinates[1]++;
             }
+
+            tempCoordinates[0]++;
+            tempCoordinates[1] = 0;
         }
 
         tempMatrix = tempResult;
@@ -369,10 +386,7 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
     }
 
     /*--------- NG On Init ---------*/
-
     ngOnInit() {
-        let vm = this; // Class scope
-
         // Variables initialization
         this.bMoveMode = false;
 
@@ -383,47 +397,49 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
         }
 
         this.reportProfile = {
-            reportName: '',
+            name: '',
             type: 'sync',
-            reportDescription: '',
-            file: [],
-            parameters: [
+            description: '',
+            amReportBlobs: {
+                fileBlob: []
+            },
+            amReportParameterses: [
                 [
                     {
-                        paramName: 'Name',
+                        name: 'Name',
                         type: 'String',
-                        paramDescription: 'Your name',
+                        description: 'Your name',
                         minValue: 0,
                         maxValue: 50,
-                        mandatory: true,
-                        paramValue: ''
+                        isMandatory: true,
+                        defaultValue: ''
                     }, {
-                        paramName: 'Surname',
+                        name: 'Surname',
                         type: 'String',
-                        paramDescription: 'Your surname',
+                        description: 'Your name',
                         minValue: 0,
                         maxValue: 50,
-                        mandatory: false,
-                        paramValue: ''
+                        isMandatory: false,
+                        defaultValue: ''
                     }
                 ],
                 [
                     {
-                        paramName: 'Place of birty',
-                        type: 'String',
-                        paramDescription: 'Your place of birth',
+                        name: 'Age',
+                        type: 'Integer',
+                        description: 'Age',
                         minValue: 0,
                         maxValue: 50,
-                        mandatory: false,
-                        paramValue: ''
+                        isMandatory: true,
+                        defaultValue: ''
                     }, {
-                        paramName: 'Year of age',
-                        type: 'Integer',
-                        paramDescription: 'Your years of age',
+                        name: 'City',
+                        type: 'String',
+                        description: 'Your name',
                         minValue: 0,
-                        maxValue: 120,
-                        mandatory: true,
-                        paramValue: ''
+                        maxValue: 50,
+                        isMandatory: false,
+                        defaultValue: ''
                     }
                 ]
             ]
@@ -431,6 +447,7 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
 
         // Construct methods
         this.__setInitPageTitle("Admin Report Upload");
+        this.__setInitCompanyCSS();
     }
 
     ngOnDestroy() { // On destroy
@@ -438,11 +455,12 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
     }
 
     /*--------- Interface imported --------*/
-    /**
-     * 
-     * @author DynTech
-     */
+
     __setInitPageTitle(title: string) {
         this._dtService.setPageTitle(title);
+    }
+
+    __setInitCompanyCSS() {
+        this._dtService.setInitCompanyCSS();
     }
 }

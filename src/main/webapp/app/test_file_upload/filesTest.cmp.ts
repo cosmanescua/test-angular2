@@ -49,17 +49,15 @@ constructor(private _cookieService:CookieService,
   downloadFile(file){
       this._testFileService.downloadFile(file.id).subscribe(
         function(data){
-          // let a = $("<a style='display: none;'/>");
-          // let url = window.URL.createObjectURL(data);
-          // a.attr("href", url);
-          // a.attr("download",file.filename);
-          // $("body").append(a);
-          // a[0].click();
-          // window.URL.revokeObjectURL(url);
-          // a.remove();
-          console.log(data);
-          var fileURL = window.URL.createObjectURL(data);
-          window.open(fileURL);
+          let a = $("<a style='display: none;'/>");
+          let url = window.URL.createObjectURL(data);
+          a.attr("href", url);
+          a.attr("download",file.filename);
+          $("body").append(a);
+          a[0].click();
+          window.URL.revokeObjectURL(url);
+          a.remove();
+          
         },
         function(error){console.log(error)},
         function(){

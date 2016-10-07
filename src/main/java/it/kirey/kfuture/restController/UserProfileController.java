@@ -7,12 +7,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,13 +26,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.kirey.kfuture.entity.Companies;
-import it.kirey.kfuture.entity.User;
-import it.kirey.kfuture.security.SecurityCache;
+import it.kirey.kfuture.entity.AmCompanies;
+import it.kirey.kfuture.entity.AmUserAccounts;
+import it.kirey.kfuture.security.TokenUtils;
 import it.kirey.kfuture.security.transfer.TokenTransfer;
 import it.kirey.kfuture.security.transfer.UserLogin;
 import it.kirey.kfuture.security.transfer.UserTransfer;
-import it.kirey.kfuture.service.UserService;
+import it.kirey.kfuture.service.IUserService;
 
 @RestController
 @RequestMapping("/rest")
@@ -42,15 +43,16 @@ public class UserProfileController {
 	private AuthenticationManager authManager;
 
 	@Autowired
-	private UserService userService;
+	private IUserService userService;
 
 	final static Logger logger = Logger.getLogger(UserProfileController.class);
 
 	@RequestMapping(value = "/user")
-	public UserTransfer getUser() {
+	public ResponseEntity<UserTransfer> getUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Object principal = authentication.getPrincipal();
 		UserDetails userDetails = (UserDetails) principal;
+		AmUserAccounts userAccount = (AmUserAccounts) principal;
 		LinkedHashMap<String, String> companyDetails = this.getCompanyDetails(userDetails);
 		List<String> cssStyles = new ArrayList<String>(); 
 		String cssFolder = "css/";
@@ -58,8 +60,10 @@ public class UserProfileController {
 		for (Map.Entry<String, String> entry : companyDetails.entrySet()) {
 			cssStyles.add(cssFolder + entry.getKey() + cssExtension);
 		}
-		return new UserTransfer(userDetails.getUsername(), this.createRoleMap(userDetails),
-				companyDetails,cssStyles);
+		
+		UserTransfer userTransfer = new UserTransfer(userDetails.getUsername(), this.createRoleMap(userDetails),
+				companyDetails,cssStyles, userAccount.getDefaultLanguage());
+		return new ResponseEntity<UserTransfer> (userTransfer, HttpStatus.OK);
 	}
 
 	
@@ -76,7 +80,7 @@ public class UserProfileController {
 	 */
 	@RequestMapping(value = "/user/authenticate", method = RequestMethod.POST, consumes = {
 			MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-	public TokenTransfer authenticate(@RequestBody UserLogin login) {
+	public ResponseEntity<TokenTransfer> authenticate(@RequestBody UserLogin login) {
 		
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 				login.getUsername(), md5convert(login.getPassword()));
@@ -84,20 +88,20 @@ public class UserProfileController {
 		Authentication authentication = this.authManager.authenticate(authenticationToken);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		User user = userService.getUserByUsername(login.getUsername());
+		AmUserAccounts user = userService.getUserByUsername(login.getUsername());
 		
 		// -------------------------- Database token approach
-		//String token = TokenUtils.createToken(user);
-
+		String token = TokenUtils.createToken(user);
+		
 		// -------------------------- SecurityCache approach		
-		String token = SecurityCache.createToken(user);
+//		String token = SecurityCache.createToken(user);
 		
 		user.setToken(token);
-		user.setTimeStamp(System.currentTimeMillis());
+		user.setTimestamp(System.currentTimeMillis());
 		userService.saveOrUpdate(user);
 		
 		TokenTransfer tokenTransfer = new TokenTransfer(token);
-		return tokenTransfer;
+		return new ResponseEntity<TokenTransfer>(tokenTransfer, HttpStatus.OK);
 	}
 	
 	private Map<String, Boolean> createRoleMap(UserDetails userDetails) {
@@ -110,9 +114,11 @@ public class UserProfileController {
 	
 	private LinkedHashMap<String, String> getCompanyDetails(UserDetails userDetails){
 		LinkedHashMap<String, String> companies = new LinkedHashMap<String, String>();
-		 Set<Companies> companiesSet = ((User)userDetails).getCompanies();
-		 for (Companies s : companiesSet) {
-			 companies.put(s.getCdCompany(), s.getDscCompany());
+
+		 List<AmCompanies> companiesList = ((AmUserAccounts)userDetails).getAmCompanieses();
+		 for (AmCompanies s : companiesList) {
+
+			 companies.put(s.getCode(), s.getDescription());
 			}
 		 
 		return companies;

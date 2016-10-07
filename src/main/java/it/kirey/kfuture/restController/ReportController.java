@@ -22,10 +22,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.kirey.kfuture.dto.ReportBookingDto;
-import it.kirey.kfuture.dto.ReportDto;
-import it.kirey.kfuture.entity.ReportParameter;
-import it.kirey.kfuture.exception.ControllerException;
+import it.kirey.kfuture.entity.AmReportBookings;
+import it.kirey.kfuture.entity.AmReportParameters;
+import it.kirey.kfuture.entity.AmReports;
 import it.kirey.kfuture.service.IReportService;
 import it.kirey.kfuture.util.Utilities;
 
@@ -37,35 +36,33 @@ public class ReportController {
 	private IReportService reportService;
 		
 	/**
-	 * Get list of all reports
+	 * Get list of all reports without fileBlob attribute
 	 * @return
 	 */
 	@RequestMapping(value = "/reports", method = RequestMethod.GET, produces = "application/json")
-	public ResponseEntity<List<ReportDto>> getReports(){
+	public ResponseEntity<List<AmReports>> getReports() throws Exception{
 		
-		List<ReportDto> reportList = reportService.getAllReports();
+		List<AmReports> reportList = reportService.getAllReportsWithoutBlobFile();
 		
-		return new ResponseEntity<List<ReportDto>>(reportList, HttpStatus.OK);
+		return new ResponseEntity<List<AmReports>>(reportList, HttpStatus.OK);
 	}
 	
 	/**
 	 * Create new report
-	 * @param rep - DTO class
+	 * @param report
 	 * @param result - validation
 	 * @return
 	 */
 	@RequestMapping(value = "/reports", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-	public ResponseEntity<Object> saveReport(@RequestBody @Valid ReportDto rep, BindingResult result){
-		try {
+	public ResponseEntity<Object> saveReport(@RequestBody @Valid AmReports report, BindingResult result) throws Exception{
+	
 			if(result.hasErrors()){
 				return new ResponseEntity<Object>(result.getFieldError().toString(), HttpStatus.CONFLICT);
 			}else{
-				reportService.saveReport(rep);
+				reportService.saveReport(report);
 				return new ResponseEntity<Object>("ok", HttpStatus.OK);
 			}
-			}catch (Exception e) {
-				 throw new ControllerException("ErrorConstants-Constant", e, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+			
 	}
 	
 	
@@ -81,21 +78,21 @@ public class ReportController {
 	 */
 	@RequestMapping(value = "/reports/{reportId}/{format}/{viewType}", method = RequestMethod.GET)
 	public ResponseEntity<byte[]> generateReport(@PathVariable String viewType, @PathVariable Integer reportId,
-												 @PathVariable String format, @RequestParam(required = true) Map<String, String> dataMap){
-		try{
-			List<ReportParameter> reportParametersList = this.reportService.getById(reportId).getParameters();
+												 @PathVariable String format, @RequestParam(required = true) Map<String, String> dataMap) throws Exception{
+		
+			List<AmReportParameters> reportParametersList = this.reportService.getById(reportId).getAmReportParameterses();
 			HashMap<String, Object> reportParameters = Utilities.convertReportPrint(dataMap, "parameters", reportParametersList);
 			
 			//get report form DB
 			ByteArrayOutputStream reportGenerated = new ByteArrayOutputStream();
 			Map <String,Object> result = new HashMap<>();
-			result = reportService.generateReportFromDB(reportId, format, reportParameters);
+			result = reportService.generateReportFromDB(reportId, format, reportParameters, reportParametersList.get(0).getAmReports());
 			
 			if(result != null) {
 				reportGenerated = (ByteArrayOutputStream) result.get("report");
 				return ResponseEntity
 			            .ok()
-			            .contentLength((int) reportGenerated.size())
+			            /*.contentLength((int) reportGenerated.size())*/
 			            .header("Content-Type", "application/octet-stream")
 			            .contentType("pdf".equals(format)?MediaType.parseMediaType("application/pdf"):MediaType.parseMediaType("application/vnd.ms-excel"))	            
 			            .body(reportGenerated.toByteArray());
@@ -103,9 +100,6 @@ public class ReportController {
 			}else{
 				return new ResponseEntity<byte[]>( HttpStatus.NO_CONTENT);        
 			}
-		}catch (Exception e){
-			throw new ControllerException("ErrorConstants-Constant", e, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 	}
 	
 
@@ -116,24 +110,22 @@ public class ReportController {
 	 * @return ResponseEntity
 	 */
 	@RequestMapping(value = "/reports/book", method = RequestMethod.PUT)
-	public ResponseEntity<String> addReportBooking(@RequestBody(required=true) ReportBookingDto reportBookingDTO) {
+	public ResponseEntity<String> addReportBooking(@RequestBody(required=true) AmReportBookings reportBooking) throws Exception{
 		
-		try{
-			String dateString = reportBookingDTO.getDeadlineString();
+	
+			Date dateString = reportBooking.getDeadline();
 			Date parsedDate = null;
 			
-			if(!Utilities.isDateValid(dateString)) {
+			/*if(!Utilities.isDateValid(dateString)) {
 				return new ResponseEntity<String>("", HttpStatus.INTERNAL_SERVER_ERROR);
 			} else {
 				parsedDate = Utilities.convertToDate(dateString);
 				reportBookingDTO.setDeadline(parsedDate);
-			}
+			}*/
 			
-			this.reportService.saveOrUpdateReportBooking(reportBookingDTO);
+			this.reportService.saveOrUpdateReportBooking(reportBooking);
 			return new ResponseEntity<String>("ok", HttpStatus.OK);
-		}catch (Exception e) {
-			throw new ControllerException("ErrorConstants-Constant", e, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+
 	}
-	
+
 }

@@ -1,0 +1,11 @@
+<div class="box-full_size overflow-auto" #box>
+    <div id="cmp-error_log_trace" class="app_content-container-cmp cmp-padding_top_bottom container">
+        <a class="glyphicon glyphicon-circle-arrow-left return_button" routerLink="/error_log"></a> 
+        <img src="app/assets/images/loader.gif" style="width: 28px;" *ngIf="loadingState">
+        <div *ngIf="trace">
+            <span [innerHtml]="trace"></span>
+        </div>
+    </div>
+</div>
+
+

@@ -12,15 +12,18 @@
 
 	<!-- SPRING SECURITY SETUP -->
  	
+ 	<!-- Authentication manager -->
 	<security:authentication-manager id="authenticationManager">
 		<security:authentication-provider
-			user-service-ref="userDao">
+			user-service-ref="userService">
 		</security:authentication-provider>
 	</security:authentication-manager>
 	
+	<!-- Disable security -->	
 	<security:http security="none" pattern="/app/**"/>
     <security:http security="none" pattern="/node_modules/**"/>
 	
+	<!-- HTTP settings -->
 	<security:http 	realm="Protected API" 
 					use-expressions="true"
 					auto-config="false"
@@ -38,10 +41,8 @@
 		<!-- <security:intercept-url pattern="/products" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" /> -->
 		<security:intercept-url pattern="/rest/user/authenticate" access="permitAll()" />
 		<security:intercept-url method="POST" pattern="/property" access="permitAll()" />
-		<security:intercept-url method="GET" pattern="/rest/downloadFile/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 		<security:intercept-url method="GET" pattern="/rest/**"	access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 		<security:intercept-url method="PUT" pattern="/rest/**"	access="hasRole('ROLE_ADMIN')" />
-		<security:intercept-url method="POST" pattern="/rest/testFileUpload" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 		<security:intercept-url method="POST" pattern="/rest/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_PLAYER')" />
 		<security:intercept-url method="DELETE"	pattern="/rest/**" access="hasRole('ROLE_ADMIN')" />
 		
@@ -53,13 +54,10 @@
 	
 	<!-- Security Beans -->
 	<bean id="unauthorizedEntryPoint" class="it.kirey.kfuture.security.UnauthorizedEntryPoint" />
-
-	<bean id="authenticationTokenProcessingFilter"	class="it.kirey.kfuture.security.AuthenticationTokenProcessingFilter"></bean>
+	<bean id="authenticationTokenProcessingFilter" class="it.kirey.kfuture.security.AuthenticationTokenProcessingFilter"></bean>
+	<bean name="userService" class="it.kirey.kfuture.service.impl.UserServiceImpl"></bean>
 	
-	<bean name="userDao" class="it.kirey.kfuture.dao.impl.UserDaoImpl"></bean>
-	
-<!--<bean id="csrfHeaderFilter" class="it.kirey.kfuture.security.CsrfHeaderFilter"/>
-	
+	<!--<bean id="csrfHeaderFilter" class="it.kirey.kfuture.security.CsrfHeaderFilter"/>
 	<bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository">
 		<property name="headerName" value="X-XSRF-TOKEN"/>
 	</bean> -->

@@ -1,0 +1,1 @@
+export const COMPANY_CSS_ROUTE = 'app/assets/company_css/';

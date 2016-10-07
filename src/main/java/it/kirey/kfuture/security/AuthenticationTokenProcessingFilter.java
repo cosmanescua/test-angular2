@@ -17,9 +17,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.GenericFilterBean;
 
-import it.kirey.kfuture.dao.UserDao;
-import it.kirey.kfuture.entity.User;
-import it.kirey.kfuture.service.UserService;
+import it.kirey.kfuture.dao.IAmUserAccountsHome;
+import it.kirey.kfuture.entity.AmUserAccounts;
+import it.kirey.kfuture.service.IUserService;
 
 /**
  * The class is used as a Spring security filter bean. It is inserted into the Spring security chain of filters.
@@ -31,7 +31,7 @@ import it.kirey.kfuture.service.UserService;
 public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
 	@Autowired
-	private UserDao userDao;
+	private IUserService userService;
 	
 	private static final Logger LOGGER = Logger.getLogger(AuthenticationTokenProcessingFilter.class.getName());
 
@@ -44,22 +44,22 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 		long beginTime2 = System.nanoTime();
 		HttpServletRequest httpRequest = this.getAsHttpRequest(request);
 		String authToken = this.extractAuthTokenFromRequest(httpRequest);
-		User user = null;
+		AmUserAccounts user = null;
 		boolean validationResult = false;
 
 		if (authToken != null) {
 			long beginTime1 = System.nanoTime();
 			
 			// -------------------------------- Database token approach			
-//			user = userDao.getUserByToken(authToken);
-//			validationResult = TokenUtils.validateToken(user, authToken);
+			user = userService.getUserByToken(authToken);
+			LOGGER.log( Level.INFO, "userService.getUserByToken(authToken): " + (System.nanoTime()-beginTime1) + "ns");
+			validationResult = TokenUtils.validateToken(user, authToken);
+			LOGGER.log( Level.INFO, "Token validation time: " + (System.nanoTime()-beginTime1) + "ns");
 			
 			// -------------------------------- SecurityCache approach
-			user = SecurityCache.validateUser(authToken);
-			validationResult = (user != null);
-//			----------------------------------------------------------
-			
-			LOGGER.log( Level.INFO, "AuthenticationTokenProcessingFilter. Token validation time: " + (System.nanoTime()-beginTime1) + "ns");
+			// user = SecurityCache.validateUser(authToken);
+			// validationResult = (user != null);
+			//----------------------------------------------------------
 			
 			if (validationResult) {
 				UserDetails userDetails = (UserDetails) user;

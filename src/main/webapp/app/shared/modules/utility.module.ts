@@ -6,17 +6,18 @@ import { FormsModule} from '@angular/forms';
 import { CookieService } from 'angular2-cookie/core';
 
 import { DTService } from '../../dtShared/dt.service';
-
-
+import { PipesModule } from '../modules/pipes.module';
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
+        PipesModule
     ],
     exports: [
         FormsModule,
         CommonModule,
+        PipesModule
     ],
     providers: [
         CookieService,

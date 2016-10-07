@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
-import { ErrorLogService } from '../error_log/errorLog.service';
-import { ErrorLogCmp } from '../error_log/errorLog.cmp';
+import { ErrorLogService } from './errorLog.service';
+import { ErrorLogCmp } from './errorLog.cmp';
+import { ErrorLogTraceCmp } from './errorLogTrace.cmp';
 
 import { ROUTING } from './errorLog.routes';
 
@@ -14,10 +16,12 @@ import { UtilityModule } from '../shared/modules/utility.module';
         UtilityModule
     ],
     declarations: [
-        ErrorLogCmp
+        ErrorLogCmp,
+        ErrorLogTraceCmp
     ],
     providers: [
-        ErrorLogService
+        ErrorLogService,
+        // ActivatedRoute
     ]
 })
 

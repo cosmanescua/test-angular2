@@ -2,7 +2,7 @@ package it.kirey.kfuture.service.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,77 +11,71 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IReportDao;
-import it.kirey.kfuture.dao.ReportBookingDao;
-import it.kirey.kfuture.dao.ReportParamDao;
-import it.kirey.kfuture.dao.ReportParamValueDao;
-import it.kirey.kfuture.dto.ReportBookingDto;
-import it.kirey.kfuture.dto.ReportDto;
-import it.kirey.kfuture.entity.Customer;
-import it.kirey.kfuture.entity.Report;
-import it.kirey.kfuture.entity.ReportBlob;
-import it.kirey.kfuture.entity.ReportBooking;
-import it.kirey.kfuture.entity.ReportParameter;
-import it.kirey.kfuture.entity.ReportParameterValue;
+import it.kirey.kfuture.dao.IAmReportBlobsHome;
+import it.kirey.kfuture.dao.IAmReportBookingParametersHome;
+import it.kirey.kfuture.dao.IAmReportBookingsHome;
+import it.kirey.kfuture.dao.IAmReportParametersHome;
+import it.kirey.kfuture.dao.IAmReportsHome;
+import it.kirey.kfuture.entity.AmReportBlobs;
+import it.kirey.kfuture.entity.AmReportBookingParameters;
+import it.kirey.kfuture.entity.AmReportBookings;
+import it.kirey.kfuture.entity.AmReportParameters;
+import it.kirey.kfuture.entity.AmReports;
 import it.kirey.kfuture.jasper.ReportEngine;
+import it.kirey.kfuture.service.IOrderServiceForEmail;
 import it.kirey.kfuture.service.IReportService;
-import it.kirey.kfuture.service.OrderServiceForEmail;
-import it.kirey.kfuture.util.ObjectTransformer;
+import it.kirey.kfuture.util.Utilities;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-@Service(value=IReportService.SPRING_QUALIFIER)
+@Service(value=IReportService.SERVICE_QUALIFIER)
 public class ReportServiceImpl implements IReportService{
 	
 	@Autowired
-	private IReportDao reportDao;
+	private IAmReportsHome amReportsHome;
 	@Autowired
 	private ReportEngine engine;
 	@Autowired
-	private OrderServiceForEmail orderService;
+	private IOrderServiceForEmail orderService;
 	@Autowired
-	private ReportParamDao reportParamDao;
+	private IAmReportParametersHome amReportParametersHome;
 	@Autowired
-	private ReportParamValueDao reportParamValueDao;
+	private IAmReportBookingParametersHome amReportBookingParametersHome;
 	@Autowired
-	private ReportBookingDao reportBookingDao;
+	private IAmReportBookingsHome amReportBookingsHome;
 	@Autowired
-	private ObjectTransformer objectTransformer;
+	private IAmReportBlobsHome amReportBlobsHome;
 	
 	@Override
 	@Transactional
-	public void saveOrUpdateReportParamValue(ReportParameterValue reportParamValue) {
-		this.reportParamValueDao.saveOrUpdate(reportParamValue);
+	public void saveOrUpdateReportParamValue(AmReportBookingParameters reportParamValue) {
+		this.amReportBookingParametersHome.attachDirty(reportParamValue);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional
-	public void saveOrUpdateReportBooking(ReportBookingDto reportBookingDTO) {
-		ReportBooking reportBooking = (ReportBooking)this.objectTransformer.build(reportBookingDTO, ReportBooking.class);
-		List<ReportParameterValue> reportParameters = (List<ReportParameterValue>)this.objectTransformer.build(reportBookingDTO.getReportParameterValues(), ReportParameterValue.class);
-		
-		this.reportBookingDao.saveOrUpdate(reportBooking);
-		
-		for(ReportParameterValue reportParameterValue : reportParameters) {
-			reportParameterValue.setReportBooking(reportBooking);
-			this.reportParamValueDao.saveOrUpdate(reportParameterValue);
-		}
+	public void saveOrUpdateReportBooking(AmReportBookings reportBooking) {
+		Date today = new Date();
+		reportBooking.setStatus("FOR_CREATION");
+		reportBooking.setAmUserAccountsByUtInsert(Utilities.getUserFromContext());
+		reportBooking.setAmUserAccountsByUtUpdate(Utilities.getUserFromContext());
+		reportBooking.setTsUpdate(today);
+		reportBooking.setTsInsert(today);
+		this.amReportBookingsHome.attachDirty(reportBooking);
 	}
 	
 	@Override
 	@Transactional(readOnly=true)
-	public ReportParameter getReportParamsById(Integer id) {
-		return this.reportParamDao.getById(id);
+	public AmReportParameters getReportParamsById(Integer id) {
+		return this.amReportParametersHome.findById(id);
 	}
 	
 	@Override
 	@Transactional(readOnly=true)
-	public Report getById(Integer id) {
-		return this.reportDao.findReportById(id);
+	public AmReports getById(Integer id) {
+		return this.amReportsHome.findById(id);
 	}
 
-	@Override
+	/*@Override
 	@Transactional
 	public ByteArrayOutputStream generateReport1(String jasperName) {
 		try {
@@ -102,7 +96,7 @@ public class ReportServiceImpl implements IReportService{
 		} catch (Exception e) {
 			return null;
 		}
-	}
+	}*/
 
 	@Override
 	public ByteArrayOutputStream generateReport2(String name, String jasperName) {
@@ -115,36 +109,20 @@ public class ReportServiceImpl implements IReportService{
 			return null;
 		}
 	}
-
-	@Override
-	@Transactional
-	public ByteArrayOutputStream generateReport3(String jasperName) {
-		Customer customer = orderService.getCustomerDetails();
-
-		HashMap<String, Object> reportParam = new HashMap<String, Object>();
-		reportParam.put("name", customer.getName());
-
-		List<Customer> list = new ArrayList<Customer>();
-		list.add(customer);
-		list.add(customer);
-
-		JasperPrint jp = engine.generateReport(reportParam, jasperName, new JRBeanCollectionDataSource(list, false));
-		return engine.exportXls(jp);
-	}
 	
-	@Transactional
 	@Override
-	public Map <String,Object> generateReportFromDB(Integer reportId,String format, HashMap<String, Object> reportParam) {
+	@Transactional(readOnly=true)
+	public Map <String,Object> generateReportFromDB(Integer reportId,String format, HashMap<String, Object> reportParam, AmReports amReports) {
 
-		ReportBlob reportBlob = reportDao.findBlobFileByReport(reportId);
+		//AmReportBlobs reportBlob = amReportBlobsHome.getBlobFileByReportId(reportId);
 		Map <String,Object> results = null;
 		
-		if (reportBlob != null) {
+		if (amReports.getAmReportBlobs().getFileBlob() != null) {
 			 results = new HashMap<String, Object>();
 
-			JasperPrint jp = engine.generateReportFromDB(reportParam, reportBlob.getFileBlob());
+			JasperPrint jp = engine.generateReportFromDBFromJasperFile(reportParam, amReports.getAmReportBlobs().getFileBlob());
 			
-			results.put("reportName", reportBlob.getReport().getReportName());
+			results.put("reportName", amReports.getName());
 			if("pdf".equals(format))
 				results.put("report",  engine.exportPdf(jp));
 			else
@@ -154,32 +132,32 @@ public class ReportServiceImpl implements IReportService{
 		return results;
 
 	}
-	@Transactional
+	
 	@Override
-	public List<ReportDto> getAllReports() {
-		
-		List<Report> repList =  reportDao.getAllReports();
-		List<ReportDto> reportDTOs = objectTransformer.build(repList, ReportDto.class);
-		return reportDTOs;
+	@Transactional(readOnly=true)
+	public List<AmReports> getAllReportsWithoutBlobFile() {
+		List<AmReports> repList =  amReportsHome.getAll();
+		return repList;
 	}
 	
-	
-	@Transactional
 	@Override
-	public void saveReport(ReportDto reportDto) throws IOException {
+	@Transactional
+	public void saveReport(AmReports report) throws IOException {
 		
+		report.setAmUserAccountsByUtInsert(Utilities.getUserFromContext());
+		report.setAmUserAccountsByUtUpdate(Utilities.getUserFromContext());
+		report.setTsInsert(new Date());
+		report.setTsUpdate(new Date());
 		
-		Report report = (Report) objectTransformer.build(reportDto, Report.class);
-		List<ReportParameter> listP = (List<ReportParameter>) objectTransformer.build(reportDto.getParameters(), ReportParameter.class);
-		for (ReportParameter reportParameter : listP) {
-			reportParameter.setReport(report);
+		if(report.getAmReportParameterses().size() != 0){		
+			for (AmReportParameters reportParameter : report.getAmReportParameterses()) {
+				reportParameter.setAmUserAccountsByUtInsert(Utilities.getUserFromContext());
+				reportParameter.setAmUserAccountsByUtUpdate(Utilities.getUserFromContext());
+				reportParameter.setTsInsert(new Date());
+				reportParameter.setTsUpdate(new Date());
+			}
 		}
-		report.setParameters(listP);
-		
-		ReportBlob blob = new ReportBlob();
-		reportDao.saveReport(report);
-		blob.setFileBlob(reportDto.getFile());
-		blob.setReport(report);
-		reportDao.saveReportBlob(blob);
+		amReportsHome.attachDirty(report);
 	}
+
 }

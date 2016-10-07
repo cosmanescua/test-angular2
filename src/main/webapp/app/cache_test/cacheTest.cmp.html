@@ -1,0 +1,55 @@
+<div class="box-full_size overflow-auto" #box>
+    <div id="cmp-cache_test" class="app_content-container-cmp container">
+        <h2 class="view-header">Cache Test <img src="app/assets/images/loader.gif" style="width: 28px;" *ngIf="loadingState"></h2>
+
+        <div class="col-md-7 padding_sides-0">
+            <div *ngIf="initialCacheCleared">
+                <h3>
+                    No-cached execution
+                    <button type="button" class="btn btn-primary" (click)="testCacheRest(false)" [disabled]="!bCacheCleared || loadingState">Test without cache</button>
+                </h3>
+                <table class="table">
+                    <tr>
+                        <td class="column-1"><b>Execution date</b></td>
+                        <td *ngIf="!bCacheCleared">{{testResult.executionDate | date: 'dd.MM.yyyy. - HH:mm:ss'}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Data size</b></td>
+                        <td *ngIf="!bCacheCleared">{{testResult.dataSize | bytes}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Execution time</b></td>
+                        <td *ngIf="!bCacheCleared">{{testResult.executionTime | seconds}} <span class="nano_seconds">({{testResult.executionTime | dotSeparator}}ns)</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div *ngIf="initialCacheCleared">
+                <h3>
+                    Cached execution
+                    <button type="button" class="btn btn-primary" (click)="testCacheRest(true)" [disabled]="bCacheCleared || loadingState">Test with cached data</button>
+                    <button type="button" class="btn btn-danger" (click)="clearCacheRest()" [disabled]="bCacheCleared || loadingState">Clear cache</button>
+                </h3>
+                <table class="table">
+                    <tr>
+                        <td class="column-1"><b>Execution date</b></td>
+                        <td *ngIf="testResultCached.executionDate">{{testResultCached.executionDate | date: 'dd.MM.yyyy. - HH:mm:ss'}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Data size</b></td>
+                        <td *ngIf="testResultCached.executionDate">{{testResultCached.dataSize | bytes}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Execution time</b></td>
+                        <td *ngIf="testResultCached.executionDate">{{testResultCached.executionTime | seconds}} <span class="nano_seconds">({{testResultCached.executionTime | dotSeparator}}ns)</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Difference from no-cached execution</b></td>
+                        <td *ngIf="testResultCached.executionDate">
+                            {{(testResult.executionTime - testResultCached.executionTime) | seconds}} <span class="nano_seconds">({{(testResult.executionTime - testResultCached.executionTime) | dotSeparator}}ns)</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

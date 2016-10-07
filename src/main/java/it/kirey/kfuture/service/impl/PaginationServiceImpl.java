@@ -5,14 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.kirey.kfuture.dao.IPaginationDao;
 import it.kirey.kfuture.dto.PaginationDto;
-import it.kirey.kfuture.entity.Product;
 import it.kirey.kfuture.service.IPaginationService;
 
-@Service(value = IPaginationService.SPRING_QUALIFIER)
+@Service(value = IPaginationService.SERVICE_QUALIFIER)
 public class PaginationServiceImpl implements IPaginationService{
-
+/*
 	@Autowired
 	IPaginationDao paginationDao;
 
@@ -31,6 +29,6 @@ public class PaginationServiceImpl implements IPaginationService{
 	public Long getTotalProductRows(PaginationDto paginationDto) {
 		Long productCounter = paginationDao.getTotalProductRows(paginationDto);
 		return productCounter;
-	}
+	}*/
 
 }

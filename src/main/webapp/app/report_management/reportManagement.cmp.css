@@ -1,0 +1,24 @@
+#cmp-report_management .report_management-list-item {
+  border-bottom: 1px solid #eaeaea;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 10px; }
+  #cmp-report_management .report_management-list-item:nth-child(even) {
+    background: #f9f9f9; }
+  #cmp-report_management .report_management-list-item:hover {
+    background: #f3f3f3; }
+#cmp-report_management .form-box {
+  background: #f8f8f8;
+  padding: 2px 0 10px; }
+  #cmp-report_management .form-box .form-header {
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 10px; }
+    #cmp-report_management .form-box .form-header .report_type {
+      color: #337ab7;
+      float: right; }
+  #cmp-report_management .form-box .form-hr {
+    border-color: #d4d4d4;
+    clear: both;
+    margin: 14px 15px; }
+
+/*# sourceMappingURL=reportManagement.cmp.css.map */

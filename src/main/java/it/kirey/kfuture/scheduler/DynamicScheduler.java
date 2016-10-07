@@ -12,7 +12,7 @@ import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Component;
 
-import it.kirey.kfuture.dao.BatchConfigDao;
+import it.kirey.kfuture.dao.IAmTaskSchedulersHome;
 
 public class DynamicScheduler implements Trigger {
 
@@ -23,13 +23,13 @@ public class DynamicScheduler implements Trigger {
 	private String status;
 	private Date nextExecutionTime;
 	private String jobName;
-	private BatchConfigDao batchConfigDao;
+	private IAmTaskSchedulersHome amTaskSchedulersHome;
 
 	private static final Log log = LogFactory.getLog(DynamicScheduler.class);
 
-	public DynamicScheduler(TaskScheduler scheduler, Runnable task, BatchConfigDao batchConfigDao, String jobName) {
-		cronExpression = batchConfigDao.findCronExpression(jobName);
-		this.batchConfigDao = batchConfigDao;
+	public DynamicScheduler(TaskScheduler scheduler, Runnable task, IAmTaskSchedulersHome amTaskSchedulersHome, String jobName) {
+		cronExpression = amTaskSchedulersHome.getCronExpression(jobName);
+		this.amTaskSchedulersHome = amTaskSchedulersHome;
 		this.jobName = jobName;
 		this.scheduler = scheduler;
 		this.task = task;
@@ -72,7 +72,7 @@ public class DynamicScheduler implements Trigger {
 		/* persisto la nuova cronExpression */
 		try {
 			new CronSequenceGenerator(cronExpression, Calendar.getInstance().getTimeZone());
-			batchConfigDao.updateCronExpression(jobName, cronExpression);
+			amTaskSchedulersHome.updateCronExpression(jobName, cronExpression);
 		} catch (IllegalArgumentException iaex) {
 			// TODO scrivere l'errore su DB
 		}

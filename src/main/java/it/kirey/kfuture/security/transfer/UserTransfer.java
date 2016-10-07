@@ -15,12 +15,16 @@ public class UserTransfer {
 	
 	private final List<String> cssStyles;
 	
+	private final String defaultLanguage;
 	
-	public UserTransfer(String username, Map<String, Boolean> roles, LinkedHashMap<String, String> companies, List<String> cssStyles) {
+	
+	public UserTransfer(String username, Map<String, Boolean> roles, LinkedHashMap<String, String> companies, List<String> cssStyles,
+			String defaultLanguage) {
 		this.username = username;
 		this.roles = roles;
 		this.companies = companies;
 		this.cssStyles = cssStyles;
+		this.defaultLanguage = defaultLanguage;
 	}
 	
 	public String getUsername() {
@@ -39,5 +43,7 @@ public class UserTransfer {
 		return cssStyles;
 	}
 
-	
+	public String getDefaultLanguage() {
+		return defaultLanguage;
+	}
 }

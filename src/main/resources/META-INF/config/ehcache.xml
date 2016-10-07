@@ -6,20 +6,30 @@
 	dynamicConfig="true">
 
 	<diskStore path="java.io.tmpdir" />
-	
-	<cache name="property" 
+
+	<cache name="security" 
 		maxEntriesLocalHeap="10000"
-		maxEntriesLocalDisk="1000" 
+		maxEntriesLocalDisk="100000" 
 		eternal="false" 
 		diskSpoolBufferSizeMB="20"
-		timeToIdleSeconds="200" timeToLiveSeconds="300"
+		timeToIdleSeconds="1000" timeToLiveSeconds="2000"
 		memoryStoreEvictionPolicy="LFU" 
 		transactionalMode="off">
 		<persistence strategy="localTempSwap" />
 	</cache>
 	
+	<cache name="dictionary" 
+		maxEntriesLocalHeap="10000"
+		maxEntriesLocalDisk="100000" 
+		eternal="false" 
+		diskSpoolBufferSizeMB="20"
+		timeToIdleSeconds="1000" timeToLiveSeconds="2000"
+		memoryStoreEvictionPolicy="LFU" 
+		transactionalMode="off">
+		<persistence strategy="localTempSwap" />		
+	</cache>
 	
-	<cache name="security" 
+	<cache name="testCache" 
 		maxEntriesLocalHeap="10000"
 		maxEntriesLocalDisk="1000" 
 		eternal="false" 

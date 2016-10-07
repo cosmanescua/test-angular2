@@ -7,9 +7,7 @@ import { LoginCmp } from '../login/login.cmp';
 
 import { ROUTING } from './login.routes';
 
-
 import { UtilityModule } from '../shared/modules/utility.module';
-
 
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { CookieService } from 'angular2-cookie/core';

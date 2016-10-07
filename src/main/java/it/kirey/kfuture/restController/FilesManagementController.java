@@ -82,20 +82,11 @@ public class FilesManagementController {
 	        String filePathToBeServed =testFile.getFilepath(); 
 	        File fileToDownload = new File(filePathToBeServed);
 	        InputStream inputStream=new FileInputStream(fileToDownload);
-//	        ByteArrayOutputStream ous = null;
-//	        InputStream ios = null;
-//	        try {
-//	            byte[] buffer = new byte[4096];
-//	            ous = new ByteArrayOutputStream();
-//	            ios = new FileInputStream(fileToDownload);
-//	            int read = 0;
-//	            while ((read = ios.read(buffer)) != -1) {
-//	                ous.write(buffer, 0, read);
-//	            }
-	        HttpHeaders headers = new HttpHeaders();
-	        headers.setContentLength(fileToDownload.length());
-	        headers.setContentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(fileToDownload.getName())));
-	        return new ResponseEntity<byte[]>(IOUtils.toByteArray(inputStream),headers,HttpStatus.OK);
+	        return ResponseEntity
+		            .ok()
+		            .header("Content-Type", "application/octet-stream")
+		            .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(fileToDownload.getName())))	            
+		            .body(IOUtils.toByteArray(inputStream));
 	 
 	}
 	@RequestMapping(value="/downloadFileOk/{id}", method=RequestMethod.GET,produces ={MediaType.APPLICATION_OCTET_STREAM_VALUE})
@@ -104,16 +95,6 @@ public class FilesManagementController {
 	    	TestFileManagement testFile=filesManagement.findFileById(id);
 	        String filePathToBeServed =testFile.getFilepath(); 
 	        File fileToDownload = new File(filePathToBeServed);
-//	        InputStream inputStream = new FileInputStream(fileToDownload);
-//	        System.out.println("File to download size: "+(int)fileToDownload.length());
-//	        response.setContentType(URLConnection.guessContentTypeFromName(fileToDownload.getName()));
-//	        response.setCharacterEncoding("UTF-8");
-//	        response.setHeader("Content-Disposition", "attachment; filename=\""+testFile.getFilename()+"\""); 
-//	        IOUtils.copy(inputStream, response.getOutputStream());
-//	        System.out.println("Buffer size"+response.getBufferSize());
-//	        response.flushBuffer();
-//	        response.getOutputStream().close();
-//	        inputStream.close();
 	        response.setContentLength((int) fileToDownload.length());
 	        response.setCharacterEncoding("UTF-16");
 	        response.setHeader("Content-Disposition", "attachment; filename="

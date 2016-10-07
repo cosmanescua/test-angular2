@@ -32,6 +32,17 @@ export class ErrorLogService{
     }
 
     /**
+     * Rest call for causeing exception on backend and storing it into DB
+     * @author DynTech
+     */
+    causeException(): Observable<any> {
+        return this._http.get('test/exc')
+            .map((response: Response) => response.json())
+            .catch(this.handleError);
+    }
+
+
+    /**
      * Error message handler
      * @author DynTech
      */

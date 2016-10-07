@@ -7,16 +7,24 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.icu.text.SimpleDateFormat;
 
-import it.kirey.kfuture.entity.ReportParameter;
+import it.kirey.kfuture.dto.FilterDto;
+import it.kirey.kfuture.dto.PaginationDto;
+import it.kirey.kfuture.entity.AmReportParameters;
+import it.kirey.kfuture.entity.AmUserAccounts;
 
 public class Utilities {
 
@@ -39,7 +47,7 @@ public class Utilities {
 	}
 
 	
-	public static HashMap<String, Object> convertReportPrint(Map<String, String> dataMap, String objectKey, List<ReportParameter> reportParameters) throws IOException, ParseException{
+	public static HashMap<String, Object> convertReportPrint(Map<String, String> dataMap, String objectKey, List<AmReportParameters> reportParameters) throws IOException, ParseException{
 		
 		HashMap<String, String> formParam = new HashMap<String, String>();
 		ObjectMapper mapper = new ObjectMapper();
@@ -49,17 +57,17 @@ public class Utilities {
 		
 		HashMap<String, Object> result = new HashMap<String, Object>();
 
-		for (ReportParameter param : reportParameters) {
+		for (AmReportParameters param : reportParameters) {
 			switch (param.getType()) {
 			case "String":
-				result.put(param.getParamName(), formParam.get(String.valueOf(param.getId())));
+				result.put(param.getName(), formParam.get(String.valueOf(param.getId())));
 				break;
 			case "Integer":
-				result.put(param.getParamName(), Integer.parseInt(formParam.get(param.getId())));
+				result.put(param.getName(), Integer.parseInt(formParam.get(param.getId())));
 				break;
 
 			case "Double":
-				result.put(param.getParamName(), Double.parseDouble(formParam.get(param.getId())));
+				result.put(param.getName(), Double.parseDouble(formParam.get(param.getId())));
 				break;
 
 			case "Timestamp":
@@ -67,7 +75,7 @@ public class Utilities {
 				Date parsedDate = dateFormat.parse(formParam.get(param.getId()));
 				Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
 
-				result.put(param.getParamName(), timestamp);
+				result.put(param.getName(), timestamp);
 				break;
 
 			default:
@@ -147,6 +155,69 @@ public class Utilities {
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
+	}
+	
+	public static String geneneratePaginationQuery(PaginationDto paginationDto){
+		
+		StringBuilder hqlSB = new StringBuilder();
+		hqlSB.setLength(0);
+		
+		if (paginationDto.getFilterList().size() != 0) {
+			Iterator<FilterDto> filterList = paginationDto.getFilterList().iterator();
+			hqlSB.append("where ");
+			while (filterList.hasNext()) {
+				FilterDto filter = filterList.next();
+				//if String
+				if (filter.getQuery() instanceof String) {
+					hqlSB.append("lower(");
+					hqlSB.append(filter.getField());
+					hqlSB.append(") like '%");
+					hqlSB.append(filter.getQuery().toString().toLowerCase());
+					hqlSB.append("%' ");
+				//if Date
+				} else if (filter.getQuery() instanceof Long) {
+					hqlSB.append(filter.getField());
+					hqlSB.append(" = to_date('");
+					hqlSB.append(new Date((Long) filter.getQuery()));
+					hqlSB.append("','YYYY-MM-DD') ");
+				//Number
+				} else {
+					hqlSB.append(filter.getField());
+					hqlSB.append(" = ");
+					hqlSB.append(filter.getQuery());
+					hqlSB.append(" ");
+				}
+				if (filterList.hasNext()) {
+					hqlSB.append(" and ");
+				}
+			}
+		}
+		return hqlSB.toString();
+	}
+	
+	public static String generateOrderByQuery(PaginationDto paginationDto){
+		StringBuilder hqlSB = new StringBuilder();
+		hqlSB.setLength(0);
+		
+		if (paginationDto.getSort().getField() != null) {
+			hqlSB.append("order by ");
+			hqlSB.append(paginationDto.getSort().getField());
+			hqlSB.append(" ");
+			hqlSB.append(paginationDto.getSort().getType());
+		}
+		return hqlSB.toString();
+	}
+	
+	public static AmUserAccounts getUserFromContext(){
+		
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		Object details = securityContext.getAuthentication().getPrincipal();
+		AmUserAccounts user = null;
+		if (details instanceof AmUserAccounts) {
+			user = (AmUserAccounts) details;
+		}
+		
+		return user;
 	}
 	
 }

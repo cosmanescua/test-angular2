@@ -1,3 +1,20 @@
+#cmp-error_log .main_table tr {
+  cursor: pointer; }
 
+#cmp-error_log_trace .method {
+  color: #272727; }
+#cmp-error_log_trace .code_trace {
+  color: #3a80ff;
+  font-weight: normal;
+  text-decoration: underline; }
+#cmp-error_log_trace .trace_row {
+  line-height: 17px;
+  padding: 2px 5px 2px 30px;
+  position: relative; }
+  #cmp-error_log_trace .trace_row.trace_start {
+    padding-left: 2px; }
+  #cmp-error_log_trace .trace_row:hover {
+    background: #f9f9f9;
+    text-decoration: underline; }
 
 /*# sourceMappingURL=errorLog.cmp.css.map */

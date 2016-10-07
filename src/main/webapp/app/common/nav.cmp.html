@@ -8,7 +8,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-            <a class="navbar-brand" href="#">KFuture {{'IME' | translate}}</a>
+            <a class="navbar-brand" href="#">KFuture</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -16,23 +16,27 @@
                 <li>
                     <a routerLink="login" routerLinkActive="active">Login</a>
                 </li>
-                <!--<li>
+                <li>
                     <a routerLink="products" routerLinkActive="active">Products</a>
-                </li>-->
+                </li>
                 <li>
                     <a routerLink="report_management" routerLinkActive="active">Report Management</a>
                 </li>
                 <li>
-                    <a routerLink="errorLog" routerLinkActive="active">Error Log</a>
-                </li>
-                 
-                <li>
                     <a routerLink="admin/create_report" routerLinkActive="active">Admin - Create Report</a>
                 </li>
-                <li>
-                    <span (click)="promenaJezika()">promena jezika</span>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dev <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a routerLink="cache_test" routerLinkActive="active">Cache Test</a></li>
+                        <li><a routerLink="error_log" routerLinkActive="active">Error Log</a></li>
+                    </ul>
                 </li>
-                  <li>
+                <!--<li>
+                    <span (click)="promenaJezika()">promena jezika</span>
+                </li>-->
+				 <li>
                     <a routerLink="usersTest" routerLinkActive="active">Users Test</a>
                 </li> 
                 <li>
@@ -41,7 +45,16 @@
                   <li>
                     <a routerLink="filesTest" routerLinkActive="active">Files Management</a>
                 </li>
-                
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <div id="language_box" class="clearfix">
+                        {{'njamb.fe.navigation.products' | translate}}
+                        <a class="language en" [ngClass]="{'active_lang': _appService.defaultLanguage == 'en'}" (click)="matchDefaultLanguage('en') || changeLanguage('en')"></a>
+                        <a class="language it" [ngClass]="{'active_lang': _appService.defaultLanguage == 'it'}" (click)="matchDefaultLanguage('it') || changeLanguage('it')"></a>
+                    </div>
+                </li>
             </ul>
         </div>
     </div>

@@ -4,8 +4,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import org.springframework.security.crypto.codec.Hex;
 
-import it.kirey.kfuture.entity.Role;
-import it.kirey.kfuture.entity.User;
+import it.kirey.kfuture.entity.AmApplicationRoles;
+import it.kirey.kfuture.entity.AmUserAccounts;
 
 /**
  * The class has a number of static methods used as token utilities
@@ -19,7 +19,7 @@ public class TokenUtils {
 	 * @param user is object of User entity
 	 * @return token as a String
 	 */
-	public static String createToken(User user) {
+	public static String createToken(AmUserAccounts user) {
 		long currnetTime = System.currentTimeMillis();
 		
 		StringBuilder signatureBuilder = new StringBuilder();
@@ -46,11 +46,11 @@ public class TokenUtils {
 	 * @param authToken
 	 * @return
 	 */
-	public static boolean validateToken(User user, String authToken) {
+	public static boolean validateToken(AmUserAccounts user, String authToken) {
 		boolean validationResult=false;
 		long currnetTime = System.currentTimeMillis();
 		long tokenIssuedTime = 0;
-		if (user != null) tokenIssuedTime = user.getTimeStamp();
+		if (user != null) tokenIssuedTime = user.getTimestamp();
 		long calculatedSessonTime =  currnetTime - tokenIssuedTime;
 		
 		if (user != null && user.getToken().equals(authToken) && (calculatedSessonTime<maxSessionDuration(user)) && (calculatedSessonTime>0)){
@@ -67,13 +67,13 @@ public class TokenUtils {
 	 * @param user
 	 * @return
 	 */
-	public static long maxSessionDuration(User user){
+	public static long maxSessionDuration(AmUserAccounts user){
 		if(user.getTimeout() != null && user.getTimeout()>0){
 			return user.getTimeout();
 		}
 		
 	    long sessionDuration=0;
-		for(Role role : user.getRoles()){
+		for(AmApplicationRoles role : user.getAmApplicationRoleses()){
 			if(role.getTimeout() != null && role.getTimeout()>sessionDuration) sessionDuration=role.getTimeout();
 		}
 		return sessionDuration;

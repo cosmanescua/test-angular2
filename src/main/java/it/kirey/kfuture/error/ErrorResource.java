@@ -19,14 +19,14 @@ public class ErrorResource {
 	private String invokingURL;    
     private String errorName;
     private String detail;
-    private String keyMsg;
+    private String message;
 
     public ErrorResource() { }
     
     public ErrorResource(String type, String keyMsg, Exception ex)
     {
     	 this.type = type;
-         this.keyMsg = ErrorConstants.EXCEPTION+"_"+keyMsg;
+         this.message = keyMsg; //TODO proveriti ovo da bude us kladu sa internacionalizacijom i categorijom
     	 this.errorName = ex.toString();
     	 if(ex.getMessage() != null)
          	this.detail = (detail.equals(errorName)?null:ex.getMessage());
@@ -80,15 +80,16 @@ public class ErrorResource {
 	public void setDetail(String detail) {
 		this.detail = detail;
 	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
 	
-	public String getKeyMsg() {
-		return keyMsg;
-	}
-
-	public void setKeyMsg(String keyMsg) {
-		this.keyMsg = keyMsg;
-	}
-
+	
 
     
 }

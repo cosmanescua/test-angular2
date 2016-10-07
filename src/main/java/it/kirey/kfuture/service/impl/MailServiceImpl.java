@@ -17,25 +17,25 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import freemarker.template.Configuration;
 import it.kirey.kfuture.common.Const;
-import it.kirey.kfuture.dao.IEmailingDao;
-import it.kirey.kfuture.entity.Customer;
-import it.kirey.kfuture.entity.EmailConfigs;
-import it.kirey.kfuture.service.MailService;
+import it.kirey.kfuture.dao.IAmEmailConfigsHome;
+import it.kirey.kfuture.dto.CustomerDto;
+import it.kirey.kfuture.entity.AmEmailConfigs;
+import it.kirey.kfuture.service.IMailService;
 
-@Service(value=MailService.SPRING_QUALIFIER)
-public class MailServiceImpl implements MailService {
+@Service(value=IMailService.SERVICE_QUALIFIER)
+public class MailServiceImpl implements IMailService {
 
 	@Autowired
-	JavaMailSenderImpl mailSender;
+	public JavaMailSenderImpl mailSender;
 	
 	@Autowired
-	IEmailingDao emailingDao;
+	public IAmEmailConfigsHome amEmailConfigsHome;
 	
-	 @Autowired
-	 Configuration freemarkerConfiguration;
+	@Autowired
+	public Configuration freemarkerConfiguration;
 
 	@Override
-	public void sendEmail(Customer customer) {
+	public void sendEmail(CustomerDto customer) {
 
 		MimeMessagePreparator preparator = createMessage(customer);
 		setMailConfigProperties();
@@ -46,7 +46,7 @@ public class MailServiceImpl implements MailService {
 		}
 	}
 
-	private MimeMessagePreparator createMessage(final Customer customer) {
+	private MimeMessagePreparator createMessage(final CustomerDto customer) {
 
 		MimeMessagePreparator preparator = new MimeMessagePreparator() {
 
@@ -61,7 +61,6 @@ public class MailServiceImpl implements MailService {
                 model.put("customer", customer);
                  
                 String text = getFreeMarkerTemplateContent(model);//Use Freemarker
-                System.out.println("Template content : "+text);
  
                 // use the true flag to indicate you need a multipart message
                 helper.setText(text, true);
@@ -77,7 +76,7 @@ public class MailServiceImpl implements MailService {
 	}
 	
 	private void setMailConfigProperties(){
-		EmailConfigs emailConfigs = emailingDao.getEmailConfigs();
+		AmEmailConfigs emailConfigs = amEmailConfigsHome.getEmailConfigs();
 		mailSender.setUsername(emailConfigs.getUsername());
 		mailSender.setPassword(emailConfigs.getPassword());
 		mailSender.setHost(emailConfigs.getHost());

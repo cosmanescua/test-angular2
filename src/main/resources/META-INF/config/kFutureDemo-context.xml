@@ -11,9 +11,11 @@
 	<context:component-scan base-package="it.kirey.kfuture.interceptors" />
 	<context:component-scan base-package="it.kirey.kfuture.exception" />
 	<context:component-scan base-package="it.kirey.kfuture.service" />
-<!--     <context:component-scan base-package="it.kirey.kfuture.dao.impl" /> -->
+	<!-- <context:component-scan base-package="it.kirey.kfuture.dao" /> -->
 	<context:component-scan base-package="it.kirey.kfuture.jasper" />
 	<context:component-scan base-package="it.kirey.kfuture.util" />
+	<!-- <context:component-scan base-package="it.kirey.kfuture.cache"/> -->
+	
 	
 	<bean id="modelMapper" class="org.modelmapper.ModelMapper"></bean>
 	<bean id="transformer" class="it.kirey.kfuture.util.ObjectTransformer"></bean>

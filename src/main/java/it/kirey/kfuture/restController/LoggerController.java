@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.kirey.kfuture.dto.ErrorTraceDto;
-import it.kirey.kfuture.entity.ErrorLog;
-import it.kirey.kfuture.entity.ErrorTrace;
+import it.kirey.kfuture.entity.AmErrorLogs;
+import it.kirey.kfuture.entity.AmErrorTraces;
 import it.kirey.kfuture.service.ILoggerService;
 
 @RestController
@@ -30,10 +29,12 @@ public class LoggerController {
 	 * Returns all error logs from database
 	 * @return
 	 */
+	
+	
 	@RequestMapping(value = "/logs", method = RequestMethod.GET)
-	public ResponseEntity<List<ErrorLog>> getAllLogs() {		
-		List<ErrorLog> logs= loggerService.getAllLogs();
-		return new ResponseEntity<List<ErrorLog>>(logs, HttpStatus.OK);	
+	public ResponseEntity<List<AmErrorLogs>> getAllLogs() {		
+		List<AmErrorLogs> logs= loggerService.getAllLogs();
+		return new ResponseEntity<List<AmErrorLogs>>(logs, HttpStatus.OK);	
 	}
 	
 	/**
@@ -42,16 +43,10 @@ public class LoggerController {
 	 * @return
 	 */
 	@RequestMapping(value = "/traces/{id}", method = RequestMethod.GET)
-	public ResponseEntity<ErrorTraceDto> getTrace(@PathVariable(value = "id") int id) {		
+	public ResponseEntity<AmErrorTraces> getTrace(@PathVariable(value = "id") int id) {		
 		
-		ErrorTrace trace= loggerService.getTraceForErrorLog(id);
-		//TODO zameniti metodom za transformisanje
-		ErrorTraceDto errorTraceDto = new ErrorTraceDto();
-		errorTraceDto.setTrace(trace.getTrace());
-		errorTraceDto.setErrorLogId(trace.getError().getId());
-		
-		
-		return new ResponseEntity<ErrorTraceDto>(errorTraceDto, HttpStatus.OK);	
+		AmErrorTraces trace= loggerService.getTraceById(id);				
+		return new ResponseEntity<AmErrorTraces>(trace, HttpStatus.OK);	
 	}
 	
 	

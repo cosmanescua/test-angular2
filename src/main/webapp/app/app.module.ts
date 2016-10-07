@@ -10,10 +10,7 @@ import { ROUTING } from './app.routes';
 
 import { UtilityModule } from './shared/modules/utility.module';
 
-
 import { AppService } from './shared/services/app.service';
-// import {FileUploader,FileSelectDirective} from 'ng2-file-upload';
-
 
 @NgModule({
     imports: [
@@ -31,7 +28,7 @@ import { AppService } from './shared/services/app.service';
         {
             provide: LocationStrategy,
             useClass: HashLocationStrategy
-        },
+        }
     ]
 })
 

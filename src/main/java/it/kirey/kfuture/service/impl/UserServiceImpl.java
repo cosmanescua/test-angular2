@@ -6,41 +6,53 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.UserDao;
-import it.kirey.kfuture.entity.User;
-import it.kirey.kfuture.service.UserService;
+import it.kirey.kfuture.dao.IAmUserAccountsHome;
+import it.kirey.kfuture.entity.AmUserAccounts;
+import it.kirey.kfuture.service.IUserService;
+import it.kirey.kfuture.util.Utilities;
 
-@Service(value="userService")
-public class UserServiceImpl implements UserService {
+@Service(value=IUserService.SERVICE_QUALIFIER)
+public class UserServiceImpl implements IUserService {
 
 	@Autowired
-	private UserDao userDao;
+	private IAmUserAccountsHome amUserAccountsHome;
 
 	@Override
-	public void saveOrUpdate(User newUser) {
-		userDao.saveOrUpdate(newUser);
+	@Transactional
+	public void saveOrUpdate(AmUserAccounts newUser) {
+		amUserAccountsHome.attachDirty(newUser);
 	}
 
 	@Override
+	@Transactional(readOnly=true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return userDao.loadUserByUsername(username);
-	}
-	
-	
-	@Override
-	public User getUserByUsername(String username) throws UsernameNotFoundException {
-		return userDao.getUserByUsername(username);
+		return amUserAccountsHome.loadUserByUsername(username);
 	}
 	
 	@Override
-	public User getUserByToken(String token) throws UsernameNotFoundException {
-		return userDao.getUserByToken(token);
+	@Transactional(readOnly=true)
+	public AmUserAccounts getUserByUsername(String username) throws UsernameNotFoundException {
+		return amUserAccountsHome.getUserByUsername(username);
+	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public AmUserAccounts getUserByToken(String token) throws UsernameNotFoundException {
+		return amUserAccountsHome.getUserByToken(token);
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public AmUserAccounts getById(Integer id) {
+		return this.amUserAccountsHome.findById(id);
 	}
 
 	@Override
 	@Transactional
-	public User getById(Integer id) {
-		return this.userDao.findUserById(id);
+	public void changeDefaultLanguage(String langCode) {
+		AmUserAccounts user = Utilities.getUserFromContext();
+		user.setDefaultLanguage(langCode);
+		amUserAccountsHome.attachDirty(user);
 	}
 
 }

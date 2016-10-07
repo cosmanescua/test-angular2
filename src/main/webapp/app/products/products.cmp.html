@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <!--<p-dataTable [value]="products">
+        <p-dataTable [value]="products">
             <p-column field="name" header="Name"></p-column>
             <p-column field="dateProduct" header="Date">
                 <template let-col let-car="rowData">
@@ -22,7 +22,7 @@
                 </template>
             </p-column>
             <p-column field="price" header="Price"></p-column>
-        </p-dataTable>-->
+        </p-dataTable>
 
         <div align="center ">
             <pagination [totalItems]="__totalItems" maxSize="10" [ngModel]="__currentPage" [boundaryLinks]="true" [(itemsPerPage)]="__pageSize " (pageChanged)="__onPageChanged($event) "></pagination>

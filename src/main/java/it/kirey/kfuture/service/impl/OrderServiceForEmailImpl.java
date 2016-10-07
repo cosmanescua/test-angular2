@@ -3,25 +3,25 @@ package it.kirey.kfuture.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.kirey.kfuture.entity.Customer;
-import it.kirey.kfuture.service.MailService;
-import it.kirey.kfuture.service.OrderServiceForEmail;
+import it.kirey.kfuture.dto.CustomerDto;
+import it.kirey.kfuture.service.IMailService;
+import it.kirey.kfuture.service.IOrderServiceForEmail;
 
-@Service(value=OrderServiceForEmail.SPRING_QUALIFIER)
-public class OrderServiceForEmailImpl implements OrderServiceForEmail {
+@Service(value=IOrderServiceForEmail.SERVICE_QUALIFIER)
+public class OrderServiceForEmailImpl implements IOrderServiceForEmail {
 
 	@Autowired
-	MailService mailService;
+	IMailService mailService;
 
 	@Override
-	public void sendOrderConfirmation(Customer customer) {
+	public void sendOrderConfirmation(CustomerDto customer) {
 		mailService.sendEmail(customer);
 	}
 
 	@Override
-	public Customer getCustomerDetails() {
+	public CustomerDto getCustomerDetails() {
 		
-		Customer customerInfo = new Customer();
+		CustomerDto customerInfo = new CustomerDto();
 		customerInfo.setName("Alexandra");
 		customerInfo.setAddress("Iasi");
 		customerInfo.setEmail("cnicuta@gmail.com");

@@ -1,7 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
-// import { DataTable, Column, Header } from 'primeng/primeng';
-
 import { ProductsService } from '../products/products.service';
 import { Product } from '../products/product.model';
 
@@ -17,8 +15,6 @@ import { DTTable } from '../dtShared/table/dt.table';
 
 @Component({
     templateUrl: 'app/products/products.cmp.html',
-
-    providers: [ProductsService, DTTable],
 })
 export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
     products: Product[];
@@ -44,7 +40,8 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
 
     /* === Ajax calls === */
 
-    private loadProductsAjax(currentPage: number, pageSize: number): void {
+    private loadProductsRest(currentPage: number, pageSize: number): void {
+        this._dtService.setRestMessageContent('ProductsCmp', 'loadProductsRest()');
         this._productsService.getProducts(this._dtTable.getPaginationParams(currentPage, pageSize, this.filters, this.sort))
             .subscribe(products => {
                 this.__totalItems = products.totalRows;
@@ -71,7 +68,7 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
 
         if (!this.pageSizeChangeStatus) {
             this.__currentPage = event.page;
-            this.loadProductsAjax(this.__currentPage, this.__pageSize);
+            this.loadProductsRest(this.__currentPage, this.__pageSize);
         }
     };
 
@@ -80,7 +77,7 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
 
         this._changeDetectionRef.detectChanges();
 
-        this.loadProductsAjax(1, this.__pageSizeModel);
+        this.loadProductsRest(1, this.__pageSizeModel);
     }
 
     public filterByName(): void {
@@ -88,14 +85,13 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
 
         this._changeDetectionRef.detectChanges();
 
-        this.loadProductsAjax(1, this.__pageSizeModel);
+        this.loadProductsRest(1, this.__pageSizeModel);
     }
 
 
 
     // ---------------------- ON INIT
     ngOnInit() {
-        this.__setInitPageTitle('Products');
 
         this.__pageSizeModel = 10;
         this.__pageSize = 10;
@@ -109,11 +105,14 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
         this.pageSizes = [5, 6, 7, 8, 9, 10, 11];
 
 
-        this.loadProductsAjax(this.__currentPage, this.__pageSize);
+        this.loadProductsRest(this.__currentPage, this.__pageSize);
+
+        // Construct methods
+        this.__setInitPageTitle('Products');
     }
 
     // Interface imported
     __setInitPageTitle(title: string) {
         this._dtService.setPageTitle(title);
-    }
+    }  
 }

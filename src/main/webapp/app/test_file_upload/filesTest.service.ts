@@ -12,19 +12,18 @@ export class TestFilesService{
             .catch(this.handleError);
     }
     downloadFile(id:number):any{
-        let options = new RequestOptions({responseType: ResponseContentType.Blob});
-         return this._http.get(this._baseUrl + 'downloadFile/'+id,options)
-            .map((response: Response) => this.handleResponse(response))
+
+         return this._http.get(this._baseUrl + 'downloadFileOk/'+id,{responseType: ResponseContentType.Blob})
+            .map((response) => this.handleResponse(response))
             .catch(this.handleError);
     }
 
-
     //this throws error "The request body isn't either a blob or an array buffer"
-    handleResponse(response:Response){
+    handleResponse(response){
         let contentType=response.headers.get("content-type");
        // console.log(response.arrayBuffer());
         console.log(contentType);
-        //console.log(response.blob());
+        console.log(response.blob());
        return new Blob([response.blob()],{type : contentType});
     }
      //error handler method

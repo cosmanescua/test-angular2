@@ -2,10 +2,8 @@ package it.kirey.kfuture.restController;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,20 +20,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.kirey.kfuture.dto.CustomerDto;
 import it.kirey.kfuture.dto.TestObject;
-import it.kirey.kfuture.entity.Customer;
-import it.kirey.kfuture.entity.ErrorLog;
-import it.kirey.kfuture.exception.ControllerException;
 import it.kirey.kfuture.service.ILoggerService;
-import it.kirey.kfuture.service.ITestService;
-import it.kirey.kfuture.service.OrderServiceForEmail;
-import it.kirey.kfuture.util.ErrorConstants;
+import it.kirey.kfuture.service.IOrderServiceForEmail;
 
 @RestController
 @RequestMapping("/demo")
-public class DemoController 
-{
-	@Autowired ITestService testService;
+public class DemoController {
 	
 	@Autowired
 	ILoggerService loggerService;
@@ -43,16 +35,7 @@ public class DemoController
 	public DemoController(){}
 
 	@Autowired
-	private OrderServiceForEmail orderService;
-	
-
-	//example http://localhost:8091/KFutureDemo/demo/testObjects
-	@RequestMapping(value = "/testObjects", method = RequestMethod.GET)
-	public ResponseEntity<String> getAll(HttpServletRequest request) throws Exception {		
-		
-		testService.testMethod();
-		return new ResponseEntity<String>("TEST OK ", HttpStatus.OK);	
-	}
+	private IOrderServiceForEmail orderService;
 	
 	/**
 	 * Demo example using @PathVariable in request
@@ -154,21 +137,6 @@ public class DemoController
 	}
 	
 	/**
-	 * Test method for exception handling
-	 * @return
-	 * @throws Exception 
-	 */
-	@RequestMapping(value = "/exc", method = RequestMethod.GET)
-	public ResponseEntity<Object> handleException1() throws Exception {		
-		
-			 testService.testMethod();
-			 return new ResponseEntity<Object>("TEST OK", HttpStatus.OK);	
-//		} catch (Exception e) {
-//			 throw new ControllerException(ErrorConstants.PRODUCT_NOT_FOUND, e, HttpStatus.INTERNAL_SERVER_ERROR);
-//		}		
-	}
-	
-	/**
 	 * Test method sending mail
 	 * example http://localhost:8091/KFutureDemo/demo/testEmail
 	 * @return
@@ -176,9 +144,22 @@ public class DemoController
 	@RequestMapping(value = "/testEmail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> testEmail() {
 		
-		Customer customer = orderService.getCustomerDetails();
+		CustomerDto customer = orderService.getCustomerDetails();
 		orderService.sendOrderConfirmation(customer);
 		
 		return new ResponseEntity<String>("TEST Email OK", HttpStatus.OK);	
 	}
+	
+	/**
+	 * Test method for exception handling
+	 * @return
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/exc", method = RequestMethod.GET)
+	public ResponseEntity<Object> handleException1() throws Exception {		
+		
+		loggerService.getAllTraces();
+		return new ResponseEntity<Object>("TEST OK", HttpStatus.OK);			
+	}
+	
 }

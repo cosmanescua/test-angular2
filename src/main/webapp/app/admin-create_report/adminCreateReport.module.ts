@@ -10,7 +10,6 @@ import { TranslateModule, TranslateLoader, TranslateStaticLoader } from 'ng2-tra
 import { AdminCreateReportCmp } from '../admin-create_report/adminCreateReport.cmp';
 import { AdminCreateReportService } from '../admin-create_report/adminCreateReport.service';
 
-import { BytesConverterPipe } from '../shared/pipes/bytesConverter.pipe';
 import { ShortTextPipe } from '../shared/pipes/shortText.pipe';
 import { FileExtensionTrimmer } from '../shared/pipes/fileExtensionTrimmer.pipe';
 
@@ -20,7 +19,6 @@ import { DTService } from '../dtShared/dt.service';
 import { ROUTING } from './adminCreateReport.routes';
 
 import { UtilityModule } from '../shared/modules/utility.module';
-
 
 @NgModule({
     imports: [
@@ -37,7 +35,6 @@ import { UtilityModule } from '../shared/modules/utility.module';
     ],
     declarations: [
         AdminCreateReportCmp,
-        BytesConverterPipe,
         ShortTextPipe,
         FileExtensionTrimmer
     ],

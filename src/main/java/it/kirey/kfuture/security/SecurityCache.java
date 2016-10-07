@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import it.kirey.kfuture.entity.User;
+import it.kirey.kfuture.entity.AmUserAccounts;
 
 /**
  * SecurityCache class is designed to keep record of all users logged to the
@@ -22,13 +22,13 @@ import it.kirey.kfuture.entity.User;
  */
 public class SecurityCache extends HashSet {
 
-	private static Map<String, User> cache;
+	private static Map<String, AmUserAccounts> cache;
 	private static final SecurityCache securityCache = new SecurityCache();
 	private static int numberOfErasedItemsInCache = 0;
 
 	private SecurityCache() {
 		// Create cache as the synchronized HashMap
-		cache = Collections.synchronizedMap(new HashMap<String, User>());
+		cache = Collections.synchronizedMap(new HashMap<String, AmUserAccounts>());
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class SecurityCache extends HashSet {
 	 *            of type User
 	 * @return token as the String
 	 */
-	public static String createToken(User user) {
+	public static String createToken(AmUserAccounts user) {
 		String token = TokenUtils.createToken(user);
 		cache.put(token, user);
 		return token;
@@ -53,13 +53,13 @@ public class SecurityCache extends HashSet {
 	 *            as String
 	 * @return User object the token of which has been validated.
 	 */
-	public static User validateUser(String authToken) {
-		User user = null;
+	public static AmUserAccounts validateUser(String authToken) {
+		AmUserAccounts user = null;
 		Object o = cache.get(authToken);
 
 		// Check if object from the cache is of User type
-		if (User.class.isInstance(o)) {
-			user = (User) o;
+		if (AmUserAccounts.class.isInstance(o)) {
+			user = (AmUserAccounts) o;
 		}
 
 		if (user == null)
@@ -90,7 +90,7 @@ public class SecurityCache extends HashSet {
 				Map.Entry item = (Map.Entry) iterator.next();
 				String authToken = (String) item.getKey();
 				Object itemObject = item.getValue();
-				User user = User.class.cast(itemObject);
+				AmUserAccounts user = AmUserAccounts.class.cast(itemObject);
 				if (!TokenUtils.validateToken(user, authToken)) {
 					iterator.remove();
 					numberOfErasedItemsInCache++;

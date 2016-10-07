@@ -11,11 +11,11 @@
         http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
         http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd">
 	
-	<context:component-scan base-package="it.kirey.kfuture.dao.impl" />
 	<context:component-scan base-package="it.kirey.kfuture.dao" />
 	<context:component-scan base-package="it.kirey.kfuture.service" />
 	<context:component-scan base-package="it.kirey.kfuture.jobs"/>
 	<context:component-scan base-package="it.kirey.kfuture.schedulerController"/>
+	<context:component-scan base-package="it.kirey.kfuture.cache"/>
 	
 
 	<!-- Enables the caching through annotations -->
@@ -45,7 +45,7 @@
 		<property name="hibernateProperties">
 			<map>
 				<entry key="hibernate.default_schema" value="${database.username}" />
-				<entry key="hibernate.hbm2ddl.auto" value="${hibernate.hbm2ddl.auto}" />
+<!-- 				<entry key="hibernate.hbm2ddl.auto" value="${hibernate.hbm2ddl.auto}" /> -->
 				<entry key="show_sql" value="true" />
 				<entry key="hibernate.dialect" value="${hibernate.dialect}" />
 				<entry key="transaction.factory_class" value="org.hibernate.transaction.JDBCTransactionFactory" />

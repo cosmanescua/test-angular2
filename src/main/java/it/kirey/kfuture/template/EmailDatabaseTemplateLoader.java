@@ -8,19 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import freemarker.cache.TemplateLoader;
-import it.kirey.kfuture.dao.IEmailingDao;
-import it.kirey.kfuture.entity.EmailTemplate;
+import it.kirey.kfuture.dao.IAmEmailTemplatesHome;
+import it.kirey.kfuture.entity.AmEmailTemplates;
 
 @Service
 public class EmailDatabaseTemplateLoader implements TemplateLoader {
-
+	
 	@Autowired
-	IEmailingDao emailingDao;
+	IAmEmailTemplatesHome amEmailTemplatesHome;
 
 	@Override
 	public Object findTemplateSource(String templateName) throws IOException {
-
-		return emailingDao.getEmailTemplate(templateName);
+		return amEmailTemplatesHome.getEmailTemplate(templateName);
 	}
 
 	@Override
@@ -31,7 +30,7 @@ public class EmailDatabaseTemplateLoader implements TemplateLoader {
 
 	@Override
 	public Reader getReader(Object templateSource, String encoding) throws IOException {
-		return new StringReader(new String(((EmailTemplate) templateSource).getTemplate()));
+		return new StringReader(new String(((AmEmailTemplates) templateSource).getTemplate()));
 	}
 
 	@Override

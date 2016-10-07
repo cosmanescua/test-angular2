@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { DTViewCmpIf } from '../dtShared/dt.viewCmpIf';
 import { DTService } from '../dtShared/dt.service';
@@ -6,80 +7,85 @@ import { DTService } from '../dtShared/dt.service';
 import { ErrorLogService } from '../error_log/errorLog.service';
 
 @Component({
-    templateUrl: 'app/error_log/errorLog.cmp.html',
-    styleUrls: ['app/error_log/errorLog.cmp.css'],
+    moduleId: module.id,
+    templateUrl: 'errorLog.cmp.html',
+    // styleUrls: ['errorLog.cmp.css'],
+
+
+    encapsulation: ViewEncapsulation.None
 })
 export class ErrorLogCmp implements OnInit, DTViewCmpIf {
     logs: any[];
     error: any;
 
+    loadingState: boolean;
+
     /*--------- Constructor --------*/
-    constructor(private _dtService: DTService,
-        private _errorLogService: ErrorLogService) { }
+    constructor(
+        private _errorLogService: ErrorLogService,
+        private _dtService: DTService,
+        private _router: Router
+    ) { }
 
-    
+
     /*--------- App logic --------*/
-    /**
-     * Get all logs in list
-     * @author DynTech
-     */
-    getLog() {
-        this._errorLogService.getLog().subscribe(logs => this.logs = logs);
-    }
-    
-    /**
-     * Get log tracer by id
-     * @author DynTech
-     */
-    getLogById(id: number) {
-        this._errorLogService.getLogById(id).subscribe(error => {
-            this.error = error;
 
-            this.error.trace = this.formatLogMessage(this.error.trace);
+    /**
+     * Get all logs
+     * @author DynTech
+     */
+    getLogRest() {
+        this.logs = [];
+        this.loadingState = true;
+        this._dtService.setRestMessageContent('ErrorLogCmp', 'getLogRest()');
+        this._errorLogService.getLog().subscribe(result => {
+            this.logs = result
+            this.loadingState = false;
+        }, error => {
+            this.loadingState = false;
         });
     }
 
     /**
-     * Format log message
+     * Cause exception on backend and store into DB as new exception
      * @author DynTech
      */
-    formatLogMessage(message: string): string {
-        let tempMessage: any = message.replace(/(\r\n|\n|\r)/gm, "<br>");
 
-        tempMessage = tempMessage.split('<br>');
+    causeException() {
+        this.loadingState = true;
 
-        for (let i in tempMessage) {
-            let tempLineSecondSection = tempMessage[i].split("(");
-            if (tempLineSecondSection[1]) {
-                tempLineSecondSection[0] = '- <i>' + tempLineSecondSection[0] + '</i> <b>';
-                tempLineSecondSection[1] += '</b>';
-            } else {
-                
-                tempLineSecondSection[0] = '- <i>' + tempLineSecondSection[0] + '</i>';
-            }
-
-            tempMessage[i] = tempLineSecondSection.join('(');
-        }
-
-        // console.log(tempMessage);
-        return tempMessage.join("<br>");
+        this._dtService.setRestMessageContent('ErrorLogCmp', 'causeException()');
+        this._errorLogService.causeException().subscribe(result => {
+            this.loadingState = false;
+        }, error => {
+            this.loadingState = true;
+            this.getLogRest();
+        })
     }
 
+    /**
+     * Get log tracer by id
+     * @author DynTech
+     */
+    selectErrorLog(log: any) {
+        this._router.navigate(['error_log', log.id])
+    }
 
     /*--------- NgOnInit --------*/
     ngOnInit() {
-        this.__setInitPageTitle('Error log');
-
+        // Variable initialization
         this.logs = [];
+        this.loadingState = false;
 
-        this.getLog();
-        // this.getLogById(108);
+        // Methods execution
+        this.getLogRest();
 
+        // Construct methods
+        this.__setInitPageTitle('Error log');
     }
 
-    //*--------- Interface imported --------*/
+    /*--------- Interface imported --------*/
     __setInitPageTitle(title: string) {
         this._dtService.setPageTitle(title);
     }
-
 }

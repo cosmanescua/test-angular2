@@ -1,1 +1,33 @@
+#cmp-error_log {
+    .main_table {
+        tr {
+            cursor: pointer;
+        }
+    }
+}
+#cmp-error_log_trace {
+    .method {
+        color: rgb(39, 39, 39);
+    }
 
+    .code_trace {
+        color: rgb(58, 128, 255);
+        font-weight: normal;
+        text-decoration: underline;
+    }
+
+    .trace_row {
+        line-height: 17px;
+        padding: 2px 5px 2px 30px;
+        position: relative;
+
+        &.trace_start {
+            padding-left: 2px;
+        }
+
+        &:hover {
+            background: rgb(249, 249, 249);
+            text-decoration: underline;
+        }
+    }
+}

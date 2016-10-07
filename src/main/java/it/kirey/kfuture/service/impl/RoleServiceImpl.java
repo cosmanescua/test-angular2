@@ -6,24 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.RoleDao;
-import it.kirey.kfuture.entity.Role;
-import it.kirey.kfuture.service.RoleService;
+import it.kirey.kfuture.dao.IAmApplicationRolesHome;
+import it.kirey.kfuture.entity.AmApplicationRoles;
+import it.kirey.kfuture.service.IRoleService;
 
-@Service(value="roleService")
-public class RoleServiceImpl implements RoleService {
+@Service(value=IRoleService.SERVICE_QUALIFIER)
+public class RoleServiceImpl implements IRoleService {
 	
 	@Autowired
-	private RoleDao roleDao;
+	private IAmApplicationRolesHome amApplicationRolesHome;
 
 	@Override
-	public void saveOrUpdate(Role role) {
-		roleDao.saveOrUpdate(role);
+	@Transactional
+	public void saveOrUpdate(AmApplicationRoles role) {
+		amApplicationRolesHome.attachDirty(role);
 	}
 
 	@Override
-	public Set<Role> getRoles(String username) {
-		return roleDao.getRoles(username);
+	@Transactional(readOnly=true)
+	public Set<AmApplicationRoles> getRoles(String username) {
+		return amApplicationRolesHome.getRolesByUsername(username);
 	}
 	
 }

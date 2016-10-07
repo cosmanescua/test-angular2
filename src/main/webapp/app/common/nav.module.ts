@@ -18,7 +18,7 @@ import { UtilityModule } from '../shared/modules/utility.module';
         RouterModule,
          TranslateModule.forRoot({ 
           provide: TranslateLoader,
-          useFactory: (http: Http) => new TranslateStaticLoader(http, 'app/assets/i18n/', '.json'),
+          useFactory: (http: Http) => new TranslateStaticLoader(http, 'rest/translations/navigation', ''),
           deps: [Http]
         })
     ],
