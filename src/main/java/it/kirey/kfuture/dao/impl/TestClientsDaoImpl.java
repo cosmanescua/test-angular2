@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.kirey.kfuture.dao.ITestClientsDao;
 import it.kirey.kfuture.entity.TestClients;
-import it.kirey.kfuture.entity.User;
 
 /**
  * Home object for domain model class TestClients.
