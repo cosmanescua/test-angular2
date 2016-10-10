@@ -31,10 +31,9 @@ var TestFilesService = (function () {
     };
     //this throws error "The request body isn't either a blob or an array buffer"
     TestFilesService.prototype.handleResponse = function (response) {
-        var contentType = response.headers.get("content-type");
+        var contentType = response.headers.get("File-Type");
         // console.log(response.arrayBuffer());
         console.log(contentType);
-        console.log(response.blob());
         return new Blob([response.blob()], { type: contentType });
     };
     //error handler method

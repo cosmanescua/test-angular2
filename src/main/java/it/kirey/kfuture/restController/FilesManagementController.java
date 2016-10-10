@@ -96,7 +96,9 @@ public class FilesManagementController {
 	        String filePathToBeServed =testFile.getFilepath(); 
 	        File fileToDownload = new File(filePathToBeServed);
 	        response.setContentLength((int) fileToDownload.length());
-	        response.setCharacterEncoding("UTF-16");
+	        //response.setCharacterEncoding("UTF-16");
+	        response.setHeader("File-Type", URLConnection.guessContentTypeFromName(fileToDownload.getName()));
+	        response.setContentType("application/octet-stream");
 	        response.setHeader("Content-Disposition", "attachment; filename="
 	                + fileToDownload.getName());
 	        ServletOutputStream outStream = response.getOutputStream();

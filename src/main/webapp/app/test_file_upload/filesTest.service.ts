@@ -20,10 +20,9 @@ export class TestFilesService{
 
     //this throws error "The request body isn't either a blob or an array buffer"
     handleResponse(response){
-        let contentType=response.headers.get("content-type");
+        let contentType=response.headers.get("File-Type");
        // console.log(response.arrayBuffer());
         console.log(contentType);
-        console.log(response.blob());
        return new Blob([response.blob()],{type : contentType});
     }
      //error handler method
