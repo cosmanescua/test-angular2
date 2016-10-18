@@ -11,6 +11,8 @@ import { DTHttpInterceptor } from '../dtShared/dt.httpInterceptor';
 
 
 import { UtilityModule } from '../shared/modules/utility.module';
+import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
+
 
 @NgModule({
     imports: [
@@ -25,6 +27,8 @@ import { UtilityModule } from '../shared/modules/utility.module';
     exports: [NavCmp],
     declarations: [NavCmp],
     providers: [
+       CookieService,
+       GlobalEventsManager,
         {
             provide: Http,
             useFactory: (

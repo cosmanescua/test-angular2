@@ -22,11 +22,12 @@
                 <li>
                     <a routerLink="report_management" routerLinkActive="active">Report Management</a>
                 </li>
-                <li>
+                <!--show this item in the nav bar only if the user is admin-->
+                <li *ngIf="isAdminUser==true">
                     <a routerLink="admin/create_report" routerLinkActive="active">Admin - Create Report</a>
                 </li>
-
-                <li class="dropdown">
+                <!--show this item in the nav bar only if the user is admin-->
+                <li *ngIf="isAdminUser==true" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dev <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a routerLink="cache_test" routerLinkActive="active">Cache Test</a></li>

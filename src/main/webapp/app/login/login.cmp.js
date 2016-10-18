@@ -15,13 +15,15 @@ var userLogin_model_1 = require('../login/userLogin.model');
 var login_service_1 = require('../login/login.service');
 var dt_service_1 = require('../dtShared/dt.service');
 var app_service_1 = require('../shared/services/app.service');
+var globalEventManager_service_1 = require('../test-routes/globalEventManager.service');
 var LoginCmp = (function () {
     /*--------- Constructor --------*/
-    function LoginCmp(_loginService, _cookieService, _dtService, _appService) {
+    function LoginCmp(_loginService, _cookieService, _dtService, _appService, _globalEventManager) {
         this._loginService = _loginService;
         this._cookieService = _cookieService;
         this._dtService = _dtService;
         this._appService = _appService;
+        this._globalEventManager = _globalEventManager;
         this.loginModel = new userLogin_model_1.UserLogin('micko', 'micko');
     }
     /*--------- App logic --------*/
@@ -64,6 +66,12 @@ var LoginCmp = (function () {
             _this.bLoginState = true;
             _this.bLoginSuccessful = true;
             _this.bLoadingState = false;
+            var userState = {};
+            userState['username'] = result.username;
+            userState['roles'] = result.roles;
+            //set the user data for guard authentication test
+            _this._cookieService.put('user', JSON.stringify(userState));
+            _this._globalEventManager.showNavBar.emit(true);
         }, function (error) {
             _this.bLoginState = true;
             _this.bLoginSuccessful = false;
@@ -111,7 +119,7 @@ var LoginCmp = (function () {
             // styleUrls: ['app/login/login.cmp.css'],
             encapsulation: core_1.ViewEncapsulation.None
         }), 
-        __metadata('design:paramtypes', [login_service_1.LoginService, core_2.CookieService, dt_service_1.DTService, app_service_1.AppService])
+        __metadata('design:paramtypes', [login_service_1.LoginService, core_2.CookieService, dt_service_1.DTService, app_service_1.AppService, globalEventManager_service_1.GlobalEventsManager])
     ], LoginCmp);
     return LoginCmp;
 }());

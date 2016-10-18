@@ -12,17 +12,28 @@ var core_1 = require('@angular/core');
 var ng2_translate_1 = require('ng2-translate/ng2-translate');
 var app_service_1 = require('../shared/services/app.service');
 var dt_service_1 = require('../dtShared/dt.service');
+var core_2 = require('angular2-cookie/core');
+var globalEventManager_service_1 = require('../test-routes/globalEventManager.service');
 var NavCmp = (function () {
     /*--------- Constructor --------*/
-    function NavCmp(_translate, _appService, _dtService) {
+    function NavCmp(_translate, _appService, _dtService, _cookieService, _globalEventsManager) {
         // translate.setDefaultLang('prevod1');
+        var _this = this;
         this._translate = _translate;
         this._appService = _appService;
         this._dtService = _dtService;
+        this._cookieService = _cookieService;
+        this._globalEventsManager = _globalEventsManager;
         this.onTranslationChange = new core_1.EventEmitter();
+        //this flag is used for conditionally display some items in the navigation bar - sections that must be available only for admin
+        this.isAdminUser = false;
         // the lang to use, if the lang isn't available, it will use the current loader to get them
         // translate.use('prevod1');
         this._dtService.setInitCompanyCSS();
+        this._globalEventsManager.showNavBar.subscribe(function (mode) {
+            console.log("event emitted");
+            _this.isAdmin();
+        });
     }
     /*--------- App logic --------*/
     NavCmp.prototype.matchDefaultLanguage = function (lang) {
@@ -47,6 +58,28 @@ var NavCmp = (function () {
         });
         // this._appService.titleChanged.subscribe(lang => console.log(lang));
     };
+    //verify if the current user logged in has admin role and set the isAdminUser flag
+    NavCmp.prototype.isAdmin = function () {
+        //get user data from cookies
+        if (this._cookieService.get("user")) {
+            var currentUserState = JSON.parse(this._cookieService.get("user"));
+            if (currentUserState.roles) {
+                if (currentUserState.roles['ROLE_ADMIN'] == true) {
+                    console.log('isAdmin');
+                    this.isAdminUser = true;
+                }
+                else {
+                    this.isAdminUser = false;
+                }
+            }
+            else {
+                console.log("not logged in");
+            }
+        }
+        else {
+            console.log("No cookie found");
+        }
+    };
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)
@@ -57,7 +90,7 @@ var NavCmp = (function () {
             selector: 'navigation-menu',
             templateUrl: 'nav.cmp.html',
         }), 
-        __metadata('design:paramtypes', [ng2_translate_1.TranslateService, app_service_1.AppService, dt_service_1.DTService])
+        __metadata('design:paramtypes', [ng2_translate_1.TranslateService, app_service_1.AppService, dt_service_1.DTService, core_2.CookieService, globalEventManager_service_1.GlobalEventsManager])
     ], NavCmp);
     return NavCmp;
 }());

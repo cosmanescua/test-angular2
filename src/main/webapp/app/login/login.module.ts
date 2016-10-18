@@ -13,6 +13,9 @@ import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { CookieService } from 'angular2-cookie/core';
 import { DTHttpInterceptor } from '../dtShared/dt.httpInterceptor';
 
+import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
+
+
 @NgModule({
     imports: [
         ROUTING,

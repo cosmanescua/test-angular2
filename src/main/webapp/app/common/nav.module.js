@@ -16,6 +16,7 @@ var http_1 = require('@angular/http');
 var core_2 = require('angular2-cookie/core');
 var dt_httpInterceptor_1 = require('../dtShared/dt.httpInterceptor');
 var utility_module_1 = require('../shared/modules/utility.module');
+var globalEventManager_service_1 = require('../test-routes/globalEventManager.service');
 var NavModule = (function () {
     function NavModule() {
     }
@@ -33,6 +34,8 @@ var NavModule = (function () {
             exports: [nav_cmp_1.NavCmp],
             declarations: [nav_cmp_1.NavCmp],
             providers: [
+                core_2.CookieService,
+                globalEventManager_service_1.GlobalEventsManager,
                 {
                     provide: http_1.Http,
                     useFactory: function (backend, defaultOptions, cookieService) {

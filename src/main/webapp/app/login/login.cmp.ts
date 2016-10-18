@@ -12,6 +12,10 @@ import { DTViewCmpIf } from '../dtShared/dt.viewcmpIF';
 
 import { AppService } from '../shared/services/app.service';
 
+import {FileManagementAccessTestService} from '../test-routes/fileManagementAccess.service';
+
+import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
+
 declare var $: JQueryStatic;
 
 @Component({
@@ -39,7 +43,8 @@ export class LoginCmp implements OnInit, DTViewCmpIf {
         private _loginService: LoginService,
         private _cookieService: CookieService,
         private _dtService: DTService,
-        private _appService: AppService) { }
+        private _appService: AppService,
+        private _globalEventManager: GlobalEventsManager) { }
 
     /*--------- App logic --------*/
     /**
@@ -53,10 +58,12 @@ export class LoginCmp implements OnInit, DTViewCmpIf {
         this.bLoadingState = true;
 
         this._dtService.setRestMessageContent('LoginCmp', 'login()');
+       
         this._loginService.login(this.loginModel)
             .subscribe(data => {
                 this._cookieService.put('X-Auth-Token', data.token);
                 this.getUserRest();
+                
             });
     }
 
@@ -84,6 +91,16 @@ export class LoginCmp implements OnInit, DTViewCmpIf {
             this.bLoginState = true;
             this.bLoginSuccessful = true;
             this.bLoadingState = false;
+           
+
+            let userState={};
+            userState['username']= result.username;
+            userState['roles']=result.roles;
+            //set the user data for guard authentication test
+            this._cookieService.put('user', JSON.stringify(userState));
+            this._globalEventManager.showNavBar.emit(true);
+
+            
         }, error => {
             this.bLoginState = true;
             this.bLoginSuccessful = false;

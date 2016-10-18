@@ -17,6 +17,9 @@ var nav_module_1 = require('./common/nav.module');
 var app_routes_1 = require('./app.routes');
 var utility_module_1 = require('./shared/modules/utility.module');
 var app_service_1 = require('./shared/services/app.service');
+var fileManagementAccess_service_1 = require('./test-routes/fileManagementAccess.service');
+var clientsDataAccess_service_1 = require('./test-routes/clientsDataAccess.service');
+var adminRoutesAccess_service_1 = require('./test-routes/adminRoutesAccess.service');
 var AppModule = (function () {
     function AppModule() {
     }
@@ -33,6 +36,9 @@ var AppModule = (function () {
             ],
             bootstrap: [app_cmp_1.AppCmp],
             providers: [
+                fileManagementAccess_service_1.FileManagementAccessTestService,
+                clientsDataAccess_service_1.ClientsDataAccess,
+                adminRoutesAccess_service_1.AdminRoutesAccess,
                 app_service_1.AppService,
                 {
                     provide: common_1.LocationStrategy,
