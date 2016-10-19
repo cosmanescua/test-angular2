@@ -12,7 +12,6 @@ import { DTViewCmpIf } from '../dtShared/dt.viewcmpIF';
 
 import { AppService } from '../shared/services/app.service';
 
-import {FileManagementAccessTestService} from '../test-routes/fileManagementAccess.service';
 
 import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
 

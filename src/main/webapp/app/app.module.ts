@@ -11,10 +11,8 @@ import { ROUTING } from './app.routes';
 import { UtilityModule } from './shared/modules/utility.module';
 
 import { AppService } from './shared/services/app.service';
-import {FileManagementAccessTestService} from './test-routes/fileManagementAccess.service';
-import {ClientsDataAccess} from './test-routes/clientsDataAccess.service';
-import {AdminRoutesAccess}  from './test-routes/adminRoutesAccess.service';
 
+import {RouteAccessGuard}  from './test-routes/routesAccessGuard.service';
 
 @NgModule({
     imports: [
@@ -28,9 +26,7 @@ import {AdminRoutesAccess}  from './test-routes/adminRoutesAccess.service';
     ],
     bootstrap: [AppCmp],
     providers: [
-        FileManagementAccessTestService,
-        ClientsDataAccess,
-        AdminRoutesAccess,
+        RouteAccessGuard,
         AppService,
         {
             provide: LocationStrategy,

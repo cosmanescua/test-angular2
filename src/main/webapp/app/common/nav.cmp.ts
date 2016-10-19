@@ -34,7 +34,7 @@ export class NavCmp {
         // translate.use('prevod1');
 
         this._dtService.setInitCompanyCSS();
-         this._globalEventsManager.showNavBar.subscribe((mode)=>{
+        this._globalEventsManager.showNavBar.subscribe((mode)=>{
             console.log("event emitted")
             this.isAdmin();
         });
