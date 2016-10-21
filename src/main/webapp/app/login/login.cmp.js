@@ -69,7 +69,7 @@ var LoginCmp = (function () {
             _this.bLoginSuccessful = true;
             _this.bLoadingState = false;
             console.log(result);
-            _this._authenticationService.setUserPermissions(result.username, result.userRoutes);
+            authentication_service_1.AuthenticationService.setUserPermissions(result.username, result.userRoutes);
             _this._globalEventManager.showNavBar.emit(true);
         }, function (error) {
             _this.bLoginState = true;
@@ -91,6 +91,7 @@ var LoginCmp = (function () {
             this.bLoginSuccessful = false;
         }
         this.bLoadingState = false;
+        authentication_service_1.AuthenticationService.isLoggedIn = true;
         this.aCssList = [];
         this.selectedCompany = '';
     };

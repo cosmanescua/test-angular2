@@ -95,7 +95,7 @@ export class LoginCmp implements OnInit, DTViewCmpIf {
            
 
            console.log(result);
-           this._authenticationService.setUserPermissions(result.username, result.userRoutes);
+           AuthenticationService.setUserPermissions(result.username, result.userRoutes);
            this._globalEventManager.showNavBar.emit(true);
 
             
@@ -122,6 +122,7 @@ export class LoginCmp implements OnInit, DTViewCmpIf {
             this.bLoginSuccessful = false;
         }
         this.bLoadingState = false;
+        AuthenticationService.isLoggedIn=true;
 
         this.aCssList = [];
         this.selectedCompany = '';

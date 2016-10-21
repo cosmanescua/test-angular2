@@ -9,18 +9,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var authentication_service_1 = require('./test-routes/authentication.service');
 var AppCmp = (function () {
-    function AppCmp() {
+    function AppCmp(_authenticationService) {
+        this._authenticationService = _authenticationService;
     }
     AppCmp.prototype.promenioTrans = function () {
         console.log('PROMENA');
+    };
+    AppCmp.prototype.ngOnInit = function () {
+        this._authenticationService.initRest().subscribe(function (userData) {
+            console.log("app component initialization");
+            console.log(userData);
+            authentication_service_1.AuthenticationService.setUserPermissions(userData.username, userData.userRoutes);
+            authentication_service_1.AuthenticationService.isLoggedIn = true;
+        }, function () {
+            authentication_service_1.AuthenticationService.isLoggedIn = false;
+        });
     };
     AppCmp = __decorate([
         core_1.Component({
             selector: 'app',
             templateUrl: 'app/app.cmp.html',
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [authentication_service_1.AuthenticationService])
     ], AppCmp);
     return AppCmp;
 }());

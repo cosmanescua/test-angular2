@@ -1,23 +1,27 @@
 import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
+import {Http} from '@angular/http';
 @Injectable()
 export class AuthenticationService{
     //define permissions for each route
-    private _userPermissions={};
-    public setUserPermissions(username, routes)
+    static isLoggedIn=false;
+    static userPermissions={};
+    constructor(private _http:Http){}
+    public static setUserPermissions(username, routes)
     {
-        this._userPermissions["username"]=username;
-        this._userPermissions["routes"]={};
+        AuthenticationService.userPermissions["username"]=username;
+        AuthenticationService.userPermissions["routes"]={};
         for(var i=0;i<routes.length;i++)
         {
-            this._userPermissions["routes"][routes[i].url]=true;
+            AuthenticationService.userPermissions["routes"][routes[i].url]=true;
         }
 
     }
     public checkPermission(route):boolean
     {
-        if(this._userPermissions["routes"])
+        if(AuthenticationService.userPermissions["routes"])
         {
-            let routes=this._userPermissions["routes"];
+            let routes=AuthenticationService.userPermissions["routes"];
             if(routes[route]==true)
             {
              return true;
@@ -25,5 +29,12 @@ export class AuthenticationService{
             return false;
         }
         return false;    
+    }
+    initRest(): Observable<any> {
+        return this._http.get('rest/init').map(result => result.json());
+    }
+    getLoginStatus()
+    {
+        return AuthenticationService.isLoggedIn;
     }
 }

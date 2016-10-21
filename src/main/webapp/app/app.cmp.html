@@ -1,5 +1,5 @@
 <!-- Navigation -->
-<navigation-menu (onTranslationChange)="promenioTrans()"></navigation-menu>
+<navigation-menu *ngIf="_authenticationService.getLoginStatus()" (onTranslationChange)="promenioTrans()"></navigation-menu>
 
 <div id="app_content-container">
     <router-outlet></router-outlet>

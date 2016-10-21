@@ -9,21 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var http_1 = require('@angular/http');
 var AuthenticationService = (function () {
-    function AuthenticationService() {
-        //define permissions for each route
-        this._userPermissions = {};
+    function AuthenticationService(_http) {
+        this._http = _http;
     }
-    AuthenticationService.prototype.setUserPermissions = function (username, routes) {
-        this._userPermissions["username"] = username;
-        this._userPermissions["routes"] = {};
+    AuthenticationService.setUserPermissions = function (username, routes) {
+        AuthenticationService.userPermissions["username"] = username;
+        AuthenticationService.userPermissions["routes"] = {};
         for (var i = 0; i < routes.length; i++) {
-            this._userPermissions["routes"][routes[i].url] = true;
+            AuthenticationService.userPermissions["routes"][routes[i].url] = true;
         }
     };
     AuthenticationService.prototype.checkPermission = function (route) {
-        if (this._userPermissions["routes"]) {
-            var routes = this._userPermissions["routes"];
+        if (AuthenticationService.userPermissions["routes"]) {
+            var routes = AuthenticationService.userPermissions["routes"];
             if (routes[route] == true) {
                 return true;
             }
@@ -31,9 +31,18 @@ var AuthenticationService = (function () {
         }
         return false;
     };
+    AuthenticationService.prototype.initRest = function () {
+        return this._http.get('rest/init').map(function (result) { return result.json(); });
+    };
+    AuthenticationService.prototype.getLoginStatus = function () {
+        return AuthenticationService.isLoggedIn;
+    };
+    //define permissions for each route
+    AuthenticationService.isLoggedIn = false;
+    AuthenticationService.userPermissions = {};
     AuthenticationService = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [http_1.Http])
     ], AuthenticationService);
     return AuthenticationService;
 }());
