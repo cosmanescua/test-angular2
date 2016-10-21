@@ -3,6 +3,7 @@ package it.kirey.kfuture.dao.impl;
 
 import static org.hibernate.criterion.Example.create;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -17,8 +18,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import it.kirey.kfuture.dao.IAmUserAccountsHome;
+import it.kirey.kfuture.entity.AmApplicationRoles;
+import it.kirey.kfuture.entity.AmUrlRoutes;
 import it.kirey.kfuture.entity.AmUserAccounts;
 
 /**
@@ -55,7 +59,6 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 	}
 
 	@Override
-	@Cacheable("security")
 	public AmUserAccounts getUserByToken(String token) throws UsernameNotFoundException {
 		return (AmUserAccounts) sessionFactory.getCurrentSession().createCriteria(AmUserAccounts.class)
 				.add(Restrictions.eq("token", token)).uniqueResult();
@@ -121,7 +124,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 			throw re;
 		}
 	}
-	
+
 	@Override
 	public AmUserAccounts merge(AmUserAccounts detachedInstance) {
 		log.debug("merging AmUserAccounts instance");
@@ -134,7 +137,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 			throw re;
 		}
 	}
-	
+
 	@Override
 	public AmUserAccounts findById(Integer id) {
 		log.debug("getting AmUserAccounts instance with id: " + id);
@@ -164,5 +167,32 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 			log.error("find by example failed", re);
 			throw re;
 		}
+	}
+
+	@Override
+	public void logoutUser(AmUserAccounts user) {
+		log.debug("deleting token for user");
+		try {
+			user.setToken("");
+			sessionFactory.getCurrentSession().update(user);
+			log.debug("delete successful");
+		} catch (RuntimeException re) {
+			log.error("delete failed", re);
+			throw re;
+		}
+
+	}
+
+	@Override
+	public List<AmUrlRoutes> findRoutesByUser(AmUserAccounts user) {
+		List<AmApplicationRoles> userRoles = user.getAmApplicationRoleses();
+		List<AmUrlRoutes> userRouts = new ArrayList<>();
+		for (AmApplicationRoles userRole : userRoles) {
+			for (int i = 0; i < userRole.getAmUrlRouteses().size(); i++) {
+				if (!userRouts.contains(userRole.getAmUrlRouteses().get(i)))
+					userRouts.add(userRole.getAmUrlRouteses().get(i));
+			}
+		}
+		return userRouts;
 	}
 }

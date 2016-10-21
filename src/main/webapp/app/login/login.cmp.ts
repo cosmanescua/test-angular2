@@ -14,6 +14,7 @@ import { AppService } from '../shared/services/app.service';
 
 
 import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
+import {AuthenticationService} from '../test-routes/authentication.service';
 
 declare var $: JQueryStatic;
 
@@ -43,7 +44,8 @@ export class LoginCmp implements OnInit, DTViewCmpIf {
         private _cookieService: CookieService,
         private _dtService: DTService,
         private _appService: AppService,
-        private _globalEventManager: GlobalEventsManager) { }
+        private _globalEventManager: GlobalEventsManager,
+        private _authenticationService: AuthenticationService) { }
 
     /*--------- App logic --------*/
     /**
@@ -92,12 +94,9 @@ export class LoginCmp implements OnInit, DTViewCmpIf {
             this.bLoadingState = false;
            
 
-            let userState={};
-            userState['username']= result.username;
-            userState['roles']=result.roles;
-            //set the user data for guard authentication test
-            this._cookieService.put('user', JSON.stringify(userState));
-            this._globalEventManager.showNavBar.emit(true);
+           console.log(result);
+           this._authenticationService.setUserPermissions(result.username, result.userRoutes);
+           this._globalEventManager.showNavBar.emit(true);
 
             
         }, error => {

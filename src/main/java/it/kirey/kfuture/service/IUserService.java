@@ -1,7 +1,10 @@
 package it.kirey.kfuture.service;
 
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import it.kirey.kfuture.entity.AmUrlRoutes;
 import it.kirey.kfuture.entity.AmUserAccounts;
 
 public interface IUserService extends UserDetailsService {
@@ -12,5 +15,6 @@ public interface IUserService extends UserDetailsService {
 	public AmUserAccounts getUserByUsername(String username);
 	public AmUserAccounts getUserByToken(String token);
 	public void changeDefaultLanguage(String langCode);
-
+	public void logoutUser();
+	public List<AmUrlRoutes> findRoutesByUser();
 }

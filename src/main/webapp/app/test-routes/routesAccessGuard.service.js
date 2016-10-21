@@ -11,96 +11,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var core_2 = require('angular2-cookie/core');
+var authentication_service_1 = require('./authentication.service');
 var RouteAccessGuard = (function () {
-    function RouteAccessGuard(router, _cookieService) {
+    function RouteAccessGuard(router, _cookieService, _authService) {
         this.router = router;
         this._cookieService = _cookieService;
-        //define permissions for each route
-        this._routePermissions = {
-            '/clientsTest': {
-                'allowedUsers': ['daniel'],
-                'allowedRole': 'ROLE_ANY'
-            },
-            '/filesTest': {
-                'allowedUsers': ['micko'],
-                'allowedRole': 'ROLE_ANY'
-            },
-            '/cache_test': {
-                'allowedUsers': [],
-                'allowedRole': 'ROLE_ADMIN'
-            },
-            '/error_log': {
-                'allowedUsers': [],
-                'allowedRole': 'ROLE_ADMIN'
-            },
-            '/admin/create_report': {
-                'allowedUsers': [],
-                'allowedRole': 'ROLE_ADMIN'
-            }
-        };
+        this._authService = _authService;
     }
     //only users in _allowedUsers can access the requested route
     RouteAccessGuard.prototype.canActivate = function (route, state) {
-        var requestedRoute = state.url;
-        console.log("Requested route: " + requestedRoute);
-        var requestedRoutePermissions = this._routePermissions[requestedRoute];
-        console.log(requestedRoutePermissions);
-        if (!requestedRoutePermissions) {
-            console.log("No special permissions defined for route: " + requestedRoute);
-            return true;
+        console.log(state);
+        console.log(route);
+        var path = state.url;
+        path = path.substr(1, path.length);
+        console.log("Checking permission for route: " + path);
+        if (this._authService.checkPermission(path) == false) {
+            this.router.navigate(['/login']);
+            return false;
         }
-        else {
-            var currentUser = this.getCurrentUser();
-            if (!currentUser) {
-                console.log("No user is logged in");
-                //the user has no permission for the route requested - redirect to login page
-                console.log("user doesn't have permissions for this route : redirecting to login page");
-                this.router.navigate(['/login']);
-                return false;
-            }
-            else {
-                var currentUsername = currentUser.username;
-                if (requestedRoutePermissions['allowedUsers'].length > 0) {
-                    //verify if the current user is allowed to access the route
-                    for (var i = 0; i < requestedRoutePermissions['allowedUsers'].length; i++) {
-                        if (requestedRoutePermissions['allowedUsers'][i] == currentUsername) {
-                            return this.checkRole(requestedRoutePermissions['allowedRole'], currentUser.roles);
-                        }
-                    }
-                    console.log("user doesn't have permissions for this route : redirecting to login page");
-                    this.router.navigate(['/login']);
-                    return false;
-                }
-                else {
-                    //any user can access the link, but we have to check the allowed roles
-                    console.log("No specific username, checking role");
-                    console.log(currentUser.roles);
-                    return this.checkRole(requestedRoutePermissions['allowedRole'], currentUser.roles);
-                }
-            }
-        }
-    };
-    RouteAccessGuard.prototype.getCurrentUser = function () {
-        if (this._cookieService.get("user"))
-            return JSON.parse(this._cookieService.get("user"));
-        return null;
-    };
-    RouteAccessGuard.prototype.checkRole = function (allowedRole, userRoles) {
-        if (allowedRole == 'ROLE_ANY') {
-            console.log("allowed role is ROLE_ANY");
-            return true;
-        }
-        console.log("allowed role is " + allowedRole + " value: " + userRoles[allowedRole]);
-        if (userRoles[allowedRole] == true) {
-            return true;
-        }
-        console.log("user doesn't have permissions for this route : redirecting to login page");
-        this.router.navigate(['/login']);
-        return false;
+        return true;
     };
     RouteAccessGuard = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [router_1.Router, core_2.CookieService])
+        __metadata('design:paramtypes', [router_1.Router, core_2.CookieService, authentication_service_1.AuthenticationService])
     ], RouteAccessGuard);
     return RouteAccessGuard;
 }());

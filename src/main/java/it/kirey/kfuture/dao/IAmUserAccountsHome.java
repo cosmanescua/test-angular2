@@ -1,7 +1,10 @@
 package it.kirey.kfuture.dao;
 
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import it.kirey.kfuture.entity.AmUrlRoutes;
 import it.kirey.kfuture.entity.AmUserAccounts;
 
 public interface IAmUserAccountsHome extends UserDetailsService {
@@ -26,4 +29,9 @@ public interface IAmUserAccountsHome extends UserDetailsService {
 	public AmUserAccounts merge(AmUserAccounts detachedInstance);
 	
 	public void persist(AmUserAccounts transientInstance);
+	
+	public void logoutUser(AmUserAccounts user);
+	
+	public List<AmUrlRoutes> findRoutesByUser(AmUserAccounts user);
+
 }

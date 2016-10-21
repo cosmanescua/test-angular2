@@ -18,6 +18,7 @@ var app_routes_1 = require('./app.routes');
 var utility_module_1 = require('./shared/modules/utility.module');
 var app_service_1 = require('./shared/services/app.service');
 var routesAccessGuard_service_1 = require('./test-routes/routesAccessGuard.service');
+var authentication_service_1 = require('./test-routes/authentication.service');
 var AppModule = (function () {
     function AppModule() {
     }
@@ -35,6 +36,7 @@ var AppModule = (function () {
             bootstrap: [app_cmp_1.AppCmp],
             providers: [
                 routesAccessGuard_service_1.RouteAccessGuard,
+                authentication_service_1.AuthenticationService,
                 app_service_1.AppService,
                 {
                     provide: common_1.LocationStrategy,

@@ -16,18 +16,18 @@
                 <li>
                     <a routerLink="login" routerLinkActive="active">Login</a>
                 </li>
-                <li>
+                <li *ngIf="checkPermission('products')">
                     <a routerLink="products" routerLinkActive="active">Products</a>
                 </li>
-                <li>
+                <li *ngIf="checkPermission('report_management')">
                     <a routerLink="report_management" routerLinkActive="active">Report Management</a>
                 </li>
                 <!--show this item in the nav bar only if the user is admin-->
-                <li *ngIf="isAdminUser==true">
+                <li *ngIf="checkPermission('admin/create_report')">
                     <a routerLink="admin/create_report" routerLinkActive="active">Admin - Create Report</a>
                 </li>
                 <!--show this item in the nav bar only if the user is admin-->
-                <li *ngIf="isAdminUser==true" class="dropdown">
+                <li  class="dropdown" *ngIf="checkPermission('cache_test') && checkPermission('error_log')" >
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dev <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a routerLink="cache_test" routerLinkActive="active">Cache Test</a></li>

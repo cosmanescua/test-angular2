@@ -16,14 +16,16 @@ var login_service_1 = require('../login/login.service');
 var dt_service_1 = require('../dtShared/dt.service');
 var app_service_1 = require('../shared/services/app.service');
 var globalEventManager_service_1 = require('../test-routes/globalEventManager.service');
+var authentication_service_1 = require('../test-routes/authentication.service');
 var LoginCmp = (function () {
     /*--------- Constructor --------*/
-    function LoginCmp(_loginService, _cookieService, _dtService, _appService, _globalEventManager) {
+    function LoginCmp(_loginService, _cookieService, _dtService, _appService, _globalEventManager, _authenticationService) {
         this._loginService = _loginService;
         this._cookieService = _cookieService;
         this._dtService = _dtService;
         this._appService = _appService;
         this._globalEventManager = _globalEventManager;
+        this._authenticationService = _authenticationService;
         this.loginModel = new userLogin_model_1.UserLogin('micko', 'micko');
     }
     /*--------- App logic --------*/
@@ -66,11 +68,8 @@ var LoginCmp = (function () {
             _this.bLoginState = true;
             _this.bLoginSuccessful = true;
             _this.bLoadingState = false;
-            var userState = {};
-            userState['username'] = result.username;
-            userState['roles'] = result.roles;
-            //set the user data for guard authentication test
-            _this._cookieService.put('user', JSON.stringify(userState));
+            console.log(result);
+            _this._authenticationService.setUserPermissions(result.username, result.userRoutes);
             _this._globalEventManager.showNavBar.emit(true);
         }, function (error) {
             _this.bLoginState = true;
@@ -119,7 +118,7 @@ var LoginCmp = (function () {
             // styleUrls: ['app/login/login.cmp.css'],
             encapsulation: core_1.ViewEncapsulation.None
         }), 
-        __metadata('design:paramtypes', [login_service_1.LoginService, core_2.CookieService, dt_service_1.DTService, app_service_1.AppService, globalEventManager_service_1.GlobalEventsManager])
+        __metadata('design:paramtypes', [login_service_1.LoginService, core_2.CookieService, dt_service_1.DTService, app_service_1.AppService, globalEventManager_service_1.GlobalEventsManager, authentication_service_1.AuthenticationService])
     ], LoginCmp);
     return LoginCmp;
 }());

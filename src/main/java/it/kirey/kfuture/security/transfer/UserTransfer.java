@@ -4,6 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import it.kirey.kfuture.entity.AmApplicationRoles;
+import it.kirey.kfuture.entity.AmUrlRoutes;
+
 public class UserTransfer {
 
 	private final String username;
@@ -17,14 +20,17 @@ public class UserTransfer {
 	
 	private final String defaultLanguage;
 	
+	private final List<AmUrlRoutes> userRoutes;
+	
 	
 	public UserTransfer(String username, Map<String, Boolean> roles, LinkedHashMap<String, String> companies, List<String> cssStyles,
-			String defaultLanguage) {
+			String defaultLanguage, List<AmUrlRoutes> userRoutes) {
 		this.username = username;
 		this.roles = roles;
 		this.companies = companies;
 		this.cssStyles = cssStyles;
 		this.defaultLanguage = defaultLanguage;
+		this.userRoutes = userRoutes;
 	}
 	
 	public String getUsername() {
@@ -46,4 +52,10 @@ public class UserTransfer {
 	public String getDefaultLanguage() {
 		return defaultLanguage;
 	}
+
+	public List<AmUrlRoutes> getUserRoutes() {
+		return userRoutes;
+	}
+
+	
 }

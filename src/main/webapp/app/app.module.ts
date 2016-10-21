@@ -13,6 +13,7 @@ import { UtilityModule } from './shared/modules/utility.module';
 import { AppService } from './shared/services/app.service';
 
 import {RouteAccessGuard}  from './test-routes/routesAccessGuard.service';
+import {AuthenticationService} from './test-routes/authentication.service';
 
 @NgModule({
     imports: [
@@ -27,6 +28,7 @@ import {RouteAccessGuard}  from './test-routes/routesAccessGuard.service';
     bootstrap: [AppCmp],
     providers: [
         RouteAccessGuard,
+        AuthenticationService,
         AppService,
         {
             provide: LocationStrategy,

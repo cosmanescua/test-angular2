@@ -6,6 +6,7 @@ import { AppService } from '../shared/services/app.service';
 import { DTService } from '../dtShared/dt.service';
 import { CookieService } from 'angular2-cookie/core';
 import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
+import {AuthenticationService} from '../test-routes/authentication.service';
 
 @Component({
     moduleId: module.id,
@@ -26,7 +27,8 @@ export class NavCmp {
         private _appService: AppService,
         private _dtService: DTService,
         private _cookieService: CookieService,
-        private _globalEventsManager:GlobalEventsManager) {
+        private _globalEventsManager:GlobalEventsManager,
+        private _authenticationService: AuthenticationService) {
 
         // translate.setDefaultLang('prevod1');
 
@@ -36,7 +38,6 @@ export class NavCmp {
         this._dtService.setInitCompanyCSS();
         this._globalEventsManager.showNavBar.subscribe((mode)=>{
             console.log("event emitted")
-            this.isAdmin();
         });
     }
 
@@ -70,34 +71,10 @@ export class NavCmp {
 
         // this._appService.titleChanged.subscribe(lang => console.log(lang));
     }
-    //verify if the current user logged in has admin role and set the isAdminUser flag
-     isAdmin()
+    //verify if the current user logged in has permissions fo the routes
+    public checkPermission(route):boolean
     {
-        //get user data from cookies
-        if(this._cookieService.get("user")){
-            let currentUserState=JSON.parse(this._cookieService.get("user"));
-            if(currentUserState.roles)
-            {
-                if(currentUserState.roles['ROLE_ADMIN']==true)
-                {
-                    console.log('isAdmin');
-                    this.isAdminUser=true;
-
-                }
-                else
-                {
-                    this.isAdminUser=false;
-                }
-            }
-            else
-            {
-                console.log("not logged in");
-            }
-            
-        }
-        else
-        {
-            console.log("No cookie found");
-        }
+        return this._authenticationService.checkPermission(route);
     }
+  
 }

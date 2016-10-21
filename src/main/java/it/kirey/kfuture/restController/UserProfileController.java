@@ -24,15 +24,20 @@ import org.springframework.security.crypto.codec.Hex;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.kirey.kfuture.entity.AmApplicationRoles;
 import it.kirey.kfuture.entity.AmCompanies;
+import it.kirey.kfuture.entity.AmUrlRoutes;
 import it.kirey.kfuture.entity.AmUserAccounts;
+import it.kirey.kfuture.security.SecurityCache;
 import it.kirey.kfuture.security.TokenUtils;
 import it.kirey.kfuture.security.transfer.TokenTransfer;
 import it.kirey.kfuture.security.transfer.UserLogin;
 import it.kirey.kfuture.security.transfer.UserTransfer;
 import it.kirey.kfuture.service.IUserService;
+import it.kirey.kfuture.util.Utilities;
 
 @RestController
 @RequestMapping("/rest")
@@ -48,24 +53,24 @@ public class UserProfileController {
 	final static Logger logger = Logger.getLogger(UserProfileController.class);
 
 	@RequestMapping(value = "/user")
-	public ResponseEntity<UserTransfer> getUser() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-		UserDetails userDetails = (UserDetails) principal;
-		AmUserAccounts userAccount = (AmUserAccounts) principal;
-		LinkedHashMap<String, String> companyDetails = this.getCompanyDetails(userDetails);
-		List<String> cssStyles = new ArrayList<String>(); 
-		String cssFolder = "css/";
-		String cssExtension = "_css.css";
-		for (Map.Entry<String, String> entry : companyDetails.entrySet()) {
-			cssStyles.add(cssFolder + entry.getKey() + cssExtension);
-		}
-		
-		UserTransfer userTransfer = new UserTransfer(userDetails.getUsername(), this.createRoleMap(userDetails),
-				companyDetails,cssStyles, userAccount.getDefaultLanguage());
-		return new ResponseEntity<UserTransfer> (userTransfer, HttpStatus.OK);
-	}
-
+	 public ResponseEntity<UserTransfer> getUser() {
+	  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	  Object principal = authentication.getPrincipal();
+	  UserDetails userDetails = (UserDetails) principal;
+	  AmUserAccounts userAccount = (AmUserAccounts) principal;
+	  LinkedHashMap<String, String> companyDetails = this.getCompanyDetails(userDetails);
+	  List<String> cssStyles = new ArrayList<String>(); 
+	  String cssFolder = "css/";
+	  String cssExtension = "_css.css";
+	  for (Map.Entry<String, String> entry : companyDetails.entrySet()) {
+	   cssStyles.add(cssFolder + entry.getKey() + cssExtension);
+	  }
+	  
+	  List<AmUrlRoutes> userRoutes = userService.findRoutesByUser();
+	  UserTransfer userTransfer = new UserTransfer(userDetails.getUsername(), null,
+		        companyDetails,cssStyles, userAccount.getDefaultLanguage(), userRoutes);
+	  return new ResponseEntity<UserTransfer> (userTransfer, HttpStatus.OK);
+	 }
 	
 	/**
 	 * Performs the authentication of the user and generation of the Auth token.
@@ -90,7 +95,7 @@ public class UserProfileController {
 
 		AmUserAccounts user = userService.getUserByUsername(login.getUsername());
 		
-		// -------------------------- Database token approach
+//		 -------------------------- Database token approach
 		String token = TokenUtils.createToken(user);
 		
 		// -------------------------- SecurityCache approach		
@@ -104,6 +109,22 @@ public class UserProfileController {
 		return new ResponseEntity<TokenTransfer>(tokenTransfer, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/logout")
+	public ResponseEntity<Object> logout() {
+	  
+	  userService.logoutUser();
+	  return new ResponseEntity<Object>("", HttpStatus.OK);
+	} 
+	
+	@RequestMapping(value = "/init")
+	 public ResponseEntity<UserTransfer> init(){
+		 List<AmUrlRoutes> userRoutes = userService.findRoutesByUser();
+		  UserTransfer userTransfer = new UserTransfer(
+				  Utilities.getUserFromContext().getUsername(), null, null, null, Utilities.getUserFromContext().getDefaultLanguage(), userRoutes);
+		  return new ResponseEntity<UserTransfer> (userTransfer, HttpStatus.OK);
+	 }
+	
+
 	private Map<String, Boolean> createRoleMap(UserDetails userDetails) {
 		Map<String, Boolean> roles = new HashMap<String, Boolean>();
 		for (GrantedAuthority authority : userDetails.getAuthorities()) {
