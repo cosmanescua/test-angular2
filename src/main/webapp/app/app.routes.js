@@ -12,6 +12,7 @@ var routes = [
     { path: 'usersTest', loadChildren: 'app/users/users.module#UsersModule' },
     { path: 'clientsTest', loadChildren: 'app/clients/clients.module#ClientsModule' },
     { path: 'filesTest', loadChildren: 'app/test_file_upload/filesTest.module#FilesTestModule' },
+    { path: 'productsTest', loadChildren: 'app/test_products/products.module#TestProductsModule' },
     { path: '**', redirectTo: 'login' }
 ];
 exports.ROUTING = router_1.RouterModule.forRoot(routes);

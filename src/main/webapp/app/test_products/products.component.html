@@ -1,0 +1,40 @@
+<div class="container" style="margin-top: 40px">
+    <div class="row">
+        <div class="ui-widget-header ui-helper-clearfix" style="padding:4px 10px;border-bottom: 0 none">
+            <i class="fa fa-search" style="float:left;margin:4px 4px 0 0"></i>
+            <input #gb type="text" pInputText size="50" style="float:left" placeholder="Search">
+            <div style="float: right;">
+                Items per page
+                <select [ngModel]="itemsPerPage" (ngModelChange)="onItemSelectChange($event)" name="itemsPerPage">
+                    <option value="2">2</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="12">12</option>
+                    <option value="30">30</option>
+                 </select>
+            </div>
+        </div>
+
+        <p-dataTable [value]="productsToDisplay" [globalFilter]="gb">
+            <p-column field="productName" header="Name"></p-column>
+            <p-column field="productCode" header="Code"></p-column>
+            <p-column field="description" header="Description"></p-column>
+            <p-column field="price" header="Price"></p-column>
+        </p-dataTable>
+       <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class={{prevBtnClass}} (click)="changePage(currentPage-1)">
+                <a aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li *ngFor="let page of pages" class="{{page.class}}" (click)="changePage(page.index)"><a>{{page.index}}</a></li>
+            <li class="{{nextBtnClass}}" (click)="changePage(currentPage+1)">
+                <a aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+    </ul>
+</nav>
+    </div>
+</div>
