@@ -13,8 +13,7 @@ export class AdminCreateReportService {
      * @author DynTech
      */
     createReport(reportProfile: any): Observable<any> {
-        return this._http.post(this._baseUrl + 'reports', JSON.stringify(reportProfile))
-            .map((response: Response) => response.json());
+        return this._http.post(this._baseUrl + 'reports', JSON.stringify(reportProfile));
     }
 
     /**

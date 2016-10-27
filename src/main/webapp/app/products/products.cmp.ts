@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 
 import { ProductsService } from '../products/products.service';
 import { Product } from '../products/product.model';
@@ -12,12 +12,17 @@ import { Sort } from '../dtShared/table/dt.sort.model';
 import { Filter } from '../dtShared/table/dt.filter.model';
 import { DTTable } from '../dtShared/table/dt.table';
 
+import { AppService } from '../shared/services/app.service';
 
 @Component({
     templateUrl: 'app/products/products.cmp.html',
+    // styleUrls: ['app/products/product.cmp.css'],
+
+    encapsulation: ViewEncapsulation.None
 })
-export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
+export class ProductsCmp implements OnInit, DTTableViewIF {
     products: Product[];
+    productsToFilter: Product[];
 
     __pageSize: number;
     __pageSizeModel: number;
@@ -30,42 +35,53 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
     filters: any;
     sort: Sort;
     pageSizes: number[];
+    timeout: any;
 
     show: boolean = true;
+    isLoading: boolean = false;
 
-    constructor(private _productsService: ProductsService,
+    constructor(
+        private _productsService: ProductsService,
         private _dtService: DTService,
         private _dtTable: DTTable,
-        private _changeDetectionRef: ChangeDetectorRef) { }
+        private _changeDetectionRef: ChangeDetectorRef,
+        private _appService: AppService
+    ) { }
 
     /* === Ajax calls === */
 
     private loadProductsRest(currentPage: number, pageSize: number): void {
         this._dtService.setRestMessageContent('ProductsCmp', 'loadProductsRest()');
         this._productsService.getProducts(this._dtTable.getPaginationParams(currentPage, pageSize, this.filters, this.sort))
-            .subscribe(products => {
+            .toPromise().then(products => {
                 this.__totalItems = products.totalRows;
 
+                console.log(this.__totalItems);
+                
+
                 this.products = products.data;
+                this.productsToFilter = this.products;
                 this.__currentPage = currentPage;
                 this.__pageSize = pageSize;
 
                 setTimeout(() => {
                     this.pageSizeChangeStatus = false;
-                });
+                    this.isLoading = false;
+                }, 50);
             }, error => {
                 this.pageSizeChangeStatus = true;
                 this.__currentPage = 1;
 
                 setTimeout(() => {
+                    this.isLoading = false;
                     this.pageSizeChangeStatus = false;
-                });
+                }, 50);
             });
     }
 
     /* === Pagination methods === */
     public __onPageChanged(event: any): void {
-
+        this.isLoading = true;
         if (!this.pageSizeChangeStatus) {
             this.__currentPage = event.page;
             this.loadProductsRest(this.__currentPage, this.__pageSize);
@@ -74,6 +90,7 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
 
     public __onPageSizeChanged(): void {
         this.pageSizeChangeStatus = true;
+        this.isLoading = true;
 
         this._changeDetectionRef.detectChanges();
 
@@ -81,38 +98,37 @@ export class ProductsCmp implements OnInit, DTViewCmpIf, DTTableViewIF {
     }
 
     public filterByName(): void {
-        this.pageSizeChangeStatus = true;
+        // this._changeDetectionRef.detectChanges();
 
-        this._changeDetectionRef.detectChanges();
+        this.timeout = setTimeout(() => {
+            this.pageSizeChangeStatus = true;
+            this.isLoading = true;
 
-        this.loadProductsRest(1, this.__pageSizeModel);
+
+            this.loadProductsRest(1, this.__pageSizeModel);
+        }, 2000);
     }
 
 
 
     // ---------------------- ON INIT
     ngOnInit() {
-
+        // Variable initialization
         this.__pageSizeModel = 10;
         this.__pageSize = 10;
         this.__currentPage = 1;
         this.__totalItems = 0;
 
         this.filters = {
-            name: ''
         }
         this.sort = new Sort('name', 'asc');
         this.pageSizes = [5, 6, 7, 8, 9, 10, 11];
 
-
+        // Methods execution
+        this.isLoading = true;
         this.loadProductsRest(this.__currentPage, this.__pageSize);
 
         // Construct methods
-        this.__setInitPageTitle('Products');
+        this._appService.pageLoaded('Products');
     }
-
-    // Interface imported
-    __setInitPageTitle(title: string) {
-        this._dtService.setPageTitle(title);
-    }  
 }

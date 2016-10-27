@@ -11,68 +11,76 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ng2_translate_1 = require('ng2-translate/ng2-translate');
 var app_service_1 = require('../shared/services/app.service');
+var auth_service_1 = require('../shared/services/auth.service');
 var dt_service_1 = require('../dtShared/dt.service');
-var core_2 = require('angular2-cookie/core');
-var globalEventManager_service_1 = require('../test-routes/globalEventManager.service');
-var authentication_service_1 = require('../test-routes/authentication.service');
 var NavCmp = (function () {
     /*--------- Constructor --------*/
-    function NavCmp(_translate, _appService, _dtService, _cookieService, _globalEventsManager, _authenticationService) {
-        // translate.setDefaultLang('prevod1');
-        this._translate = _translate;
+    function NavCmp(_translateService, _appService, _dtService, _authService) {
+        this._translateService = _translateService;
         this._appService = _appService;
         this._dtService = _dtService;
-        this._cookieService = _cookieService;
-        this._globalEventsManager = _globalEventsManager;
-        this._authenticationService = _authenticationService;
-        this.onTranslationChange = new core_1.EventEmitter();
-        //this flag is used for conditionally display some items in the navigation bar - sections that must be available only for admin
-        this.isAdminUser = false;
-        // the lang to use, if the lang isn't available, it will use the current loader to get them
-        // translate.use('prevod1');
-        this._dtService.setInitCompanyCSS();
-        this._globalEventsManager.showNavBar.subscribe(function (mode) {
-            console.log("event emitted");
-        });
+        this._authService = _authService;
     }
     /*--------- App logic --------*/
+    /**
+     * Change language on flag click
+     * @author DynTech
+     */
+    NavCmp.prototype.changeLanguage = function (lang) {
+        this._appService.changeLang(lang);
+    };
+    /**
+     * REST - Login authentication with token returned as data
+     * @author DynTech
+     */
+    NavCmp.prototype.logout = function () {
+        var _this = this;
+        this.logoutLoading = true;
+        this._authService.logout().toPromise().then(function (res) {
+            auth_service_1.AuthService.clearAuth();
+            _this.logoutLoading = false;
+            _this._authService.redirectUrl = '';
+        }, function (error) {
+            console.log('LOGIN FAILED');
+            _this.logoutLoading = false;
+        });
+    };
+    /**
+     * Check if logged in user can see given route
+     * @author DynTech
+     */
+    NavCmp.prototype.checkRoute = function (route) {
+        return this._authService.userRoutes[route];
+    };
+    /*--------- Utility ---------*/
+    /**
+     * Match default language for click prevention
+     * @author DynTech
+     */
     NavCmp.prototype.matchDefaultLanguage = function (lang) {
         return lang == this._appService.defaultLanguage;
     };
-    NavCmp.prototype.changeLanguage = function (lang) {
-        this._appService.changeLang(lang);
-        // this._translate.use('');
-    };
+    /*--------- NG On Init ---------*/
     NavCmp.prototype.ngOnInit = function () {
         var _this = this;
-        // console.log('NG on init');
-        this.state = true;
-        this._translate.use('it');
-        this._appService.languageChanged.subscribe(function (lang) {
-            console.log(lang);
-            _this._translate.use(lang);
-            // this.state = false;
-            // setInterval(() => {
-            //     this.state = true;
-            // })
+        this.logoutLoading = false;
+        this._translateService.use(this._appService.getStoredLanguage());
+        this._appService.navLanguageChanged.subscribe(function (lang) {
+            _this._appService.changeLangTranslate(_this._translateService, lang);
         });
-        // this._appService.titleChanged.subscribe(lang => console.log(lang));
+        this._dtService.setInitCompanyCSS();
     };
-    //verify if the current user logged in has permissions fo the routes
-    NavCmp.prototype.checkPermission = function (route) {
-        return this._authenticationService.checkPermission(route);
+    NavCmp.prototype.ngOnDestroy = function () {
+        this._appService.refreshEmitters(true);
     };
-    __decorate([
-        core_1.Output(), 
-        __metadata('design:type', Object)
-    ], NavCmp.prototype, "onTranslationChange", void 0);
     NavCmp = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: 'navigation-menu',
             templateUrl: 'nav.cmp.html',
+            encapsulation: core_1.ViewEncapsulation.None
         }), 
-        __metadata('design:paramtypes', [ng2_translate_1.TranslateService, app_service_1.AppService, dt_service_1.DTService, core_2.CookieService, globalEventManager_service_1.GlobalEventsManager, authentication_service_1.AuthenticationService])
+        __metadata('design:paramtypes', [ng2_translate_1.TranslateService, app_service_1.AppService, dt_service_1.DTService, auth_service_1.AuthService])
     ], NavCmp);
     return NavCmp;
 }());

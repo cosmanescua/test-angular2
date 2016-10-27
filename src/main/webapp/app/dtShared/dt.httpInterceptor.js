@@ -15,94 +15,100 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var Rx_1 = require('rxjs/Rx');
-var core_2 = require('angular2-cookie/core');
 var dt_service_1 = require('./dt.service');
+var app_service_1 = require('../shared/services/app.service');
+var auth_service_1 = require('../shared/services/auth.service');
+var constants_1 = require('../constants');
 var http_1 = require("@angular/http");
 var DTHttpInterceptor = (function (_super) {
     __extends(DTHttpInterceptor, _super);
-    function DTHttpInterceptor(backend, defaultOptions, _cookieService) {
+    function DTHttpInterceptor(backend, defaultOptions, _dtService) {
         _super.call(this, backend, defaultOptions);
-        this._cookieService = _cookieService;
+        this._dtService = _dtService;
     }
-    DTHttpInterceptor.prototype.request = function (url, options) {
-        return _super.prototype.request.call(this, url, options);
-    };
     DTHttpInterceptor.prototype.get = function (url, options) {
-        var tempUrl = url.indexOf('i18n');
+        var _this = this;
+        var tempUrl = url.indexOf('translations');
+        var tempUrlChangeLang = url.indexOf('translations/language');
+        var that = this;
         if (tempUrl == -1) {
-            return _super.prototype.get.call(this, url, this.getAuthTokenHeader(options)).do(function (result) {
-                dt_service_1.DTService.restConsoleMessage(url, 'GET', result.status, true, result);
+            return _super.prototype.get.call(this, url, this.getAuthTokenHeader(options)).do(function (res) {
+                _this._dtService.restConsoleMessage(url, 'GET', res.status, true, res);
                 return Rx_1.Observable;
-            }).catch(function (err) {
-                dt_service_1.DTService.restConsoleMessage(url, 'GET', err.status, false, err);
-                console.log('catch');
-                // if (err.status === 404) {
-                //     console.log('404 greska');
-                //     return Observable.throw(err);
-                // } else {
+            }, function (err) {
+                _this.handleErrorRequest(err.status, url, 'GET', false, err, true);
                 return Rx_1.Observable.throw(err);
-                // }
+            });
+        }
+        else if (tempUrlChangeLang == -1) {
+            app_service_1.AppService.bLanguageLoading = true;
+            var transformedUrl = url.split('/');
+            transformedUrl = transformedUrl.splice(0, transformedUrl.length - 1);
+            transformedUrl = transformedUrl.join('/');
+            return _super.prototype.get.call(this, transformedUrl, this.getAuthTokenHeader(options)).do(function () {
+                app_service_1.AppService.bLanguageLoading = false;
+                return Rx_1.Observable;
+            }, function (err) {
+                app_service_1.AppService.bLanguageLoading = false;
+                _this.handleErrorRequest(err.status, url, 'GET', false, err, false);
+                return Rx_1.Observable.throw(err);
             });
         }
         else {
-            return _super.prototype.get.call(this, url);
+            return _super.prototype.get.call(this, url, this.getAuthTokenHeader(options)).do(function (res) {
+                app_service_1.AppService.bLanguageLoading = false;
+            }, function (err) {
+                app_service_1.AppService.bLanguageLoading = false;
+                _this.handleErrorRequest(err.status, url, 'GET', false, err, false);
+                return Rx_1.Observable.throw(err);
+            });
         }
     };
     DTHttpInterceptor.prototype.post = function (url, body, options) {
+        var _this = this;
         var tempUrl = url.split('/');
         tempUrl = tempUrl[tempUrl.length - 1];
+        var that = this;
         if (tempUrl != 'authenticate') {
-            return _super.prototype.post.call(this, url, body, this.getAuthTokenHeader(options, 'application/json')).do(function (result) {
-                dt_service_1.DTService.restConsoleMessage(url, 'POST', result.status, true, result);
+            return _super.prototype.post.call(this, url, body, this.getAuthTokenHeader(options, 'application/json')).do(function (res) {
+                _this._dtService.restConsoleMessage(url, 'POST', res.status, true, res);
                 return Rx_1.Observable;
-            }).catch(function (err) {
-                // console.log('catch');
-                // console.log(123);
-                dt_service_1.DTService.restConsoleMessage(url, 'POST', err.status, false, err);
-                // console.log(1234);
-                // if (err.status === 404) {
-                //     console.log('404 greska');
-                //     return Observable.throw(err);
-                // } else {
+            }, function (err) {
+                _this.handleErrorRequest(err.status, url, 'POST', false, err, true);
                 return Rx_1.Observable.throw(err);
-                // }
             });
         }
         else {
-            return _super.prototype.post.call(this, url, body, options).do(function (result) {
-                dt_service_1.DTService.restConsoleMessage(url, 'POST', result.status, true, result);
+            return _super.prototype.post.call(this, url, body, options).do(function (res) {
+                _this._dtService.restConsoleMessage(url, 'POST', res.status, true, res);
                 return Rx_1.Observable;
-            }).catch(function (err) {
-                dt_service_1.DTService.restConsoleMessage(url, 'POST', err.status, false, err);
+            }, function (err) {
+                _this.handleErrorRequest(err.status, url, 'POST', false, err, true);
                 return Rx_1.Observable.throw(err);
             });
         }
     };
     DTHttpInterceptor.prototype.put = function (url, body, options) {
+        var _this = this;
         var tempUrl = url.split('/');
         tempUrl = tempUrl[tempUrl.length - 1];
-        return _super.prototype.put.call(this, url, body, this.getAuthTokenHeader(options, 'application/json')).do(function (result) {
-            dt_service_1.DTService.restConsoleMessage(url, 'PUT', result.status, true, result);
+        var that = this;
+        return _super.prototype.put.call(this, url, body, this.getAuthTokenHeader(options, 'application/json')).do(function (res) {
+            _this._dtService.restConsoleMessage(url, 'PUT', res.status, true, res);
             return Rx_1.Observable;
-        }).catch(function (err) {
-            dt_service_1.DTService.restConsoleMessage(url, 'POST', err.status, true, err);
-            console.log('catch');
-            // if (err.status === 404) {
-            //     console.log('404 greska');
-            //     return Observable.throw(err);
-            // } else {
+        }, function (err) {
+            _this.handleErrorRequest(err.status, url, 'PUT', false, err, true);
             return Rx_1.Observable.throw(err);
-            // }
         });
     };
-    DTHttpInterceptor.prototype.getToken = function () {
-        var tempToken = this._cookieService.get('X-Auth-Token');
-        return tempToken;
-    };
+    /**
+     * Get header with token and additional options from original request
+     * @author DynTech
+     */
     DTHttpInterceptor.prototype.getAuthTokenHeader = function (options, contentType) {
-        var headers = new http_1.Headers({
-            'X-Auth-Token': this.getToken()
-        });
+        var tempheaders = {};
+        tempheaders[constants_1.TOKEN_COOKIE_NAME] = this._dtService.getToken();
+        var headers = new http_1.Headers(tempheaders);
         if (contentType) {
             headers.append('Content-Type', contentType);
         }
@@ -113,9 +119,23 @@ var DTHttpInterceptor = (function (_super) {
             return new http_1.RequestOptions({ headers: headers });
         }
     };
+    /**
+     * Method for handling request with error
+     * @author DynTech
+     */
+    DTHttpInterceptor.prototype.handleErrorRequest = function (statusCode, url, method, success, err, consoleLog) {
+        if (consoleLog) {
+            this._dtService.restConsoleMessage(url, method, statusCode, success, err);
+        }
+        if (statusCode === 401) {
+            auth_service_1.AuthService.clearAuth();
+            auth_service_1.AuthService.bLoginStatus = false;
+            app_service_1.AppService.router.navigate(['login']);
+        }
+    };
     DTHttpInterceptor = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [http_1.ConnectionBackend, http_1.RequestOptions, core_2.CookieService])
+        __metadata('design:paramtypes', [http_1.ConnectionBackend, http_1.RequestOptions, dt_service_1.DTService])
     ], DTHttpInterceptor);
     return DTHttpInterceptor;
 }(http_1.Http));

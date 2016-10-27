@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.kirey.kfuture.entity.AmErrorLogs;
+import it.kirey.kfuture.security.AuthenticationTokenProcessingFilter;
 import it.kirey.kfuture.service.ITestCacheService;
 
 @RestController
+@RequestMapping(value="/rest")
 public class TestController {
-	
+	private static final Logger LOGGER = Logger.getLogger(TestController.class.getName());
 	
 	@Autowired
 	ITestCacheService testCacheService;
@@ -31,7 +35,11 @@ public class TestController {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("ErrorLogs", amE);
 		map.put("executeTime", result);
-		System.err.println(result/1000000000);
+		
+		LOGGER.log( Level.INFO, "Getting cache: " + result/1000000000 + "ns");
+		LOGGER.log( Level.INFO, "Getting cache: " + result/1000000 + "ms");
+		
+		//System.err.println(result/1000000000);
 		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
 	}
 

@@ -11,14 +11,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var platform_browser_1 = require('@angular/platform-browser');
 var common_1 = require('@angular/common');
+var http_1 = require('@angular/http');
 // Custom Components
 var app_cmp_1 = require('./app.cmp'); // Main cmp
 var nav_module_1 = require('./common/nav.module');
-var app_routes_1 = require('./app.routes');
 var utility_module_1 = require('./shared/modules/utility.module');
+var auth_service_1 = require('./shared/services/auth.service');
 var app_service_1 = require('./shared/services/app.service');
-var routesAccessGuard_service_1 = require('./test-routes/routesAccessGuard.service');
-var authentication_service_1 = require('./test-routes/authentication.service');
+var dt_service_1 = require('./dtShared/dt.service');
+var dt_httpInterceptor_1 = require('./dtShared/dt.httpInterceptor');
+var authGuard_1 = require('./authGuard');
+var login_authGuard_1 = require('./login/login.authGuard');
+var home_guard_1 = require('./home/home.guard');
+var app_routes_1 = require('./app.routes');
 var AppModule = (function () {
     function AppModule() {
     }
@@ -28,19 +33,28 @@ var AppModule = (function () {
                 platform_browser_1.BrowserModule,
                 nav_module_1.NavModule,
                 app_routes_1.ROUTING,
-                utility_module_1.UtilityModule
+                utility_module_1.UtilityModule,
             ],
             declarations: [
                 app_cmp_1.AppCmp
             ],
             bootstrap: [app_cmp_1.AppCmp],
             providers: [
-                routesAccessGuard_service_1.RouteAccessGuard,
-                authentication_service_1.AuthenticationService,
+                authGuard_1.AuthGuard,
+                login_authGuard_1.LoginAuthGuard,
+                home_guard_1.HomeAuthGuard,
+                auth_service_1.AuthService,
                 app_service_1.AppService,
                 {
                     provide: common_1.LocationStrategy,
                     useClass: common_1.HashLocationStrategy
+                },
+                {
+                    provide: http_1.Http,
+                    useFactory: function (backend, defaultOptions, dtService) {
+                        return new dt_httpInterceptor_1.DTHttpInterceptor(backend, defaultOptions, dtService);
+                    },
+                    deps: [http_1.XHRBackend, http_1.RequestOptions, dt_service_1.DTService]
                 }
             ]
         }), 

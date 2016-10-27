@@ -1,80 +1,88 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { TranslateService } from 'ng2-translate/ng2-translate';
 
 import { AppService } from '../shared/services/app.service';
+import { AuthService } from '../shared/services/auth.service';
 import { DTService } from '../dtShared/dt.service';
-import { CookieService } from 'angular2-cookie/core';
-import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
-import {AuthenticationService} from '../test-routes/authentication.service';
 
 @Component({
     moduleId: module.id,
     selector: 'navigation-menu',
     templateUrl: 'nav.cmp.html',
 
+    encapsulation: ViewEncapsulation.None
 })
 
-export class NavCmp {
-    @Output() onTranslationChange = new EventEmitter();
-    state: boolean;
-    //this flag is used for conditionally display some items in the navigation bar - sections that must be available only for admin
-    isAdminUser: boolean=false;
+export class NavCmp implements OnInit {
+    bRouteChanged: boolean;
+
+    logoutLoading: boolean;
 
     /*--------- Constructor --------*/
     constructor(
-        private _translate: TranslateService,
+        private _translateService: TranslateService,
         private _appService: AppService,
         private _dtService: DTService,
-        private _cookieService: CookieService,
-        private _globalEventsManager:GlobalEventsManager,
-        private _authenticationService: AuthenticationService) {
-
-        // translate.setDefaultLang('prevod1');
-
-        // the lang to use, if the lang isn't available, it will use the current loader to get them
-        // translate.use('prevod1');
-
-        this._dtService.setInitCompanyCSS();
-        this._globalEventsManager.showNavBar.subscribe((mode)=>{
-            console.log("event emitted")
-        });
-    }
+        private _authService: AuthService) { }
 
     /*--------- App logic --------*/
+    /**
+     * Change language on flag click
+     * @author DynTech
+     */
+    changeLanguage(lang: string): void {
+        this._appService.changeLang(lang);
+    }
+
+    /**
+     * REST - Login authentication with token returned as data
+     * @author DynTech
+     */
+    logout(): void {
+        this.logoutLoading = true;
+        this._authService.logout().toPromise().then(res => {
+            AuthService.clearAuth();
+            this.logoutLoading = false;
+            this._authService.redirectUrl = '';
+        }, error => {
+            console.log('LOGIN FAILED');
+            this.logoutLoading = false;
+
+        })
+    }
+
+    /**
+     * Check if logged in user can see given route
+     * @author DynTech
+     */
+    checkRoute(route: string): boolean {
+        return this._authService.userRoutes[route];
+    }
+
+    /*--------- Utility ---------*/
+    /**
+     * Match default language for click prevention
+     * @author DynTech
+     */
     matchDefaultLanguage(lang: string): boolean {
         return lang == this._appService.defaultLanguage;
     }
 
-    changeLanguage(lang: string): void {
-        this._appService.changeLang(lang);
-        // this._translate.use('');
-    }
-
-    /*--------- NG On Init ---------*/f
+    /*--------- NG On Init ---------*/
     ngOnInit() {
-        // console.log('NG on init');
-        this.state = true;
-        this._translate.use('it');
+        this.logoutLoading = false;
 
-        this._appService.languageChanged.subscribe(lang => {
-            console.log(lang);
+        this._translateService.use(this._appService.getStoredLanguage());
 
-            this._translate.use(lang);
-
-            // this.state = false;
-
-            // setInterval(() => {
-            //     this.state = true;
-            // })
+        this._appService.navLanguageChanged.subscribe(lang => {
+            this._appService.changeLangTranslate(this._translateService, lang);
         });
 
-        // this._appService.titleChanged.subscribe(lang => console.log(lang));
+        this._dtService.setInitCompanyCSS();
     }
-    //verify if the current user logged in has permissions fo the routes
-    public checkPermission(route):boolean
-    {
-        return this._authenticationService.checkPermission(route);
+
+    ngOnDestroy(): void {
+        this._appService.refreshEmitters(true);
     }
-  
 }

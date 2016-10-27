@@ -11,8 +11,8 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmErrorLogsHome;
 import it.kirey.kfuture.entity.AmErrorLogs;
 
 /**
@@ -21,15 +21,15 @@ import it.kirey.kfuture.entity.AmErrorLogs;
  * @see it.kirey.kfuture.gen.AmErrorLogs
  * @author Hibernate Tools
  */
-@Repository(value = IAmErrorLogsHome.REPOSITORY_QUALIFIER)
-public class AmErrorLogsHome implements IAmErrorLogsHome {
+@Repository(value = "amErrorLogsHome")
+public class AmErrorLogsHome {
 
 	private static final Log log = LogFactory.getLog(AmErrorLogsHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
+	@Transactional
 	public void persist(AmErrorLogs transientInstance) {
 		log.debug("persisting AmErrorLogs instance");
 		try {
@@ -41,7 +41,7 @@ public class AmErrorLogsHome implements IAmErrorLogsHome {
 		}
 	}
 	
-	@Override
+	@Transactional
 	public void attachDirty(AmErrorLogs instance) {
 		log.debug("attaching dirty AmErrorLogs instance");
 		try {
@@ -53,7 +53,7 @@ public class AmErrorLogsHome implements IAmErrorLogsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmErrorLogs instance) {
 		log.debug("attaching clean AmErrorLogs instance");
 		try {
@@ -65,7 +65,7 @@ public class AmErrorLogsHome implements IAmErrorLogsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmErrorLogs persistentInstance) {
 		log.debug("deleting AmErrorLogs instance");
 		try {
@@ -77,7 +77,7 @@ public class AmErrorLogsHome implements IAmErrorLogsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmErrorLogs merge(AmErrorLogs detachedInstance) {
 		log.debug("merging AmErrorLogs instance");
 		try {
@@ -90,7 +90,7 @@ public class AmErrorLogsHome implements IAmErrorLogsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmErrorLogs findById(Integer id) {
 		log.debug("getting AmErrorLogs instance with id: " + id);
 		try {
@@ -107,6 +107,7 @@ public class AmErrorLogsHome implements IAmErrorLogsHome {
 		}
 	}
 
+	@Transactional
 	public List<AmErrorLogs> findByExample(AmErrorLogs instance) {
 		log.debug("finding AmErrorLogs instance by example");
 		try {
@@ -120,8 +121,8 @@ public class AmErrorLogsHome implements IAmErrorLogsHome {
 		}
 	}
 
-	@Override
-	public List<AmErrorLogs> getAll() {
+	@Transactional
+	public List<AmErrorLogs> findAll() {
 		return (List<AmErrorLogs>) this.sessionFactory.getCurrentSession().createCriteria(AmErrorLogs.class).list();
 	}
 }

@@ -28,15 +28,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import it.kirey.kfuture.entity.AmApplicationRoles;
+import it.kirey.kfuture.dao.impl.AmUrlRoutesHome;
+import it.kirey.kfuture.dao.impl.AmUserAccountsHome;
 import it.kirey.kfuture.entity.AmCompanies;
 import it.kirey.kfuture.entity.AmUrlRoutes;
 import it.kirey.kfuture.entity.AmUserAccounts;
-import it.kirey.kfuture.security.SecurityCache;
 import it.kirey.kfuture.security.TokenUtils;
 import it.kirey.kfuture.security.transfer.TokenTransfer;
 import it.kirey.kfuture.security.transfer.UserLogin;
 import it.kirey.kfuture.security.transfer.UserTransfer;
-import it.kirey.kfuture.service.IUserService;
 import it.kirey.kfuture.util.Utilities;
 
 @RestController
@@ -48,7 +48,10 @@ public class UserProfileController {
 	private AuthenticationManager authManager;
 
 	@Autowired
-	private IUserService userService;
+	private AmUserAccountsHome amUserAccountsHome;
+	
+	@Autowired
+	private AmUrlRoutesHome amUrlRoutesHome;
 
 	final static Logger logger = Logger.getLogger(UserProfileController.class);
 
@@ -66,7 +69,7 @@ public class UserProfileController {
 	   cssStyles.add(cssFolder + entry.getKey() + cssExtension);
 	  }
 	  
-	  List<AmUrlRoutes> userRoutes = userService.findRoutesByUser();
+	  List<AmUrlRoutes> userRoutes = amUrlRoutesHome.findRoutesByUser(Utilities.getUserFromContext());
 	  UserTransfer userTransfer = new UserTransfer(userDetails.getUsername(), null,
 		        companyDetails,cssStyles, userAccount.getDefaultLanguage(), userRoutes);
 	  return new ResponseEntity<UserTransfer> (userTransfer, HttpStatus.OK);
@@ -93,7 +96,7 @@ public class UserProfileController {
 		Authentication authentication = this.authManager.authenticate(authenticationToken);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		AmUserAccounts user = userService.getUserByUsername(login.getUsername());
+		AmUserAccounts user = amUserAccountsHome.getUserByUsername(login.getUsername());
 		
 //		 -------------------------- Database token approach
 		String token = TokenUtils.createToken(user);
@@ -103,7 +106,7 @@ public class UserProfileController {
 		
 		user.setToken(token);
 		user.setTimestamp(System.currentTimeMillis());
-		userService.saveOrUpdate(user);
+		amUserAccountsHome.attachDirty(user);
 		
 		TokenTransfer tokenTransfer = new TokenTransfer(token);
 		return new ResponseEntity<TokenTransfer>(tokenTransfer, HttpStatus.OK);
@@ -112,13 +115,13 @@ public class UserProfileController {
 	@RequestMapping(value = "/logout")
 	public ResponseEntity<Object> logout() {
 	  
-	  userService.logoutUser();
+		amUserAccountsHome.logoutUser(Utilities.getUserFromContext());
 	  return new ResponseEntity<Object>("", HttpStatus.OK);
 	} 
 	
 	@RequestMapping(value = "/init")
 	 public ResponseEntity<UserTransfer> init(){
-		 List<AmUrlRoutes> userRoutes = userService.findRoutesByUser();
+		 List<AmUrlRoutes> userRoutes = amUrlRoutesHome.findRoutesByUser(Utilities.getUserFromContext());
 		  UserTransfer userTransfer = new UserTransfer(
 				  Utilities.getUserFromContext().getUsername(), null, null, null, Utilities.getUserFromContext().getDefaultLanguage(), userRoutes);
 		  return new ResponseEntity<UserTransfer> (userTransfer, HttpStatus.OK);

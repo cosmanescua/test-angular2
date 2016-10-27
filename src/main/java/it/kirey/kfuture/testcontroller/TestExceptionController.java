@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.kirey.kfuture.entity.AmReports;
+import it.kirey.kfuture.dto.FormDto;
 import it.kirey.kfuture.exception.ITestService;
+import it.kirey.kfuture.exception.ValidationFormException;
 
 
 @RestController
@@ -36,16 +37,15 @@ public class TestExceptionController {
 	}
 	
 	@RequestMapping(value = "/forms", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-	public ResponseEntity<Object> saveReport(@RequestBody @Valid AmReports report, BindingResult result) throws Exception{
+	public ResponseEntity<Object> saveReport(@RequestBody @Valid FormDto form, BindingResult result) throws Exception{
 	
 			if(result.hasErrors()){
-				//generate new validation exception
-				return new ResponseEntity<Object>(result.getFieldError().toString(), HttpStatus.CONFLICT);
+				throw new ValidationFormException(result, form.getFormName());
 			}else{
 				
+
 				return new ResponseEntity<Object>("Validation test ok", HttpStatus.OK);
-			}
-			
+			}			
 	}
 	
 }

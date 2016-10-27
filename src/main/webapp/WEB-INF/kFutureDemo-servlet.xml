@@ -3,51 +3,40 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-                           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-                           http://www.springframework.org/schema/context
-                           http://www.springframework.org/schema/context/spring-context-4.0.xsd
-                            http://www.springframework.org/schema/aop  
-                            http://www.springframework.org/schema/aop/spring-aop.xsd
-                           http://www.springframework.org/schema/mvc 
-       			   http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+                        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+                        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
 
+	
 	<context:component-scan base-package="it.kirey.kfuture.restController" />
 	<context:component-scan base-package="it.kirey.kfuture.testcontroller" />
-	<context:component-scan base-package="it.kirey.kfuture.schedulerController" />
-	<context:component-scan base-package="it.kirey.kfuture.service" />
-	<context:component-scan base-package="it.kirey.kfuture.dao" />
-	<context:component-scan base-package="it.kirey.kfuture.exception" />
-	<context:component-scan base-package="it.kirey.kfuture.cache" />
-
+	
+	<bean id="interceptorTranslator" class="it.kirey.kfuture.interceptors.InterceptorTranslator" />
+	
+	<aop:config proxy-target-class="true">
+		<aop:aspect id="translateAspect" ref="interceptorTranslator">
+			<aop:pointcut id="translatePoint"
+				expression="execution(* it.kirey.kfuture.restController.*.*(..))
+ 				&amp;&amp; !execution(* it.kirey.kfuture.restController.InternationalizationController.*(..))
+ 				&amp;&amp; !execution(* it.kirey.kfuture.restController.UserProfileController.*(..))
+ 				&amp;&amp; !execution(* it.kirey.kfuture.restController.ReportController.generateReport(..))" /> 
+			<aop:around method="aroundMethod" pointcut-ref="translatePoint" />
+		</aop:aspect>
+	</aop:config> 
+	
 	<bean id="interceptorLogging" class="it.kirey.kfuture.interceptors.InterceptorLogging" />
 	
  	<aop:config proxy-target-class="true">
 		<aop:aspect id="loggingAspect" ref="interceptorLogging">
-			<!--@Around-->
 			<aop:pointcut id="loggingCommon"
 				expression="execution(* it.kirey.kfuture..*.*(..))
 				&amp;&amp; !execution(* it.kirey.kfuture.util.PrintingToConsole.*(..)) 	
 				&amp;&amp; !execution(* it.kirey.kfuture.entity.*.*(..))" /> 
 			<aop:around method="aroundMethod" pointcut-ref="loggingCommon" />
- <!-- 			<aop:after method="after" pointcut-ref="loggingCommon" /> --> 
-		</aop:aspect>
-	</aop:config> 
-	
-	<bean id="interceptorTranslator" class="it.kirey.kfuture.interceptors.InterceptorTranslator" />
-	
- 	<aop:config proxy-target-class="true">
-		<aop:aspect id="translateAspect" ref="interceptorTranslator">
-			<aop:pointcut id="translatePoint"
-				expression="execution(* it.kirey.kfuture.restController.*.*(..))
- 				&amp;&amp; !execution(* it.kirey.kfuture.restController.InternationalizationController.*(..))
- 				&amp;&amp; !execution(* it.kirey.kfuture.restController.ReportController.generateReport(..))" /> 
-			<aop:around method="aroundMethod" pointcut-ref="translatePoint" />
 		</aop:aspect>
 	</aop:config>  
 	
-<!-- 	 uncomment this if there is after method in InterceptorLogging class -->
-
 	<mvc:annotation-driven />
 	<mvc:default-servlet-handler />
 

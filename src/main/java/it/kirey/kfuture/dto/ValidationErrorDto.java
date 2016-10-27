@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class ValidationErrorDto {
 
 	private String formName;
-	private HashMap<Object,	Object> fields;
+	private HashMap<String,	String> fields;
 	
 	public String getFormName() {
 		return formName;
@@ -15,11 +15,11 @@ public class ValidationErrorDto {
 		this.formName = formName;
 	}
 	
-	public HashMap<Object, Object> getFields() {
+	public HashMap<String, String> getFields() {
 		return fields;
 	}
 	
-	public void setFields(HashMap<Object, Object> fields) {
+	public void setFields(HashMap<String,String> fields) {
 		this.fields = fields;
 	}
 	

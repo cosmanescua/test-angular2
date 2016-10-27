@@ -3,6 +3,7 @@ package it.kirey.kfuture.dao.impl;
 
 import static org.hibernate.criterion.Example.create;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -11,15 +12,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmProductsHome;
 import it.kirey.kfuture.dto.FilterDto;
 import it.kirey.kfuture.dto.PaginationDto;
 import it.kirey.kfuture.entity.AmProducts;
+import it.kirey.kfuture.util.Translation;
 import it.kirey.kfuture.util.Utilities;
-import oracle.net.aso.h;
 
 /**
  * Home object for domain model class AmProducts.
@@ -28,15 +30,18 @@ import oracle.net.aso.h;
  * @author Hibernate Tools
  */
 
-@Repository(IAmProductsHome.REPOSITORY_QUALIFIER)
-public class AmProductsHome implements IAmProductsHome {
+@Repository(value = "amProductsHome")
+public class AmProductsHome {
 
 	private static final Log log = LogFactory.getLog(AmProductsHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private Translation translation;
 
-	@Override
+	@Transactional
 	public void persist(AmProducts transientInstance) {
 		log.debug("persisting AmProducts instance");
 		try {
@@ -48,7 +53,7 @@ public class AmProductsHome implements IAmProductsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachDirty(AmProducts instance) {
 		log.debug("attaching dirty AmProducts instance");
 		try {
@@ -60,7 +65,7 @@ public class AmProductsHome implements IAmProductsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmProducts instance) {
 		log.debug("attaching clean AmProducts instance");
 		try {
@@ -72,7 +77,7 @@ public class AmProductsHome implements IAmProductsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmProducts persistentInstance) {
 		log.debug("deleting AmProducts instance");
 		try {
@@ -84,11 +89,11 @@ public class AmProductsHome implements IAmProductsHome {
 		}
 	}
 
-	@Override
-	public List<AmProducts> getAll() {
+/*	public List<AmProducts> findAll() {
 		return (List<AmProducts>) this.sessionFactory.getCurrentSession().createCriteria(AmProducts.class).list();
-	}
+	}*/
 
+	@Transactional
 	public AmProducts merge(AmProducts detachedInstance) {
 		log.debug("merging AmProducts instance");
 		try {
@@ -101,7 +106,7 @@ public class AmProductsHome implements IAmProductsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmProducts findById(Integer id) {
 		log.debug("getting AmProducts instance with id: " + id);
 		try {
@@ -118,6 +123,7 @@ public class AmProductsHome implements IAmProductsHome {
 		}
 	}
 
+	@Transactional
 	public List<AmProducts> findByExample(AmProducts instance) {
 		log.debug("finding AmProducts instance by example");
 		try {
@@ -132,25 +138,109 @@ public class AmProductsHome implements IAmProductsHome {
 
 	}
 
-	@Override
-	public List<AmProducts> getAll(PaginationDto paginationDto) {
+	@SuppressWarnings("unchecked")
+	@Transactional
+	public List<AmProducts> findAllPaginated(PaginationDto paginationDto) {
 		StringBuilder hqlSB = new StringBuilder();
 		hqlSB.setLength(0);
-		hqlSB.append("from AmProducts as product ");
-		hqlSB.append(Utilities.geneneratePaginationQuery(paginationDto));
-		hqlSB.append(Utilities.generateOrderByQuery(paginationDto));
 		
-		return (List<AmProducts>) sessionFactory.getCurrentSession().createQuery(hqlSB.toString())
-				.setFirstResult((paginationDto.getPage() - 1) * paginationDto.getPageSize())
-				.setMaxResults(paginationDto.getPageSize()).list();
+		String lang = translation.getUsersDefaultLang(); 
+		paginationDto.getSort().setField("nameGenericName");
+		
+		hqlSB.append("select p.id as id, nvl(nvl(r.translation, d.defaultTranslation), p.nameGenericName) as nameGenericName "
+				+ " from AmProducts as p "
+				+ "left join AmDictionary as d on d.genericName = p.nameGenericName "
+				+ "left join AmResourceBundle r on r.amDictionary.genericName =  p.nameGenericName and r.language = '"+lang+"' ");
+		
+		if (paginationDto.getFilterList().size() != 0) {
+			Iterator<FilterDto> filterList = paginationDto.getFilterList().iterator();
+			hqlSB.append("where ");
+			while (filterList.hasNext()) {
+						FilterDto filter = filterList.next();
+						//if String
+						if (filter.getQuery() instanceof String) {
+							hqlSB.append("lower(");
+							//hqlSB.append(filter.getField());
+							hqlSB.append("nvl(nvl(r.translation, d.defaultTranslation), p."+filter.getField()+")");
+							hqlSB.append(") like '%");
+							hqlSB.append(filter.getQuery().toString().toLowerCase());
+							hqlSB.append("%' ");
+						//if Date
+						} else if (filter.getQuery() instanceof Long) {
+							hqlSB.append(filter.getField());
+							hqlSB.append(" = to_date('");
+							hqlSB.append(new Date((Long) filter.getQuery()));
+							hqlSB.append("','YYYY-MM-DD') ");
+						//Number
+						} else {
+							hqlSB.append(filter.getField());
+							hqlSB.append(" = ");
+							hqlSB.append(filter.getQuery());
+							hqlSB.append(" ");
+						}
+						if (filterList.hasNext()) {
+							hqlSB.append(" and ");
+						}
+					}
+		}	
+		
+		if (paginationDto.getSort().getField() != null) {
+			hqlSB.append("order by nvl(nvl(r.translation, d.defaultTranslation), p."+paginationDto.getSort().getField()+") "+paginationDto.getSort().getType());
+		}
+		
+		List<AmProducts> result = sessionFactory.getCurrentSession().createQuery(hqlSB.toString())
+		.setResultTransformer(Transformers.aliasToBean(AmProducts.class))
+		.setFirstResult((paginationDto.getPage() - 1) * paginationDto.getPageSize())
+		.setMaxResults(paginationDto.getPageSize()).list();		
+		return result;
 	}
-
-	@Override
-	public Long getTotalProductRows(PaginationDto paginationDto) {
+	
+	@Transactional
+	public Long findTotalProductRows(PaginationDto paginationDto) {
 		StringBuilder hqlSB = new StringBuilder();
 		hqlSB.setLength(0);
-		hqlSB.append("select count(*) from AmProducts as product ");
-		hqlSB.append(Utilities.geneneratePaginationQuery(paginationDto));
+		//hqlSB.append("select count(*) from AmProducts as product ");
+		String lang = translation.getUsersDefaultLang(); 
+		paginationDto.getSort().setField("nameGenericName");
+		
+		hqlSB.append("select count(*)"
+				+ " from AmProducts as p "
+				+ "left join AmDictionary as d on d.genericName = p.nameGenericName "
+				+ "left join AmResourceBundle r on r.amDictionary.genericName =  p.nameGenericName and r.language = '"+lang+"' ");
+		
+		if (paginationDto.getFilterList().size() != 0) {
+			Iterator<FilterDto> filterList = paginationDto.getFilterList().iterator();
+			hqlSB.append("where ");
+			while (filterList.hasNext()) {
+						FilterDto filter = filterList.next();
+						//if String
+						if (filter.getQuery() instanceof String) {
+							hqlSB.append("lower(");
+							//hqlSB.append(filter.getField());
+							hqlSB.append("nvl(nvl(r.translation, d.defaultTranslation), p."+filter.getField()+")");
+							hqlSB.append(") like '%");
+							hqlSB.append(filter.getQuery().toString().toLowerCase());
+							hqlSB.append("%' ");
+						//if Date
+						} else if (filter.getQuery() instanceof Long) {
+							hqlSB.append(filter.getField());
+							hqlSB.append(" = to_date('");
+							hqlSB.append(new Date((Long) filter.getQuery()));
+							hqlSB.append("','YYYY-MM-DD') ");
+						//Number
+						} else {
+							hqlSB.append(filter.getField());
+							hqlSB.append(" = ");
+							hqlSB.append(filter.getQuery());
+							hqlSB.append(" ");
+						}
+						if (filterList.hasNext()) {
+							hqlSB.append(" and ");
+						}
+					}
+			}
+		
+		//hqlSB.append(Utilities.geneneratePaginationQuery(paginationDto));
 		Long count = (Long) sessionFactory.getCurrentSession().createQuery(hqlSB.toString()).uniqueResult();
 		return count;
 	}

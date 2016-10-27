@@ -17,19 +17,6 @@ var LoginService = (function () {
         this._baseUrl = 'rest/';
     }
     /**
-     * REST - Login authentication with token returned as data
-     * @author DynTech
-     */
-    LoginService.prototype.login = function (loginData) {
-        var headers = new http_1.Headers({
-            'Content-Type': 'application/json'
-        });
-        var options = new http_1.RequestOptions({ headers: headers });
-        return this._http.post(this._baseUrl + 'user/authenticate', JSON.stringify(loginData), options)
-            .map(function (response) { return response.json(); })
-            .catch(this.handleError);
-    };
-    /**
      * REST - Get user info based on login token
      * @author DynTech
      */

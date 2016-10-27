@@ -41,11 +41,12 @@ public class InterceptorTranslator implements ThrowsAdvice  {
 	    	if(result instanceof ResponseEntity)
 			{	
 	    		ObjectMapper mapper = new ObjectMapper();
-	    		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+	    		/*mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);*/
 	    		obj = (ResponseEntity<Object>) result;
-				ObjectWriter ow = new ObjectMapper().writer();
-				
-				String responseString = ow.writeValueAsString(obj.getBody());    		
+				//ObjectWriter ow = new ObjectMapper().writer();
+	    		String responseString = mapper.writer().writeValueAsString(obj.getBody());    		
+	    		
+				//String responseString = ow.writeValueAsString(obj.getBody());    		
 				resultBody = translator.translate(responseString);				
 			}
 	    } catch (Exception ex) {

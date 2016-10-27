@@ -1,6 +1,6 @@
 "use strict";
 var router_1 = require('@angular/router');
-var reportManagement_cmp_1 = require('../report_management/reportManagement.cmp');
+var reportManagement_cmp_1 = require('./reportManagement.cmp');
 exports.ROUTING = router_1.RouterModule.forChild([
     {
         path: '',

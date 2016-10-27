@@ -6,15 +6,16 @@ import { DTService } from '../dtShared/dt.service';
 
 import { ErrorLogService } from '../error_log/errorLog.service';
 
+import { AppService } from '../shared/services/app.service';
+
 @Component({
     moduleId: module.id,
     templateUrl: 'errorLog.cmp.html',
     // styleUrls: ['errorLog.cmp.css'],
 
-
     encapsulation: ViewEncapsulation.None
 })
-export class ErrorLogCmp implements OnInit, DTViewCmpIf {
+export class ErrorLogCmp implements OnInit {
     logs: any[];
     error: any;
 
@@ -24,7 +25,8 @@ export class ErrorLogCmp implements OnInit, DTViewCmpIf {
     constructor(
         private _errorLogService: ErrorLogService,
         private _dtService: DTService,
-        private _router: Router
+        private _router: Router,
+        private _appService: AppService
     ) { }
 
 
@@ -38,8 +40,8 @@ export class ErrorLogCmp implements OnInit, DTViewCmpIf {
         this.logs = [];
         this.loadingState = true;
         this._dtService.setRestMessageContent('ErrorLogCmp', 'getLogRest()');
-        this._errorLogService.getLog().subscribe(result => {
-            this.logs = result
+        this._errorLogService.getLog().toPromise().then(res => {
+            this.logs = res
             this.loadingState = false;
         }, error => {
             this.loadingState = false;
@@ -55,7 +57,7 @@ export class ErrorLogCmp implements OnInit, DTViewCmpIf {
         this.loadingState = true;
 
         this._dtService.setRestMessageContent('ErrorLogCmp', 'causeException()');
-        this._errorLogService.causeException().subscribe(result => {
+        this._errorLogService.causeException().toPromise().then(res => {
             this.loadingState = false;
         }, error => {
             this.loadingState = true;
@@ -81,11 +83,6 @@ export class ErrorLogCmp implements OnInit, DTViewCmpIf {
         this.getLogRest();
 
         // Construct methods
-        this.__setInitPageTitle('Error log');
-    }
-
-    /*--------- Interface imported --------*/
-    __setInitPageTitle(title: string) {
-        this._dtService.setPageTitle(title);
+        this._appService.pageLoaded('Error log');
     }
 }

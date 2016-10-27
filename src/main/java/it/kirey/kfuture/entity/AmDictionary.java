@@ -51,7 +51,7 @@ public class AmDictionary implements java.io.Serializable {
 		this.genericName = genericName;
 	}
 
-	@Column(name = "DEFAULT_TRANSLATION", nullable = false, length = 4000)
+	@Column(name = "DEFAULT_TRANSLATION", nullable = true, length = 4000)
 	public String getDefaultTranslation() {
 		return this.defaultTranslation;
 	}

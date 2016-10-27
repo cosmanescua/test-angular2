@@ -1,12 +1,30 @@
-#cmp-report_management .report_management-list-item {
-  border-bottom: 1px solid #eaeaea;
+#cmp-report_management .report-list .item {
   cursor: pointer;
-  font-size: 16px;
-  padding: 10px; }
-  #cmp-report_management .report_management-list-item:nth-child(even) {
+  font-size: 16px; }
+  #cmp-report_management .report-list .item:nth-child(even) {
     background: #f9f9f9; }
-  #cmp-report_management .report_management-list-item:hover {
+  #cmp-report_management .report-list .item td {
+    padding: 10px; }
+  #cmp-report_management .report-list .item:hover {
     background: #f3f3f3; }
+#cmp-report_management .report-list .item-active {
+  background: #337ab7 !important;
+  color: white; }
+#cmp-report_management .report-list .col-name {
+  padding: 0; }
+#cmp-report_management .report-list table {
+  margin-bottom: 0; }
+#cmp-report_management .report-list li:first-child td {
+  border: none; }
+#cmp-report_management .report-list .list-refresh_btn {
+  color: #337ab7;
+  cursor: pointer;
+  font-size: 21px;
+  left: 3px;
+  top: 4px; }
+  #cmp-report_management .report-list .list-refresh_btn:hover {
+    color: white !important;
+    text-shadow: 0 0 4px #337ab7, 0 0 4px #337ab7, 0 0 4px #337ab7, 0 0 4px #337ab7; }
 #cmp-report_management .form-box {
   background: #f8f8f8;
   padding: 2px 0 10px; }
@@ -20,5 +38,8 @@
     border-color: #d4d4d4;
     clear: both;
     margin: 14px 15px; }
+#cmp-report_management .ui-growl {
+  bottom: 0;
+  top: auto; }
 
 /*# sourceMappingURL=reportManagement.cmp.css.map */

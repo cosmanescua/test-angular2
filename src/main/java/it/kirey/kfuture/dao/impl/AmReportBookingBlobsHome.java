@@ -11,8 +11,8 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmReportBookingBlobsHome;
 import it.kirey.kfuture.entity.AmReportBookingBlobs;
 
 /**
@@ -21,14 +21,15 @@ import it.kirey.kfuture.entity.AmReportBookingBlobs;
  * @see it.kirey.kfuture.gen.AmReportBookingBlobs
  * @author Hibernate Tools
  */
-@Repository(value = IAmReportBookingBlobsHome.REPOSITORY_QUALIFIER)
-public class AmReportBookingBlobsHome implements IAmReportBookingBlobsHome {
+@Repository(value = "amReportBookingBlobsHome")
+public class AmReportBookingBlobsHome{
 
 	private static final Log log = LogFactory.getLog(AmReportBookingBlobsHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@Transactional
 	public void persist(AmReportBookingBlobs transientInstance) {
 		log.debug("persisting AmReportBookingBlobs instance");
 		try {
@@ -40,6 +41,7 @@ public class AmReportBookingBlobsHome implements IAmReportBookingBlobsHome {
 		}
 	}
 
+	@Transactional
 	public void attachDirty(AmReportBookingBlobs instance) {
 		log.debug("attaching dirty AmReportBookingBlobs instance");
 		try {
@@ -51,6 +53,7 @@ public class AmReportBookingBlobsHome implements IAmReportBookingBlobsHome {
 		}
 	}
 
+	@Transactional
 	public void attachClean(AmReportBookingBlobs instance) {
 		log.debug("attaching clean AmReportBookingBlobs instance");
 		try {
@@ -62,6 +65,7 @@ public class AmReportBookingBlobsHome implements IAmReportBookingBlobsHome {
 		}
 	}
 
+	@Transactional
 	public void delete(AmReportBookingBlobs persistentInstance) {
 		log.debug("deleting AmReportBookingBlobs instance");
 		try {
@@ -73,6 +77,7 @@ public class AmReportBookingBlobsHome implements IAmReportBookingBlobsHome {
 		}
 	}
 
+	@Transactional
 	public AmReportBookingBlobs merge(AmReportBookingBlobs detachedInstance) {
 		log.debug("merging AmReportBookingBlobs instance");
 		try {
@@ -86,6 +91,7 @@ public class AmReportBookingBlobsHome implements IAmReportBookingBlobsHome {
 		}
 	}
 
+	@Transactional
 	public AmReportBookingBlobs findById(Integer id) {
 		log.debug("getting AmReportBookingBlobs instance with id: " + id);
 		try {
@@ -103,6 +109,7 @@ public class AmReportBookingBlobsHome implements IAmReportBookingBlobsHome {
 		}
 	}
 
+	@Transactional
 	public List<AmReportBookingBlobs> findByExample(AmReportBookingBlobs instance) {
 		log.debug("finding AmReportBookingBlobs instance by example");
 		try {

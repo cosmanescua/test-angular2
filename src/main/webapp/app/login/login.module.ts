@@ -9,12 +9,10 @@ import { ROUTING } from './login.routes';
 
 import { UtilityModule } from '../shared/modules/utility.module';
 
-import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
-import { CookieService } from 'angular2-cookie/core';
+import { Http, XHRBackend, RequestOptions } from '@angular/http';
 import { DTHttpInterceptor } from '../dtShared/dt.httpInterceptor';
 
-import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
-
+import { AppService } from '../shared/services/app.service';
 
 @NgModule({
     imports: [
@@ -31,11 +29,10 @@ import {GlobalEventsManager} from '../test-routes/globalEventManager.service';
             useFactory: (
                 backend: XHRBackend,
                 defaultOptions: RequestOptions,
-                cookieService: CookieService,
                 dtService: DTService) =>
-                new DTHttpInterceptor(backend, defaultOptions, cookieService),
-            deps: [XHRBackend, RequestOptions, CookieService]
-        },
+                new DTHttpInterceptor(backend, defaultOptions, dtService),
+            deps: [XHRBackend, RequestOptions, DTService]
+        }
     ]
 })
 export class LoginModule { }

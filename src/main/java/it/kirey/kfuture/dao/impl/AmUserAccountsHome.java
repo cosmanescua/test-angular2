@@ -13,17 +13,20 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmUserAccountsHome;
 import it.kirey.kfuture.entity.AmApplicationRoles;
 import it.kirey.kfuture.entity.AmUrlRoutes;
+
 import it.kirey.kfuture.entity.AmUserAccounts;
+import it.kirey.kfuture.util.Utilities;
 
 /**
  * Home object for domain model class AmUserAccounts.
@@ -31,16 +34,17 @@ import it.kirey.kfuture.entity.AmUserAccounts;
  * @see it.kirey.kfuture.gen.AmUserAccounts
  * @author Hibernate Tools
  */
-@Repository(value = IAmUserAccountsHome.REPOSITORY_QUALIFIER)
-public class AmUserAccountsHome implements IAmUserAccountsHome {
+
+@Repository(value = "amUserAccountsHome")
+public class AmUserAccountsHome implements UserDetailsService {
 
 	private static final Log log = LogFactory.getLog(AmUserAccountsHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
-	// @CachePut("security")
 
 	@Override
+	@Transactional(readOnly=true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		AmUserAccounts user = (AmUserAccounts) sessionFactory.getCurrentSession().createCriteria(AmUserAccounts.class)
 				.add(Restrictions.eq("username", username)).uniqueResult();
@@ -49,7 +53,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		return user;
 	}
 
-	@Override
+	@Transactional(readOnly=true)
 	public AmUserAccounts getUserByUsername(String username) throws UsernameNotFoundException {
 		AmUserAccounts user = (AmUserAccounts) sessionFactory.getCurrentSession().createCriteria(AmUserAccounts.class)
 				.add(Restrictions.eq("username", username)).uniqueResult();
@@ -57,26 +61,27 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 			throw new UsernameNotFoundException("The user with name " + username + " was not found");
 		return user;
 	}
-
-	@Override
+	
+	@Cacheable("security")
+	@Transactional(readOnly=true)
 	public AmUserAccounts getUserByToken(String token) throws UsernameNotFoundException {
 		return (AmUserAccounts) sessionFactory.getCurrentSession().createCriteria(AmUserAccounts.class)
 				.add(Restrictions.eq("token", token)).uniqueResult();
 	}
 
-	@Override
+	@Transactional
 	public Integer countUsers() {
 		return new Integer(((Number) sessionFactory.getCurrentSession().createCriteria(AmUserAccounts.class)
 				.setProjection(Projections.rowCount()).uniqueResult()).intValue());
 	}
 
-	@Override
+	@Transactional
 	public void deleteUserById(Integer id) {
 		AmUserAccounts user = this.findById(id);
 		sessionFactory.getCurrentSession().delete(user);
 	}
 
-	@Override
+	@Transactional
 	public void persist(AmUserAccounts transientInstance) {
 		log.debug("persisting AmUserAccounts instance");
 		try {
@@ -88,8 +93,8 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		}
 	}
 
+	@Transactional
 	@CachePut("security")
-	@Override
 	public void attachDirty(AmUserAccounts instance) {
 		log.debug("attaching dirty AmUserAccounts instance");
 		try {
@@ -101,7 +106,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmUserAccounts instance) {
 		log.debug("attaching clean AmUserAccounts instance");
 		try {
@@ -113,7 +118,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmUserAccounts persistentInstance) {
 		log.debug("deleting AmUserAccounts instance");
 		try {
@@ -125,7 +130,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmUserAccounts merge(AmUserAccounts detachedInstance) {
 		log.debug("merging AmUserAccounts instance");
 		try {
@@ -138,7 +143,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		}
 	}
 
-	@Override
+	@Transactional(readOnly=true)
 	public AmUserAccounts findById(Integer id) {
 		log.debug("getting AmUserAccounts instance with id: " + id);
 		try {
@@ -156,6 +161,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		}
 	}
 
+	@Transactional
 	public List<AmUserAccounts> findByExample(AmUserAccounts instance) {
 		log.debug("finding AmUserAccounts instance by example");
 		try {
@@ -169,7 +175,8 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 		}
 	}
 
-	@Override
+	@Transactional
+	@CacheEvict("security")
 	public void logoutUser(AmUserAccounts user) {
 		log.debug("deleting token for user");
 		try {
@@ -183,7 +190,7 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 
 	}
 
-	@Override
+	@Transactional
 	public List<AmUrlRoutes> findRoutesByUser(AmUserAccounts user) {
 		List<AmApplicationRoles> userRoles = user.getAmApplicationRoleses();
 		List<AmUrlRoutes> userRouts = new ArrayList<>();
@@ -193,6 +200,13 @@ public class AmUserAccountsHome implements IAmUserAccountsHome {
 					userRouts.add(userRole.getAmUrlRouteses().get(i));
 			}
 		}
-		return userRouts;
+	  return userRouts;
+	 }
+	
+	@Transactional
+	public void changeDefaultLanguage(String langCode) {
+		AmUserAccounts user = Utilities.getUserFromContext();
+		user.setDefaultLanguage(langCode);
+		attachDirty(user);
 	}
 }

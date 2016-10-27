@@ -13,8 +13,8 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmDictionaryHome;
 import it.kirey.kfuture.entity.AmDictionary;
 
 
@@ -24,15 +24,14 @@ import it.kirey.kfuture.entity.AmDictionary;
  * @see it.kirey.kfuture.gen.AmDictionary
  * @author Hibernate Tools
  */
-@Repository(value = IAmDictionaryHome.REPOSITORY_QUALIFIER)
-public class AmDictionaryHome implements IAmDictionaryHome {
+@Repository(value = "amDictionaryHome")
+public class AmDictionaryHome{
 
 	private static final Log log = LogFactory.getLog(AmDictionaryHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
 	public void persist(AmDictionary transientInstance) {
 		log.debug("persisting AmDictionary instance");
 		try {
@@ -43,7 +42,7 @@ public class AmDictionaryHome implements IAmDictionaryHome {
 			throw re;
 		}
 	}
-	@Override
+	
 	public void attachDirty(AmDictionary instance) {
 		log.debug("attaching dirty AmDictionary instance");
 		try {
@@ -55,7 +54,6 @@ public class AmDictionaryHome implements IAmDictionaryHome {
 		}
 	}
 	
-	@Override
 	public void attachClean(AmDictionary instance) {
 		log.debug("attaching clean AmDictionary instance");
 		try {
@@ -67,7 +65,6 @@ public class AmDictionaryHome implements IAmDictionaryHome {
 		}
 	}
 	
-	@Override
 	public void delete(AmDictionary persistentInstance) {
 		log.debug("deleting AmDictionary instance");
 		try {
@@ -79,7 +76,6 @@ public class AmDictionaryHome implements IAmDictionaryHome {
 		}
 	}
 	
-	@Override
 	public AmDictionary merge(AmDictionary detachedInstance) {
 		log.debug("merging AmDictionary instance");
 		try {
@@ -92,7 +88,6 @@ public class AmDictionaryHome implements IAmDictionaryHome {
 		}
 	}
 
-	@Override
 	public AmDictionary findById(java.lang.String id) {
 		log.debug("getting AmDictionary instance with id: " + id);
 		try {
@@ -122,13 +117,13 @@ public class AmDictionaryHome implements IAmDictionaryHome {
 		}
 	}
 	
-	@Cacheable(cacheNames="dictionary") 
-	@Override
-	public List<AmDictionary> getAll() {
+	@Cacheable(cacheNames="dictionary")
+	@Transactional(readOnly = true)
+	public List<AmDictionary> findAll() {
 		return (List<AmDictionary>) this.sessionFactory.getCurrentSession().createCriteria(AmDictionary.class).list();
 	}
 
-	@Override
+
 	public List<AmDictionary> findByCategory(String lang, String category) { 
 		return (List<AmDictionary>)this.sessionFactory.getCurrentSession().createCriteria(AmDictionary.class, "dictionary")
 				.createAlias("dictionary.resource", "resource")

@@ -28,7 +28,9 @@ var ProductsModule = (function () {
                 utility_module_1.UtilityModule,
                 products_routes_1.ROUTING
             ],
-            declarations: [products_cmp_1.ProductsCmp],
+            declarations: [
+                products_cmp_1.ProductsCmp
+            ],
             providers: [
                 products_service_1.ProductsService,
                 dt_service_1.DTService,

@@ -11,8 +11,8 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmReportBookingParametersHome;
 import it.kirey.kfuture.entity.AmReportBookingParameters;
 
 /**
@@ -21,15 +21,15 @@ import it.kirey.kfuture.entity.AmReportBookingParameters;
  * @see it.kirey.kfuture.gen.AmReportBookingParameters
  * @author Hibernate Tools
  */
-@Repository(value = IAmReportBookingParametersHome.REPOSITORY_QUALIFIER)
-public class AmReportBookingParametersHome implements IAmReportBookingParametersHome {
+@Repository(value = "amReportBookingParametersHome")
+public class AmReportBookingParametersHome {
 
 	private static final Log log = LogFactory.getLog(AmReportBookingParametersHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
+	@Transactional
 	public void persist(AmReportBookingParameters transientInstance) {
 		log.debug("persisting AmReportBookingParameters instance");
 		try {
@@ -41,7 +41,7 @@ public class AmReportBookingParametersHome implements IAmReportBookingParameters
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachDirty(AmReportBookingParameters instance) {
 		log.debug("attaching dirty AmReportBookingParameters instance");
 		try {
@@ -53,7 +53,7 @@ public class AmReportBookingParametersHome implements IAmReportBookingParameters
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmReportBookingParameters instance) {
 		log.debug("attaching clean AmReportBookingParameters instance");
 		try {
@@ -65,7 +65,7 @@ public class AmReportBookingParametersHome implements IAmReportBookingParameters
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmReportBookingParameters persistentInstance) {
 		log.debug("deleting AmReportBookingParameters instance");
 		try {
@@ -77,7 +77,7 @@ public class AmReportBookingParametersHome implements IAmReportBookingParameters
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReportBookingParameters merge(AmReportBookingParameters detachedInstance) {
 		log.debug("merging AmReportBookingParameters instance");
 		try {
@@ -91,7 +91,7 @@ public class AmReportBookingParametersHome implements IAmReportBookingParameters
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReportBookingParameters findById(Integer id) {
 		log.debug("getting AmReportBookingParameters instance with id: " + id);
 		try {
@@ -109,6 +109,7 @@ public class AmReportBookingParametersHome implements IAmReportBookingParameters
 		}
 	}
 
+	@Transactional
 	public List<AmReportBookingParameters> findByExample(AmReportBookingParameters instance) {
 		log.debug("finding AmReportBookingParameters instance by example");
 		try {

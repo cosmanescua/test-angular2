@@ -1,7 +1,8 @@
-<!-- Navigation -->
-<navigation-menu *ngIf="_authenticationService.getLoginStatus()" (onTranslationChange)="promenioTrans()"></navigation-menu>
+<navigation-menu *ngIf="_authService.getLoginStatus() && _authService.initState && _appService.initModuleLoaded"></navigation-menu>
+
+<!--<dt-global-loader loaderCounter="1" loadingMessage="neki tekst"></dt-global-loader>-->
 
 <div id="app_content-container">
-    <router-outlet></router-outlet>
+	<!-- Routing container -->
+	<router-outlet></router-outlet>
 </div>
-

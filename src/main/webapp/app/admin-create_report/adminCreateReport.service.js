@@ -20,8 +20,7 @@ var AdminCreateReportService = (function () {
      * @author DynTech
      */
     AdminCreateReportService.prototype.createReport = function (reportProfile) {
-        return this._http.post(this._baseUrl + 'reports', JSON.stringify(reportProfile))
-            .map(function (response) { return response.json(); });
+        return this._http.post(this._baseUrl + 'reports', JSON.stringify(reportProfile));
     };
     /**
      * Handle error on service layer

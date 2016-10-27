@@ -19,14 +19,12 @@ public class TestCacheDaoImpl implements ITestCacheDao{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	@Cacheable(value = "testCache")
 	public List<AmErrorLogs> getAllErrorLogs() {
 
 		return (List<AmErrorLogs>) this.sessionFactory.getCurrentSession().createCriteria(AmErrorLogs.class).list();
 	}
 
 	@Override
-	@CacheEvict(value = "testCache", allEntries=true )
 	public void cacheEvict() {
 	System.out.println("______________________   cacheEvict");
 	}

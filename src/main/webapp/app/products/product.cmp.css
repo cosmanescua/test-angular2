@@ -1,0 +1,22 @@
+section {
+  height: 100%;
+  margin: -10px;
+  position: absolute;
+  width: 100%; }
+
+#overlay {
+  background: rgba(255, 255, 255, 0.5);
+  display: table;
+  height: 100%;
+  position: relative;
+  width: 100%;
+  z-index: 4; }
+  #overlay i {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle; }
+
+.spin-normal {
+  background: url("../assets/images/loader.gif") center no-repeat; }
+
+/*# sourceMappingURL=product.cmp.css.map */

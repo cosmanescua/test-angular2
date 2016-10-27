@@ -10,14 +10,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var forms_1 = require('@angular/forms');
+var ng2_translate_1 = require('ng2-translate/ng2-translate');
 var dt_service_1 = require('../dtShared/dt.service');
 var reportManagement_service_1 = require('./reportManagement.service');
 var validation_service_1 = require('../shared/services/validation.service');
+var app_service_1 = require('../shared/services/app.service');
+var reportFilter_pipe_1 = require('./pipes/reportFilter.pipe');
+var models_1 = require('./models');
+var models_2 = require('../shared/models');
 var ReportManagementCmp = (function () {
     /*--------- Constructor --------*/
-    function ReportManagementCmp(_dtService, _reportManagementService) {
+    function ReportManagementCmp(_dtService, _reportManagementService, _translateService, _appService) {
         this._dtService = _dtService;
         this._reportManagementService = _reportManagementService;
+        this._translateService = _translateService;
+        this._appService = _appService;
     }
     /*--------- App logic --------*/
     /**
@@ -26,18 +33,19 @@ var ReportManagementCmp = (function () {
      */
     ReportManagementCmp.prototype.loadReportsRest = function () {
         var _this = this;
-        // this.isLoading = false;
-        this.loadingState = true;
-        this.reports = null;
+        this.setAlert(false);
+        this.bLoadingState = true;
+        this.reports = [];
+        this.selectedReport = null;
         this._dtService.setRestMessageContent('ReportManagementCmp', 'loadingReportRest()');
-        this._reportManagementService.getReports().subscribe(function (res) {
+        this._reportManagementService.getReports().toPromise().then(function (res) {
             _this.allReports = res;
             _this.reports = _this.allReports;
-            _this.loadingState = false;
+            _this.bLoadingState = false;
             _this.sortReportParameters(_this.reports);
         }, function (err) {
             console.log(err);
-            _this.loadingState = false;
+            _this.bLoadingState = false;
         });
     };
     /**
@@ -46,6 +54,7 @@ var ReportManagementCmp = (function () {
      */
     ReportManagementCmp.prototype.selectReport = function (id) {
         var _this = this;
+        this.setAlert(false);
         this.selectedReport = this.reports.filter(this.filterArrayOfObjects.bind(null, { name: 'id', value: id }))[0];
         this.selectedReportParams = this.parametersArrayToMatrix(this.selectedReport.amReportParameterses);
         this.formLoaded = false;
@@ -117,7 +126,8 @@ var ReportManagementCmp = (function () {
      */
     ReportManagementCmp.prototype.addBooking = function () {
         var _this = this;
-        this.isLoading = true;
+        this.setAlert(false);
+        this.bPrintReportLoading = true;
         var date = new Date(this.form.value.deadline);
         var params = [];
         var obj = {
@@ -147,24 +157,24 @@ var ReportManagementCmp = (function () {
         }
         //Setting params
         obj.amReportBookingParameterses = params;
-        //console.log(obj);
         this._dtService.setRestMessageContent('ReportManagementCmp', 'addBooking()');
-        this._reportManagementService.addBooking(obj).subscribe(function (res) {
-            _this.messages.push({ severity: 'info', summary: 'Success Message', detail: 'Successfully booked a report.' });
+        this._reportManagementService.addBooking(obj).toPromise().then(function (res) {
+            _this.setAlert(true, 'Report booked', 'success');
         }, function (err) {
-            _this.messages.push({ severity: 'error', summary: 'Error Message', detail: 'Internal Server Error' });
-        }, function () {
-            setTimeout(function () {
-                _this.isLoading = false;
-            }, 500);
+            _this.setAlert(true, 'Report failed booking', 'danger');
+        }).then(function () {
+            _this.bPrintReportLoading = false;
         });
     };
     /**
      * Printing a report.
      * @author DynTech
      */
-    ReportManagementCmp.prototype.printReport = function () {
+    ReportManagementCmp.prototype.printReport = function (newWindow, reportName) {
+        var _this = this;
         var params = {};
+        this.bPrintReportLoading = true;
+        this.setAlert(false);
         for (var key in this.form.value) {
             INNERLOOP: for (var _i = 0, _a = this.selectedReport.amReportParameterses; _i < _a.length; _i++) {
                 var parameter = _a[_i];
@@ -190,53 +200,32 @@ var ReportManagementCmp = (function () {
             amReportParameterses: params,
             frontEndFormat: frontEndFormat
         };
-        // var x = new XMLHttpRequest();
-        // x.open("GET", 'reports/19/pdf/inline?parameters=%7B"17":"root"%7D', true);
-        // x.responseType = 'blob';
-        // x.onload = function (e) {
-        //     // download(x.response, "maxica.pdf", "application/pdf" ); 
-        //     let blob = new Blob([x.response], { type: 'application/pdf' });
-        //     console.log(x.response);
-        //     var fileURL = URL.createObjectURL(blob);
-        //     window.open(fileURL);
-        //     // saveAs(blob, "report."+obj.format);
-        // }
-        // x.send();
-        // let pom = 'mario';
-        // let blob = new Blob([pom], { type: 'application/pdf' })
-        // console.log(blob);
         this._dtService.setRestMessageContent('ReportManagementCmp', 'printReport()');
-        this._reportManagementService.printReport(obj).subscribe(function (res) {
-            // let blob1 = new Blob([res._body], { type: 'blob' });
-            // console.log(res);
-            console.log(res);
-            // let blob = new Blob([res], { type: 'application/pdf' });
-            // console.log(blob1);
-            // console.log(blob);
-            // saveAs(res, "report.pdf");
-            var fileURL = URL.createObjectURL(res);
-            window.open(fileURL);
-            // download(res._body, "maxica.pdf", "application/pdf" ); 
+        this._reportManagementService.printReport(obj).toPromise().then(function (res) {
+            var tempBlob = new Blob([res.blob()], { type: 'application/pdf' });
+            // this.reportAlert.message = 'Report printed';
+            // this.reportAlert.type = 'success';
+            // this.reportAlert.show = true;
+            _this.setAlert(true, 'Report printed', 'success');
+            if (newWindow) {
+                var fileURL = URL.createObjectURL(tempBlob);
+                window.open(fileURL);
+            }
+            else {
+                saveAs(tempBlob, reportName + ".pdf");
+            }
+        }, function (error) {
+            _this.setAlert(true, 'Report failed printing', 'danger');
+        }).then(function () {
+            _this.bPrintReportLoading = false;
         });
     };
     /**
-     * Selecting sync, async or all reports.
+     * Method to be executed when report type is changed
      * @author DynTech
      */
-    ReportManagementCmp.prototype.onTypeChange = function () {
-        var _this = this;
-        this.reports = null;
+    ReportManagementCmp.prototype.typeChanged = function () {
         this.selectedReport = null;
-        setTimeout(function () {
-            _this.reports = _this.allReports.filter(function (el) {
-                if (_this.selectedType == "sync")
-                    return (el.type == "sync") ? true : false;
-                else if (_this.selectedType == "async")
-                    return (el.type == "async") ? true : false;
-                else
-                    return true;
-            });
-        });
     };
     /*---------- Utilities ----------*/
     /**
@@ -289,26 +278,55 @@ var ReportManagementCmp = (function () {
             });
         }
     };
+    /**
+     * Set or remove alert in header with message and type
+     * @author DynTech
+     */
+    ReportManagementCmp.prototype.setAlert = function (show, message, type) {
+        this.reportAlert.message = message;
+        this.reportAlert.type = type;
+        this.reportAlert.show = show;
+    };
+    /**
+     * Check if piped report result is empty
+     * @author DynTech
+     */
+    ReportManagementCmp.prototype.isReportPipeEmpty = function (reports, selectedType) {
+        return new reportFilter_pipe_1.ReportFilterPipe().transform(reports, selectedType).length == 0;
+    };
     /*--------- NG On Init ---------*/
     ReportManagementCmp.prototype.ngOnInit = function () {
+        var _this = this;
+        // Variable initialization
         this.messages = [];
+        this.reports = [];
         this.form = new forms_1.FormGroup({});
         this.formLoaded = false;
-        this.loadingState = false;
+        this.bLoadingState = false;
+        this.bPrintReportLoading = false;
         this.selectedReportParams = [];
         this.types = [
-            { label: 'Asynchronous', value: 'async' },
-            { label: 'All', value: 'all' },
-            { label: 'Synchronous', value: 'sync' }
+            new models_1.ReportType('Asynchronous', 'async'),
+            new models_1.ReportType('All', 'all'),
+            new models_1.ReportType('Synchronous', 'sync')
         ];
         this.selectedType = 'all';
-        this.loadReportsRest();
+        this.reportAlert = new models_2.Alert(null, true);
+        // Methods execution
+        this._appService.languageChanged.subscribe(function (lang) {
+            _this._appService.changeLangTranslate(_this._translateService, lang, true);
+        });
+        app_service_1.AppService.languageChangeCompletedEmit.subscribe(function () {
+            _this.loadReportsRest();
+        });
         // Construct methods
-        this.__setInitPageTitle('Report Management');
+        this._translateService.use(this._appService.getStoredLanguage()).toPromise().then(function (res) {
+            app_service_1.AppService.languageChangeCompleted();
+        });
+        this._appService.pageLoaded('Report management');
     };
-    /*--------- Interface imported --------*/
-    ReportManagementCmp.prototype.__setInitPageTitle = function (title) {
-        this._dtService.setPageTitle(title);
+    ReportManagementCmp.prototype.ngOnDestroy = function () {
+        this._appService.refreshEmitters();
     };
     ReportManagementCmp = __decorate([
         core_1.Component({
@@ -317,7 +335,7 @@ var ReportManagementCmp = (function () {
             // styleUrls: ['app/report_management/reportManagement.cmp.css'],
             encapsulation: core_1.ViewEncapsulation.None
         }), 
-        __metadata('design:paramtypes', [dt_service_1.DTService, reportManagement_service_1.ReportManagementService])
+        __metadata('design:paramtypes', [dt_service_1.DTService, reportManagement_service_1.ReportManagementService, ng2_translate_1.TranslateService, app_service_1.AppService])
     ], ReportManagementCmp);
     return ReportManagementCmp;
 }());

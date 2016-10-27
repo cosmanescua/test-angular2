@@ -13,37 +13,45 @@ var products_service_1 = require('../products/products.service');
 var dt_service_1 = require('../dtShared/dt.service');
 var dt_sort_model_1 = require('../dtShared/table/dt.sort.model');
 var dt_table_1 = require('../dtShared/table/dt.table');
+var app_service_1 = require('../shared/services/app.service');
 var ProductsCmp = (function () {
-    function ProductsCmp(_productsService, _dtService, _dtTable, _changeDetectionRef) {
+    function ProductsCmp(_productsService, _dtService, _dtTable, _changeDetectionRef, _appService) {
         this._productsService = _productsService;
         this._dtService = _dtService;
         this._dtTable = _dtTable;
         this._changeDetectionRef = _changeDetectionRef;
+        this._appService = _appService;
         this.show = true;
+        this.isLoading = false;
     }
     /* === Ajax calls === */
     ProductsCmp.prototype.loadProductsRest = function (currentPage, pageSize) {
         var _this = this;
         this._dtService.setRestMessageContent('ProductsCmp', 'loadProductsRest()');
         this._productsService.getProducts(this._dtTable.getPaginationParams(currentPage, pageSize, this.filters, this.sort))
-            .subscribe(function (products) {
+            .toPromise().then(function (products) {
             _this.__totalItems = products.totalRows;
+            console.log(_this.__totalItems);
             _this.products = products.data;
+            _this.productsToFilter = _this.products;
             _this.__currentPage = currentPage;
             _this.__pageSize = pageSize;
             setTimeout(function () {
                 _this.pageSizeChangeStatus = false;
-            });
+                _this.isLoading = false;
+            }, 50);
         }, function (error) {
             _this.pageSizeChangeStatus = true;
             _this.__currentPage = 1;
             setTimeout(function () {
+                _this.isLoading = false;
                 _this.pageSizeChangeStatus = false;
-            });
+            }, 50);
         });
     };
     /* === Pagination methods === */
     ProductsCmp.prototype.__onPageChanged = function (event) {
+        this.isLoading = true;
         if (!this.pageSizeChangeStatus) {
             this.__currentPage = event.page;
             this.loadProductsRest(this.__currentPage, this.__pageSize);
@@ -52,38 +60,42 @@ var ProductsCmp = (function () {
     ;
     ProductsCmp.prototype.__onPageSizeChanged = function () {
         this.pageSizeChangeStatus = true;
+        this.isLoading = true;
         this._changeDetectionRef.detectChanges();
         this.loadProductsRest(1, this.__pageSizeModel);
     };
     ProductsCmp.prototype.filterByName = function () {
-        this.pageSizeChangeStatus = true;
-        this._changeDetectionRef.detectChanges();
-        this.loadProductsRest(1, this.__pageSizeModel);
+        // this._changeDetectionRef.detectChanges();
+        var _this = this;
+        this.timeout = setTimeout(function () {
+            _this.pageSizeChangeStatus = true;
+            _this.isLoading = true;
+            _this.loadProductsRest(1, _this.__pageSizeModel);
+        }, 2000);
     };
     // ---------------------- ON INIT
     ProductsCmp.prototype.ngOnInit = function () {
+        // Variable initialization
         this.__pageSizeModel = 10;
         this.__pageSize = 10;
         this.__currentPage = 1;
         this.__totalItems = 0;
-        this.filters = {
-            name: ''
-        };
+        this.filters = {};
         this.sort = new dt_sort_model_1.Sort('name', 'asc');
         this.pageSizes = [5, 6, 7, 8, 9, 10, 11];
+        // Methods execution
+        this.isLoading = true;
         this.loadProductsRest(this.__currentPage, this.__pageSize);
         // Construct methods
-        this.__setInitPageTitle('Products');
-    };
-    // Interface imported
-    ProductsCmp.prototype.__setInitPageTitle = function (title) {
-        this._dtService.setPageTitle(title);
+        this._appService.pageLoaded('Products');
     };
     ProductsCmp = __decorate([
         core_1.Component({
             templateUrl: 'app/products/products.cmp.html',
+            // styleUrls: ['app/products/product.cmp.css'],
+            encapsulation: core_1.ViewEncapsulation.None
         }), 
-        __metadata('design:paramtypes', [products_service_1.ProductsService, dt_service_1.DTService, dt_table_1.DTTable, core_1.ChangeDetectorRef])
+        __metadata('design:paramtypes', [products_service_1.ProductsService, dt_service_1.DTService, dt_table_1.DTTable, core_1.ChangeDetectorRef, app_service_1.AppService])
     ], ProductsCmp);
     return ProductsCmp;
 }());

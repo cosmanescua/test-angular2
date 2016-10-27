@@ -15,6 +15,7 @@ var forms_1 = require('@angular/forms');
 var core_2 = require('angular2-cookie/core');
 var dt_service_1 = require('../../dtShared/dt.service');
 var pipes_module_1 = require('../modules/pipes.module');
+var dt_globalLoader_module_1 = require('../../dtShared/global_loader/dt.globalLoader.module');
 var UtilityModule = (function () {
     function UtilityModule() {
     }
@@ -23,14 +24,17 @@ var UtilityModule = (function () {
             imports: [
                 common_1.CommonModule,
                 forms_1.FormsModule,
-                pipes_module_1.PipesModule
+                pipes_module_1.PipesModule,
+                dt_globalLoader_module_1.DTGlobalLoaderModule
             ],
             exports: [
-                forms_1.FormsModule,
                 common_1.CommonModule,
-                pipes_module_1.PipesModule
+                forms_1.FormsModule,
+                pipes_module_1.PipesModule,
+                dt_globalLoader_module_1.DTGlobalLoaderModule
             ],
             providers: [
+                // Router,
                 core_2.CookieService,
                 platform_browser_1.Title,
                 dt_service_1.DTService,

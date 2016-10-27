@@ -4,54 +4,33 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmReportBlobsHome;
-import it.kirey.kfuture.dao.IAmReportBookingParametersHome;
-import it.kirey.kfuture.dao.IAmReportBookingsHome;
-import it.kirey.kfuture.dao.IAmReportParametersHome;
-import it.kirey.kfuture.dao.IAmReportsHome;
-import it.kirey.kfuture.entity.AmReportBlobs;
-import it.kirey.kfuture.entity.AmReportBookingParameters;
+import it.kirey.kfuture.dao.impl.AmReportBookingsHome;
+import it.kirey.kfuture.dao.impl.AmReportsHome;
 import it.kirey.kfuture.entity.AmReportBookings;
 import it.kirey.kfuture.entity.AmReportParameters;
 import it.kirey.kfuture.entity.AmReports;
 import it.kirey.kfuture.jasper.ReportEngine;
-import it.kirey.kfuture.service.IOrderServiceForEmail;
 import it.kirey.kfuture.service.IReportService;
 import it.kirey.kfuture.util.Utilities;
 import net.sf.jasperreports.engine.JasperPrint;
 
 @Service(value=IReportService.SERVICE_QUALIFIER)
 public class ReportServiceImpl implements IReportService{
-	
+
 	@Autowired
-	private IAmReportsHome amReportsHome;
+	private AmReportsHome amReportsHome;
 	@Autowired
 	private ReportEngine engine;
 	@Autowired
-	private IOrderServiceForEmail orderService;
-	@Autowired
-	private IAmReportParametersHome amReportParametersHome;
-	@Autowired
-	private IAmReportBookingParametersHome amReportBookingParametersHome;
-	@Autowired
-	private IAmReportBookingsHome amReportBookingsHome;
-	@Autowired
-	private IAmReportBlobsHome amReportBlobsHome;
+	private AmReportBookingsHome amReportBookingsHome;
+
 	
-	@Override
-	@Transactional
-	public void saveOrUpdateReportParamValue(AmReportBookingParameters reportParamValue) {
-		this.amReportBookingParametersHome.attachDirty(reportParamValue);
-	}
-	
-	@Override
 	@Transactional
 	public void saveOrUpdateReportBooking(AmReportBookings reportBooking) {
 		Date today = new Date();
@@ -63,42 +42,6 @@ public class ReportServiceImpl implements IReportService{
 		this.amReportBookingsHome.attachDirty(reportBooking);
 	}
 	
-	@Override
-	@Transactional(readOnly=true)
-	public AmReportParameters getReportParamsById(Integer id) {
-		return this.amReportParametersHome.findById(id);
-	}
-	
-	@Override
-	@Transactional(readOnly=true)
-	public AmReports getById(Integer id) {
-		return this.amReportsHome.findById(id);
-	}
-
-	/*@Override
-	@Transactional
-	public ByteArrayOutputStream generateReport1(String jasperName) {
-		try {
-
-			Customer customer = orderService.getCustomerDetails();
-
-			HashMap<String, Object> reportParam = new HashMap<String, Object>();
-			reportParam.put("name", customer.getName());
-
-			List<Customer> list = new ArrayList<Customer>();
-			list.add(customer);
-			list.add(customer);
-
-			JasperPrint jp = engine.generateReport(reportParam, jasperName,
-					new JRBeanCollectionDataSource(list, false));
-			return engine.exportPdf(jp);
-
-		} catch (Exception e) {
-			return null;
-		}
-	}*/
-
-	@Override
 	public ByteArrayOutputStream generateReport2(String name, String jasperName) {
 		try {
 			Map<String, Object> reportParams = new HashMap<String, Object>();
@@ -110,11 +53,8 @@ public class ReportServiceImpl implements IReportService{
 		}
 	}
 	
-	@Override
 	@Transactional(readOnly=true)
-	public Map <String,Object> generateReportFromDB(Integer reportId,String format, HashMap<String, Object> reportParam, AmReports amReports) {
-
-		//AmReportBlobs reportBlob = amReportBlobsHome.getBlobFileByReportId(reportId);
+	public Map <String,Object> generateReportFromDB(String format, HashMap<String, Object> reportParam, AmReports amReports) {
 		Map <String,Object> results = null;
 		
 		if (amReports.getAmReportBlobs().getFileBlob() != null) {
@@ -133,14 +73,6 @@ public class ReportServiceImpl implements IReportService{
 
 	}
 	
-	@Override
-	@Transactional(readOnly=true)
-	public List<AmReports> getAllReportsWithoutBlobFile() {
-		List<AmReports> repList =  amReportsHome.getAll();
-		return repList;
-	}
-	
-	@Override
 	@Transactional
 	public void saveReport(AmReports report) throws IOException {
 		

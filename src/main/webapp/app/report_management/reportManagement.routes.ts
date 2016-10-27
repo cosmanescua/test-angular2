@@ -2,7 +2,7 @@ import { RouterModule } from '@angular/router';
 
 import { ModuleWithProviders } from '@angular/core';
 
-import { ReportManagementCmp } from '../report_management/reportManagement.cmp';
+import { ReportManagementCmp } from './reportManagement.cmp';
 
 export const ROUTING: ModuleWithProviders = RouterModule.forChild([
     {

@@ -1,15 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { DTViewCmpIf } from '../dtShared/dt.viewCmpIF';
 import { DTService } from '../dtShared/dt.service';
 
 import { CacheTestService } from './cacheTest.service';
 
+import { AppService } from '../shared/services/app.service';
+
 @Component({
     moduleId: module.id,
-    templateUrl: 'cacheTest.cmp.html'
+    templateUrl: 'cacheTest.cmp.html',
+
+    encapsulation: ViewEncapsulation.None
 })
-export class CacheTestCmp implements OnInit, DTViewCmpIf {
+export class CacheTestCmp implements OnInit {
     testResult: any;
     testResultCached: any;
     initialCacheCleared: boolean;
@@ -21,7 +25,8 @@ export class CacheTestCmp implements OnInit, DTViewCmpIf {
     /*--------- Constructor ---------*/
     constructor(
         private _dtService: DTService,
-        private _cacheTestService: CacheTestService
+        private _cacheTestService: CacheTestService,
+        private _appService: AppService
     ) { }
 
     /*--------- App logic ---------*/
@@ -33,18 +38,18 @@ export class CacheTestCmp implements OnInit, DTViewCmpIf {
     testCacheRest(bCached: boolean) {
         this._dtService.setRestMessageContent('CacheTestCmp', 'testCacheRest()');
         this.loadingState = true;
-        this._cacheTestService.testCache().subscribe(result => {
+        this._cacheTestService.testCache().toPromise().then(res => {
             this.bCacheCleared = false;
             this.loadingState = false;
 
             if (bCached) {
                 this.testResultCached.executionDate = new Date();
-                this.testResultCached.dataSize = JSON.stringify(result.ErrorLogs).length;
-                this.testResultCached.executionTime = result.executeTime;
+                this.testResultCached.dataSize = JSON.stringify(res.ErrorLogs).length;
+                this.testResultCached.executionTime = res.executeTime;
             } else {
                 this.testResult.executionDate = new Date();
-                this.testResult.dataSize = JSON.stringify(result.ErrorLogs).length;
-                this.testResult.executionTime = result.executeTime;
+                this.testResult.dataSize = JSON.stringify(res.ErrorLogs).length;
+                this.testResult.executionTime = res.executeTime;
             }
         }, error => {
             this.loadingState = false;
@@ -58,7 +63,7 @@ export class CacheTestCmp implements OnInit, DTViewCmpIf {
     clearCacheRest() {
         this._dtService.setRestMessageContent('CacheTestCmp', 'clearCacheRest()');
         this.loadingState = true;
-        this._cacheTestService.clearCache().subscribe(result => {
+        this._cacheTestService.clearCache().toPromise().then(res => {
             this.bCacheCleared = true;
             this.loadingState = false;
 
@@ -112,14 +117,7 @@ export class CacheTestCmp implements OnInit, DTViewCmpIf {
         this.initialCacheCleared = false;
 
         // Construct methods
-        this.__setInitPageTitle('Cache Test');
-
         this.clearCacheRest();
-    }
-
-    /*--------- Interface imported --------*/
-
-    __setInitPageTitle(title: string) {
-        this._dtService.setPageTitle(title);
+        this._appService.pageLoaded('Cache test');
     }
 }

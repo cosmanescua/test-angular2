@@ -10,13 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
+var http_1 = require('@angular/http');
 var nav_cmp_1 = require('./nav.cmp');
 var ng2_translate_1 = require('ng2-translate/ng2-translate');
-var http_1 = require('@angular/http');
-var core_2 = require('angular2-cookie/core');
 var dt_httpInterceptor_1 = require('../dtShared/dt.httpInterceptor');
+var dt_service_1 = require('../dtShared/dt.service');
+var alert_1 = require('ng2-bootstrap/components/alert');
 var utility_module_1 = require('../shared/modules/utility.module');
-var globalEventManager_service_1 = require('../test-routes/globalEventManager.service');
 var NavModule = (function () {
     function NavModule() {
     }
@@ -25,6 +25,7 @@ var NavModule = (function () {
             imports: [
                 utility_module_1.UtilityModule,
                 router_1.RouterModule,
+                alert_1.AlertModule,
                 ng2_translate_1.TranslateModule.forRoot({
                     provide: ng2_translate_1.TranslateLoader,
                     useFactory: function (http) { return new ng2_translate_1.TranslateStaticLoader(http, 'rest/translations/navigation', ''); },
@@ -34,15 +35,13 @@ var NavModule = (function () {
             exports: [nav_cmp_1.NavCmp],
             declarations: [nav_cmp_1.NavCmp],
             providers: [
-                core_2.CookieService,
-                globalEventManager_service_1.GlobalEventsManager,
                 {
                     provide: http_1.Http,
-                    useFactory: function (backend, defaultOptions, cookieService) {
-                        return new dt_httpInterceptor_1.DTHttpInterceptor(backend, defaultOptions, cookieService);
+                    useFactory: function (backend, defaultOptions, dtService) {
+                        return new dt_httpInterceptor_1.DTHttpInterceptor(backend, defaultOptions, dtService);
                     },
-                    deps: [http_1.XHRBackend, http_1.RequestOptions, core_2.CookieService]
-                },
+                    deps: [http_1.XHRBackend, http_1.RequestOptions, dt_service_1.DTService]
+                }
             ],
         }), 
         __metadata('design:paramtypes', [])

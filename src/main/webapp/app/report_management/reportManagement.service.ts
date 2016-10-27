@@ -12,7 +12,7 @@ export class ReportManagementService {
      * Retrieves all reports from database.
      * @author DynTech
      */
-    getReports(): any {
+    getReports(): Observable<any> {
         return this._http.get(this._baseUrl + 'reports').map(
             (res) => res.json()
         ).catch(this.handleError);
@@ -36,11 +36,8 @@ export class ReportManagementService {
         let params = encodeURI(JSON.stringify(reportData.amReportParameterses));
         let url = this._baseUrl + "reports/" + reportData.reportId + "/" + reportData.format + "/inline?parameters=" + params;
 
-        return this._http.get(url, { responseType: ResponseContentType.Blob }).map(
-            (res) => {
-                return new Blob([res.blob()], { type: 'application/pdf' })
-            }
-        ).catch(this.handleError);
+        return this._http.get(url, { responseType: ResponseContentType.Blob })
+            .catch(this.handleError);
     }
 
     /**

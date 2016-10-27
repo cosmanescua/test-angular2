@@ -13,14 +13,14 @@ var http_1 = require('@angular/http');
 var CacheTestService = (function () {
     function CacheTestService(_http) {
         this._http = _http;
-        this._baseUrl = '';
+        this._baseUrl = 'rest/';
     }
     /**
      * Test cache bay making call for getting data and reciving time
      * @author DynTech
      */
     CacheTestService.prototype.testCache = function () {
-        return this._http.get('testCache')
+        return this._http.get(this._baseUrl + 'testCache')
             .map(function (response) { return response.json(); });
     };
     /**
@@ -28,7 +28,7 @@ var CacheTestService = (function () {
      * @author DynTech
      */
     CacheTestService.prototype.clearCache = function () {
-        return this._http.get('testCacheEvict')
+        return this._http.get(this._baseUrl + 'testCacheEvict')
             .map(function (response) { return response; });
     };
     /**

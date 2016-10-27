@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.kirey.kfuture.dao.impl.AmErrorLogsHome;
+import it.kirey.kfuture.dao.impl.AmErrorTracesHome;
 import it.kirey.kfuture.entity.AmErrorLogs;
 import it.kirey.kfuture.entity.AmErrorTraces;
 import it.kirey.kfuture.service.ILoggerService;
@@ -19,9 +21,12 @@ import it.kirey.kfuture.service.ILoggerService;
 @RestController
 @RequestMapping("/log")
 public class LoggerController {
+		
+	@Autowired
+	AmErrorLogsHome amErrorLogsHome;
 	
 	@Autowired
-	ILoggerService loggerService;
+	AmErrorTracesHome amErrorTracesHome;
 	 
 	Log logger = LogFactory.getLog(getClass());
 	
@@ -33,7 +38,7 @@ public class LoggerController {
 	
 	@RequestMapping(value = "/logs", method = RequestMethod.GET)
 	public ResponseEntity<List<AmErrorLogs>> getAllLogs() {		
-		List<AmErrorLogs> logs= loggerService.getAllLogs();
+		List<AmErrorLogs> logs= amErrorLogsHome.findAll();
 		return new ResponseEntity<List<AmErrorLogs>>(logs, HttpStatus.OK);	
 	}
 	
@@ -45,7 +50,7 @@ public class LoggerController {
 	@RequestMapping(value = "/traces/{id}", method = RequestMethod.GET)
 	public ResponseEntity<AmErrorTraces> getTrace(@PathVariable(value = "id") int id) {		
 		
-		AmErrorTraces trace= loggerService.getTraceById(id);				
+		AmErrorTraces trace= amErrorTracesHome.findById(id);				
 		return new ResponseEntity<AmErrorTraces>(trace, HttpStatus.OK);	
 	}
 	

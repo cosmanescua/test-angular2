@@ -12,8 +12,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmReportBlobsHome;
 import it.kirey.kfuture.entity.AmReportBlobs;
 import it.kirey.kfuture.entity.AmReports;
 
@@ -23,15 +23,15 @@ import it.kirey.kfuture.entity.AmReports;
  * @see it.kirey.kfuture.gen.AmReportBlobs
  * @author Hibernate Tools
  */
-@Repository(value = IAmReportBlobsHome.REPOSITORY_QUALIFIER)
-public class AmReportBlobsHome implements IAmReportBlobsHome {
+@Repository(value = "amReportBlobsHome")
+public class AmReportBlobsHome{
 
 	private static final Log log = LogFactory.getLog(AmReportBlobsHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
+	@Transactional
 	public AmReportBlobs getBlobFileByReportId(Integer reportId) {
 		AmReports rep = (AmReports) sessionFactory.getCurrentSession().createCriteria(AmReports.class)
 				.add(Restrictions.eq("id", reportId)).uniqueResult();
@@ -39,7 +39,7 @@ public class AmReportBlobsHome implements IAmReportBlobsHome {
 				.add(Restrictions.eq("report", rep)).uniqueResult();
 	}
 
-	@Override
+	@Transactional
 	public void persist(AmReportBlobs transientInstance) {
 		log.debug("persisting AmReportBlobs instance");
 		try {
@@ -51,6 +51,7 @@ public class AmReportBlobsHome implements IAmReportBlobsHome {
 		}
 	}
 
+	@Transactional
 	public void attachDirty(AmReportBlobs instance) {
 		log.debug("attaching dirty AmReportBlobs instance");
 		try {
@@ -62,7 +63,7 @@ public class AmReportBlobsHome implements IAmReportBlobsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmReportBlobs instance) {
 		log.debug("attaching clean AmReportBlobs instance");
 		try {
@@ -74,7 +75,7 @@ public class AmReportBlobsHome implements IAmReportBlobsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmReportBlobs persistentInstance) {
 		log.debug("deleting AmReportBlobs instance");
 		try {
@@ -86,7 +87,7 @@ public class AmReportBlobsHome implements IAmReportBlobsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReportBlobs merge(AmReportBlobs detachedInstance) {
 		log.debug("merging AmReportBlobs instance");
 		try {
@@ -99,7 +100,7 @@ public class AmReportBlobsHome implements IAmReportBlobsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReportBlobs findById(Integer id) {
 		log.debug("getting AmReportBlobs instance with id: " + id);
 		try {
@@ -117,6 +118,7 @@ public class AmReportBlobsHome implements IAmReportBlobsHome {
 		}
 	}
 
+	@Transactional
 	public List<AmReportBlobs> findByExample(AmReportBlobs instance) {
 		log.debug("finding AmReportBlobs instance by example");
 		try {

@@ -1,32 +1,29 @@
 package it.kirey.kfuture.dao.impl;
 // Generated Oct 14, 2016 11:23:15 AM by Hibernate Tools 4.3.5.Final
 
+import static org.hibernate.criterion.Example.create;
+
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.InitialContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.aop.aspectj.AspectJAdviceParameterNameDiscoverer.AmbiguousBindingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import it.kirey.kfuture.dao.IAmUrlRoutesHome;
 import it.kirey.kfuture.entity.AmApplicationRoles;
 import it.kirey.kfuture.entity.AmUrlRoutes;
 import it.kirey.kfuture.entity.AmUserAccounts;
-
-import static org.hibernate.criterion.Example.create;
 
 /**
  * Home object for domain model class AmUrlRoutes.
  * @see it.kirey.kfuture.gen.AmUrlRoutes
  * @author Hibernate Tools
  */
-@Repository(value = IAmUrlRoutesHome.REPOSITORY_QUALIFIER)
-public class AmUrlRoutesHome implements IAmUrlRoutesHome{
+@Repository(value = "amUrlRoutesHome")
+public class AmUrlRoutesHome {
 
 	private static final Log log = LogFactory.getLog(AmUrlRoutesHome.class);
 	
@@ -119,7 +116,6 @@ public class AmUrlRoutesHome implements IAmUrlRoutesHome{
 		}
 	}
 	
-	@Override
 	 public List<AmUrlRoutes> findRoutesByUser(AmUserAccounts user) {
 	  
 	  List<AmApplicationRoles> userRoles = user.getAmApplicationRoleses();
@@ -129,9 +125,6 @@ public class AmUrlRoutesHome implements IAmUrlRoutesHome{
 	     if(!userRouts.contains(userRole.getAmUrlRouteses().get(i)))
 	      userRouts.add(userRole.getAmUrlRouteses().get(i));
 	     }
-	   }
-	   for (AmUrlRoutes amUrlRoutes : userRouts) {
-	    System.out.println(">>>>>>>>>>>>>>>>>>>>>>" +  amUrlRoutes.getUrl());
 	   }
 	  return userRouts;
 	 }

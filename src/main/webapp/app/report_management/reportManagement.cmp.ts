@@ -1,41 +1,51 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+
 import { Message } from 'primeng/primeng';
+import { TranslateService } from 'ng2-translate/ng2-translate';
+
 import { DTViewCmpIf } from '../dtShared/dt.viewCmpIF';
 import { DTService } from '../dtShared/dt.service';
 import { ReportManagementService } from './reportManagement.service';
 import { ValidationService } from '../shared/services/validation.service';
-import { ControlMessages } from '../shared/controlMessage.cmp';
+import { AppService } from '../shared/services/app.service';
+
+import { ReportFilterPipe } from './pipes/reportFilter.pipe';
+
+import { ReportType, Report } from './models';
+import { Alert } from '../shared/models';
+
 declare let saveAs: any;
-declare let download: any;
 
 @Component({
     moduleId: module.id,
     templateUrl: 'reportManagement.cmp.html',
     // styleUrls: ['app/report_management/reportManagement.cmp.css'],
-
     encapsulation: ViewEncapsulation.None
-
 })
-export class ReportManagementCmp implements OnInit, DTViewCmpIf {
-    reports: any;
+export class ReportManagementCmp implements OnInit {
+    reports: Report[];
+    allReports: Report[];
+
     selectedReport: any;
     formLoaded: boolean;
     deadline: Date;
     messages: Message[];
     form: FormGroup;
-    isLoading: boolean;
-    types: any[];
+    types: ReportType[];
     selectedType: string;
-    allReports: any[];
-
     selectedReportParams: any[];
+    reportAlert: Alert;
 
-    loadingState: boolean;
+    bLoadingState: boolean;
+    bPrintReportLoading: boolean;
 
     /*--------- Constructor --------*/
-    constructor(private _dtService: DTService,
-        private _reportManagementService: ReportManagementService) { }
+    constructor(
+        private _dtService: DTService,
+        private _reportManagementService: ReportManagementService,
+        private _translateService: TranslateService,
+        private _appService: AppService) { }
 
 
     /*--------- App logic --------*/
@@ -45,22 +55,22 @@ export class ReportManagementCmp implements OnInit, DTViewCmpIf {
      * @author DynTech
      */
     loadReportsRest(): void {
-        // this.isLoading = false;
-        this.loadingState = true;
-        this.reports = null;
+        this.setAlert(false);
+        this.bLoadingState = true;
+        this.reports = [];
+        this.selectedReport = null;
         this._dtService.setRestMessageContent('ReportManagementCmp', 'loadingReportRest()');
-        this._reportManagementService.getReports().subscribe(
-            (res) => {
+        this._reportManagementService.getReports().toPromise().then(
+            (res: Report[]) => {
                 this.allReports = res;
                 this.reports = this.allReports;
-                this.loadingState = false;
+                this.bLoadingState = false;
 
                 this.sortReportParameters(this.reports);
-
             },
             (err) => {
                 console.log(err);
-                this.loadingState = false;
+                this.bLoadingState = false;
             }
         );
     }
@@ -70,6 +80,7 @@ export class ReportManagementCmp implements OnInit, DTViewCmpIf {
      * @author DynTech
      */
     selectReport(id: number): void {
+        this.setAlert(false);
         this.selectedReport = this.reports.filter(this.filterArrayOfObjects.bind(null, { name: 'id', value: id }))[0];
 
         this.selectedReportParams = this.parametersArrayToMatrix(this.selectedReport.amReportParameterses);
@@ -142,7 +153,9 @@ export class ReportManagementCmp implements OnInit, DTViewCmpIf {
      * @author DynTech
      */
     public addBooking(): void {
-        this.isLoading = true;
+        this.setAlert(false);
+        
+        this.bPrintReportLoading = true;
         let date = new Date(this.form.value.deadline);
         let params = [];
         let obj = {
@@ -171,30 +184,30 @@ export class ReportManagementCmp implements OnInit, DTViewCmpIf {
         }
         //Setting params
         obj.amReportBookingParameterses = params;
-        //console.log(obj);
-        
+
         this._dtService.setRestMessageContent('ReportManagementCmp', 'addBooking()');
-        this._reportManagementService.addBooking(obj).subscribe(
+        this._reportManagementService.addBooking(obj).toPromise().then(
             (res) => {
-                this.messages.push({ severity: 'info', summary: 'Success Message', detail: 'Successfully booked a report.' });
+                this.setAlert(true, 'Report booked', 'success');
             },
             (err) => {
-                this.messages.push({ severity: 'error', summary: 'Error Message', detail: 'Internal Server Error' });
-            },
-            () => {
-                setTimeout(() => {
-                    this.isLoading = false;
-                }, 500);
+                this.setAlert(true, 'Report failed booking', 'danger');
             }
-        );
+        ).then(() => {
+            this.bPrintReportLoading = false;
+        });
     }
 
     /**
      * Printing a report.
      * @author DynTech
      */
-    public printReport(): void {
+    public printReport(newWindow: boolean, reportName: string): void {
         let params = {};
+        this.bPrintReportLoading = true;
+
+        this.setAlert(false);
+
         for (let key in this.form.value) {
             INNERLOOP: for (let parameter of this.selectedReport.amReportParameterses) {
                 if (parameter['name'] == key) {
@@ -219,81 +232,39 @@ export class ReportManagementCmp implements OnInit, DTViewCmpIf {
             frontEndFormat: frontEndFormat
         }
 
-        // var x = new XMLHttpRequest();
-        // x.open("GET", 'reports/19/pdf/inline?parameters=%7B"17":"root"%7D', true);
-        // x.responseType = 'blob';
-        // x.onload = function (e) {
-        //     // download(x.response, "maxica.pdf", "application/pdf" ); 
-
-        //     let blob = new Blob([x.response], { type: 'application/pdf' });
-
-        //     console.log(x.response);
-
-        //     var fileURL = URL.createObjectURL(blob);
-        //     window.open(fileURL);
-
-
-
-        //     // saveAs(blob, "report."+obj.format);
-        // }
-        // x.send();
-
-        // let pom = 'mario';
-        // let blob = new Blob([pom], { type: 'application/pdf' })
-        // console.log(blob);
-
-
         this._dtService.setRestMessageContent('ReportManagementCmp', 'printReport()');
 
-        this._reportManagementService.printReport(obj).subscribe(
+        this._reportManagementService.printReport(obj).toPromise().then(
             (res) => {
+                let tempBlob = new Blob([res.blob()], { type: 'application/pdf' });
 
-                // let blob1 = new Blob([res._body], { type: 'blob' });
-                // console.log(res);
+                // this.reportAlert.message = 'Report printed';
+                // this.reportAlert.type = 'success';
+                // this.reportAlert.show = true;
 
-                console.log(res);
+                this.setAlert(true, 'Report printed', 'success');
 
+                if (newWindow) {
+                    var fileURL = URL.createObjectURL(tempBlob);
+                    window.open(fileURL);
+                } else {
+                    saveAs(tempBlob, reportName + ".pdf");
+                }
 
-
-
-                // let blob = new Blob([res], { type: 'application/pdf' });
-
-
-                // console.log(blob1);
-                // console.log(blob);
-
-                // saveAs(res, "report.pdf");
-
-                var fileURL = URL.createObjectURL(res);
-                window.open(fileURL);
-
-                // download(res._body, "maxica.pdf", "application/pdf" ); 
-
-
-
+            }, error => {
+                this.setAlert(true, 'Report failed printing', 'danger');
             }
-        );
+        ).then(() => {
+            this.bPrintReportLoading = false;
+        });
     }
 
     /**
-     * Selecting sync, async or all reports.
+     * Method to be executed when report type is changed
      * @author DynTech
      */
-    private onTypeChange(): void {
-        this.reports = null;
+    typeChanged(): void {
         this.selectedReport = null;
-        setTimeout(() => {
-            this.reports = this.allReports.filter(
-                el => {
-                    if (this.selectedType == "sync")
-                        return (el.type == "sync") ? true : false;
-                    else if (this.selectedType == "async")
-                        return (el.type == "async") ? true : false;
-                    else
-                        return true;
-                }
-            );
-        });
     }
 
     /*---------- Utilities ----------*/
@@ -352,33 +323,66 @@ export class ReportManagementCmp implements OnInit, DTViewCmpIf {
         }
     }
 
+    /**
+     * Set or remove alert in header with message and type
+     * @author DynTech
+     */
+    private setAlert(show: boolean, message?: string, type?: string): void {
+        this.reportAlert.message = message;
+        this.reportAlert.type = type;
+        this.reportAlert.show = show;
+    }
+
+
+    /**
+     * Check if piped report result is empty
+     * @author DynTech
+     */
+    isReportPipeEmpty(reports: Report[], selectedType: string): boolean {
+        return new ReportFilterPipe().transform(reports, selectedType).length == 0;
+    }
 
     /*--------- NG On Init ---------*/
     public ngOnInit(): void {
+        // Variable initialization
         this.messages = [];
+        this.reports = [];
 
         this.form = new FormGroup({});
         this.formLoaded = false;
 
-        this.loadingState = false;
+        this.bLoadingState = false;
+        this.bPrintReportLoading = false;
 
         this.selectedReportParams = [];
 
         this.types = [
-            { label: 'Asynchronous', value: 'async' },
-            { label: 'All', value: 'all' },
-            { label: 'Synchronous', value: 'sync' }
+            new ReportType('Asynchronous', 'async'),
+            new ReportType('All', 'all'),
+            new ReportType('Synchronous', 'sync')
         ];
         this.selectedType = 'all';
 
-        this.loadReportsRest();
+        this.reportAlert = new Alert(null, true);
+
+        // Methods execution
+        this._appService.languageChanged.subscribe(lang => {
+            this._appService.changeLangTranslate(this._translateService, lang, true);
+        });
+
+        AppService.languageChangeCompletedEmit.subscribe(() => {
+            this.loadReportsRest();
+        });
 
         // Construct methods
-        this.__setInitPageTitle('Report Management');
+        this._translateService.use(this._appService.getStoredLanguage()).toPromise().then(res => {
+            AppService.languageChangeCompleted();
+        });
+
+        this._appService.pageLoaded('Report management');
     }
 
-    /*--------- Interface imported --------*/
-    __setInitPageTitle(title: string): void {
-        this._dtService.setPageTitle(title);
+    ngOnDestroy(): void {
+        this._appService.refreshEmitters();
     }
 }

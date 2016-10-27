@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default navbar-fixed-top" style="z-index: 1000000;">
+<nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
@@ -8,55 +8,49 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-            <a class="navbar-brand" href="#">KFuture</a>
+            <a class="navbar-brand" routerLink="home">KFuture</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li>
-                    <a routerLink="login" routerLinkActive="active">Login</a>
+                    <a routerLink="home" routerLinkActive="active">{{'fe.navigation.home' | translate}}</a>
                 </li>
-                <li *ngIf="checkPermission('products')">
-                    <a routerLink="products" routerLinkActive="active">Products</a>
+                <li>
+                    <a routerLink="products" routerLinkActive="active" *ngIf="checkRoute('products')">{{'fe.navigation.products' | translate}}</a>
                 </li>
-                <li *ngIf="checkPermission('report_management')">
-                    <a routerLink="report_management" routerLinkActive="active">Report Management</a>
-                </li>
-                <!--show this item in the nav bar only if the user is admin-->
-                <li *ngIf="checkPermission('admin/create_report')">
-                    <a routerLink="admin/create_report" routerLinkActive="active">Admin - Create Report</a>
-                </li>
-                <!--show this item in the nav bar only if the user is admin-->
-                <li  class="dropdown" *ngIf="checkPermission('cache_test') && checkPermission('error_log')" >
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dev <span class="caret"></span></a>
+                <li class="dropdown" *ngIf="checkRoute('Reports')">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a routerLink="cache_test" routerLinkActive="active">Cache Test</a></li>
-                        <li><a routerLink="error_log" routerLinkActive="active">Error Log</a></li>
+                        <li><a routerLink="report_management" routerLinkActive="active" *ngIf="checkRoute('report_management')">{{'fe.navigation.reportManagement' | translate}}</a></li>
+                        <li><a routerLink="admin/create_report" routerLinkActive="active" *ngIf="checkRoute('admin/create_report')">{{'fe.navigation.adminCreateReport' | translate}}</a></li>
                     </ul>
                 </li>
-                <!--<li>
-                    <span (click)="promenaJezika()">promena jezika</span>
-                </li>-->
-				 <!--<li>
-                    <a routerLink="usersTest" routerLinkActive="active">Users Test</a>
-                </li> -->
-                <li>
-                    <a routerLink="clientsTest" routerLinkActive="active">Clients Test</a>
-                </li>
-                <li>
-                    <a routerLink="filesTest" routerLinkActive="active">Files Management</a>
-                </li>
-                <li>
-                    <a routerLink="productsTest" routerLinkActive="active">Test Products</a>
+
+                <li class="dropdown" *ngIf="checkRoute('Dev')">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dev <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a routerLink="cache_test" routerLinkActive="active" *ngIf="checkRoute('cache_test')">{{'fe.navigation.cacheTest' | translate}}</a></li>
+                        <li><a routerLink="error_log" routerLinkActive="active" *ngIf="checkRoute('error_log')">{{'fe.navigation.errorLog' | translate}}</a></li>
+                        <li><a routerLink="dev/exception" routerLinkActive="active" *ngIf="checkRoute('dev/exception')">Validation Exception</a></li>
+                    </ul>
                 </li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
                 <li>
+                    <img src="app/assets/images/loader.gif" class="cmp-global_loader-img" alt="Loading..." *ngIf="_appService.getBLanguageLoading() || logoutLoading" >
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{_appService.userProfile.userName}} <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a class="logout-link" (click)="logout()">Logout</a></li>
+                    </ul>
+                </li>
+                <li>
                     <div id="language_box" class="clearfix">
-                        {{'njamb.fe.navigation.products' | translate}}
-                        <a class="language en" [ngClass]="{'active_lang': _appService.defaultLanguage == 'en'}" (click)="matchDefaultLanguage('en') || changeLanguage('en')"></a>
-                        <a class="language it" [ngClass]="{'active_lang': _appService.defaultLanguage == 'it'}" (click)="matchDefaultLanguage('it') || changeLanguage('it')"></a>
+                        <a class="language en" [ngClass]="{'active_lang': _appService.defaultLanguage == 'en'}" (click)="_appService.getBLanguageLoading() || matchDefaultLanguage('en') || changeLanguage('en')"></a>
+                        <a class="language it" [ngClass]="{'active_lang': _appService.defaultLanguage == 'it'}" (click)="_appService.getBLanguageLoading() || matchDefaultLanguage('it') || changeLanguage('it')"></a>
                     </div>
                 </li>
             </ul>

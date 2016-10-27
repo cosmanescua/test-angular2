@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
-import { CookieService } from 'angular2-cookie/core';
-
 import { DTService } from './dt.service';
+import { AppService } from '../shared/services/app.service';
+import { AuthService } from '../shared/services/auth.service';
+
+import { TOKEN_COOKIE_NAME } from '../constants';
 
 import {
     RequestOptionsArgs,
     RequestOptions,
     ConnectionBackend,
     Http,
-    Request,
     Response,
     Headers
 } from "@angular/http";
@@ -18,76 +19,80 @@ import {
 @Injectable()
 export class DTHttpInterceptor extends Http {
 
-    constructor(backend: ConnectionBackend,
+    constructor(
+        backend: ConnectionBackend,
         defaultOptions: RequestOptions,
-        private _cookieService: CookieService) {
-
+        private _dtService: DTService) {
         super(backend, defaultOptions);
 
-
-
     }
-
-    request(url: string | Request, options?: RequestOptionsArgs) {
-        return super.request(url, options);
-    }
-
 
     get(url: string, options?: RequestOptionsArgs): Observable<Response> {
-        let tempUrl: number = url.indexOf('i18n');
-        
+        let tempUrl: number = url.indexOf('translations');
+        let tempUrlChangeLang: number = url.indexOf('translations/language');
+        let that = this;
 
         if (tempUrl == -1) {// Check if GET call is from Translation module
-            return super.get(url, this.getAuthTokenHeader(options)).do(result => {
-                DTService.restConsoleMessage(url, 'GET', result.status, true, result);
+            return super.get(url, this.getAuthTokenHeader(options)).do(res => {
+                this._dtService.restConsoleMessage(url, 'GET', res.status, true, res);
 
                 return Observable;
-            }).catch(err => {
-                DTService.restConsoleMessage(url, 'GET', err.status, false, err);
-                console.log('catch');
-                // if (err.status === 404) {
-                //     console.log('404 greska');
-                //     return Observable.throw(err);
-                // } else {
+            }, err => {
+                this.handleErrorRequest(err.status, url, 'GET', false, err, true);
+
                 return Observable.throw(err);
-                // }
+            });
+        } else if (tempUrlChangeLang == -1) {
+            AppService.bLanguageLoading = true;
+            let transformedUrl: any = url.split('/');
+            transformedUrl = transformedUrl.splice(0, transformedUrl.length - 1);
+            transformedUrl = transformedUrl.join('/');
+
+            return super.get(transformedUrl, this.getAuthTokenHeader(options)).do(() => {
+                AppService.bLanguageLoading = false;
+
+                return Observable;
+            }, err => {
+                AppService.bLanguageLoading = false;
+                this.handleErrorRequest(err.status, url, 'GET', false, err, false);
+
+                return Observable.throw(err);
             });
         } else {
-            return super.get(url);
-        }
+            return super.get(url, this.getAuthTokenHeader(options)).do(res => {
 
+                AppService.bLanguageLoading = false;
+            }, err => {
+                AppService.bLanguageLoading = false;
+                this.handleErrorRequest(err.status, url, 'GET', false, err, false);
+
+                return Observable.throw(err);
+            })
+        }
     }
 
     post(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
         let tempUrl: any = url.split('/');
         tempUrl = tempUrl[tempUrl.length - 1];
+        let that = this;        
 
         if (tempUrl != 'authenticate') {
-            return super.post(url, body, this.getAuthTokenHeader(options, 'application/json')).do(result => {
-                DTService.restConsoleMessage(url, 'POST', result.status, true, result);
+            return super.post(url, body, this.getAuthTokenHeader(options, 'application/json')).do(res => {
+                this._dtService.restConsoleMessage(url, 'POST', res.status, true, res);
 
                 return Observable;
-            }).catch(err => {
-                // console.log('catch');
-                // console.log(123);
-                DTService.restConsoleMessage(url, 'POST', err.status, false, err);
+            }, err => {
+                this.handleErrorRequest(err.status, url, 'POST', false, err, true);
 
-                // console.log(1234);
-
-                // if (err.status === 404) {
-                //     console.log('404 greska');
-                //     return Observable.throw(err);
-                // } else {
                 return Observable.throw(err);
-                // }
             });
         } else {
-            return super.post(url, body, options).do(result => {
-                DTService.restConsoleMessage(url, 'POST', result.status, true, result);
+            return super.post(url, body, options).do(res => {
+                this._dtService.restConsoleMessage(url, 'POST', res.status, true, res);
 
                 return Observable;
-            }).catch(err => {
-                DTService.restConsoleMessage(url, 'POST', err.status, false, err);
+            }, err => {
+                this.handleErrorRequest(err.status, url, 'POST', false, err, true);
 
                 return Observable.throw(err);
             });
@@ -97,30 +102,28 @@ export class DTHttpInterceptor extends Http {
     put(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
         let tempUrl: any = url.split('/');
         tempUrl = tempUrl[tempUrl.length - 1];
-        return super.put(url, body, this.getAuthTokenHeader(options, 'application/json')).do(result => {
-            DTService.restConsoleMessage(url, 'PUT', result.status, true, result);
+        let that = this;
+
+        return super.put(url, body, this.getAuthTokenHeader(options, 'application/json')).do(res => {
+            this._dtService.restConsoleMessage(url, 'PUT', res.status, true, res);
+
             return Observable;
-        }).catch(err => {
-            DTService.restConsoleMessage(url, 'POST', err.status, true, err);
-            console.log('catch');
-            // if (err.status === 404) {
-            //     console.log('404 greska');
-            //     return Observable.throw(err);
-            // } else {
+        }, err => {
+            this.handleErrorRequest(err.status, url, 'PUT', false, err, true);
+
             return Observable.throw(err);
-            // }
         });
     }
 
-    getToken(): any {
-        let tempToken: string = this._cookieService.get('X-Auth-Token');
-        return tempToken;
-    }
+    /**
+     * Get header with token and additional options from original request
+     * @author DynTech
+     */
+    private getAuthTokenHeader(options: RequestOptionsArgs, contentType?: string): RequestOptions {
+        let tempheaders = {};
+        tempheaders[TOKEN_COOKIE_NAME] = this._dtService.getToken();
 
-    getAuthTokenHeader(options: RequestOptionsArgs, contentType?: string): RequestOptions {
-        let headers: Headers = new Headers({
-            'X-Auth-Token': this.getToken()
-        });
+        let headers: Headers = new Headers(tempheaders);
 
         if (contentType) {
             headers.append('Content-Type', contentType);
@@ -130,6 +133,21 @@ export class DTHttpInterceptor extends Http {
             return new RequestOptions({ headers: headers, responseType: options.responseType });
         } else {
             return new RequestOptions({ headers: headers });
+        }
+    }
+
+    /**
+     * Method for handling request with error
+     * @author DynTech
+     */
+    private handleErrorRequest(statusCode: number, url: string, method: string, success: boolean, err: any, consoleLog: boolean): void {
+        if (consoleLog) {
+            this._dtService.restConsoleMessage(url, method, statusCode, success, err);
+        }
+        if (statusCode === 401) {
+            AuthService.clearAuth();
+            AuthService.bLoginStatus = false;
+            AppService.router.navigate(['login'])
         }
     }
 }

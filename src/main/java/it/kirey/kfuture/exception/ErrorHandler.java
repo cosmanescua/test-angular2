@@ -95,5 +95,26 @@ public class ErrorHandler extends ResponseEntityExceptionHandler{
 		}	
 	}
 	
+	@ExceptionHandler(ValidationFormException.class)
+	protected ResponseEntity<Object> handleValidationFormException(ValidationFormException ex, HttpServletRequest req){
+	
+		//ErrorResource errorResponse = new ErrorResource(ErrorConstants.EXCEPTION, ErrorConstants.GENERAL_ERROR_KEY, ex );
+		HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		//errorResponse.setInvokingURL(Utilities.getUrlFromRequest(req));
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		
+		String translationOfError = translator.translateErrorMessage(ex.getValidationDto());
+		if(translationOfError!=null)
+			return new ResponseEntity<Object>(translationOfError, headers, httpStatus != null ? httpStatus:HttpStatus.SERVICE_UNAVAILABLE); 
+		else
+		{
+			printer.printMessage(this.getClass(),"Error translating...");
+			return new ResponseEntity<Object>(ex.getValidationDto(), headers, httpStatus != null ? httpStatus:HttpStatus.SERVICE_UNAVAILABLE); 
+		}	
+		
+	}
+	
 }
 

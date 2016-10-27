@@ -11,11 +11,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var dt_service_1 = require('../dtShared/dt.service');
 var cacheTest_service_1 = require('./cacheTest.service');
+var app_service_1 = require('../shared/services/app.service');
 var CacheTestCmp = (function () {
     /*--------- Constructor ---------*/
-    function CacheTestCmp(_dtService, _cacheTestService) {
+    function CacheTestCmp(_dtService, _cacheTestService, _appService) {
         this._dtService = _dtService;
         this._cacheTestService = _cacheTestService;
+        this._appService = _appService;
     }
     /*--------- App logic ---------*/
     /**
@@ -26,18 +28,18 @@ var CacheTestCmp = (function () {
         var _this = this;
         this._dtService.setRestMessageContent('CacheTestCmp', 'testCacheRest()');
         this.loadingState = true;
-        this._cacheTestService.testCache().subscribe(function (result) {
+        this._cacheTestService.testCache().toPromise().then(function (res) {
             _this.bCacheCleared = false;
             _this.loadingState = false;
             if (bCached) {
                 _this.testResultCached.executionDate = new Date();
-                _this.testResultCached.dataSize = JSON.stringify(result.ErrorLogs).length;
-                _this.testResultCached.executionTime = result.executeTime;
+                _this.testResultCached.dataSize = JSON.stringify(res.ErrorLogs).length;
+                _this.testResultCached.executionTime = res.executeTime;
             }
             else {
                 _this.testResult.executionDate = new Date();
-                _this.testResult.dataSize = JSON.stringify(result.ErrorLogs).length;
-                _this.testResult.executionTime = result.executeTime;
+                _this.testResult.dataSize = JSON.stringify(res.ErrorLogs).length;
+                _this.testResult.executionTime = res.executeTime;
             }
         }, function (error) {
             _this.loadingState = false;
@@ -51,7 +53,7 @@ var CacheTestCmp = (function () {
         var _this = this;
         this._dtService.setRestMessageContent('CacheTestCmp', 'clearCacheRest()');
         this.loadingState = true;
-        this._cacheTestService.clearCache().subscribe(function (result) {
+        this._cacheTestService.clearCache().toPromise().then(function (res) {
             _this.bCacheCleared = true;
             _this.loadingState = false;
             _this.initialCacheCleared = true;
@@ -99,19 +101,16 @@ var CacheTestCmp = (function () {
         this.bCacheCleared = true;
         this.initialCacheCleared = false;
         // Construct methods
-        this.__setInitPageTitle('Cache Test');
         this.clearCacheRest();
-    };
-    /*--------- Interface imported --------*/
-    CacheTestCmp.prototype.__setInitPageTitle = function (title) {
-        this._dtService.setPageTitle(title);
+        this._appService.pageLoaded('Cache test');
     };
     CacheTestCmp = __decorate([
         core_1.Component({
             moduleId: module.id,
-            templateUrl: 'cacheTest.cmp.html'
+            templateUrl: 'cacheTest.cmp.html',
+            encapsulation: core_1.ViewEncapsulation.None
         }), 
-        __metadata('design:paramtypes', [dt_service_1.DTService, cacheTest_service_1.CacheTestService])
+        __metadata('design:paramtypes', [dt_service_1.DTService, cacheTest_service_1.CacheTestService, app_service_1.AppService])
     ], CacheTestCmp);
     return CacheTestCmp;
 }());

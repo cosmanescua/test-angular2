@@ -11,8 +11,8 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmReportBookingsHome;
 import it.kirey.kfuture.entity.AmReportBookings;
 
 /**
@@ -20,16 +20,15 @@ import it.kirey.kfuture.entity.AmReportBookings;
  * @see it.kirey.kfuture.gen.AmReportBookings
  * @author Hibernate Tools
  */
-@Repository(value=IAmReportBookingsHome.REPOSITORY_QUALIFIER)
-public class AmReportBookingsHome implements IAmReportBookingsHome {
+@Repository(value = "amReportBookingsHome")
+public class AmReportBookingsHome {
 
 	private static final Log log = LogFactory.getLog(AmReportBookingsHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-
-	@Override
+	@Transactional
 	public void persist(AmReportBookings transientInstance) {
 		log.debug("persisting AmReportBookings instance");
 		try {
@@ -41,7 +40,7 @@ public class AmReportBookingsHome implements IAmReportBookingsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachDirty(AmReportBookings instance) {
 		log.debug("attaching dirty AmReportBookings instance");
 		try {
@@ -53,7 +52,7 @@ public class AmReportBookingsHome implements IAmReportBookingsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmReportBookings instance) {
 		log.debug("attaching clean AmReportBookings instance");
 		try {
@@ -65,7 +64,7 @@ public class AmReportBookingsHome implements IAmReportBookingsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmReportBookings persistentInstance) {
 		log.debug("deleting AmReportBookings instance");
 		try {
@@ -77,7 +76,7 @@ public class AmReportBookingsHome implements IAmReportBookingsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReportBookings merge(AmReportBookings detachedInstance) {
 		log.debug("merging AmReportBookings instance");
 		try {
@@ -90,7 +89,7 @@ public class AmReportBookingsHome implements IAmReportBookingsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReportBookings findById(Integer id) {
 		log.debug("getting AmReportBookings instance with id: " + id);
 		try {
@@ -108,6 +107,7 @@ public class AmReportBookingsHome implements IAmReportBookingsHome {
 		}
 	}
 
+	@Transactional
 	public List<AmReportBookings> findByExample(AmReportBookings instance) {
 		log.debug("finding AmReportBookings instance by example");
 		try {

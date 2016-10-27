@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import it.kirey.kfuture.dao.impl.AmProductsHome;
 import it.kirey.kfuture.dto.PaginationDto;
 import it.kirey.kfuture.entity.AmProducts;
-import it.kirey.kfuture.service.IProductService;
 
 @RestController
 public class ProductController {
 
 	@Autowired
-	private IProductService productService;
+	private AmProductsHome amProductsHome;
 
 	
 	@RequestMapping(value = "/products", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,9 +34,9 @@ public class ProductController {
 
 		paginationDto = mapper.readValue(paginationExp.get("pagination"), PaginationDto.class);
 
-		List<AmProducts> productDtoList = productService.getPaginatedProduct(paginationDto);
+		List<AmProducts> productDtoList = amProductsHome.findAllPaginated(paginationDto);
 		
-		Long totalRows = productService.getTotalProductRows(paginationDto);
+		Long totalRows = amProductsHome.findTotalProductRows(paginationDto);
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("data", productDtoList);
 		map.put("totalRows", totalRows);

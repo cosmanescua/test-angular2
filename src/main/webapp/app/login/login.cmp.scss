@@ -1,14 +1,18 @@
 #cmp-login {
     #login-wrapper {
-        position: absolute;
-        width: 290px;
-        height: 402px;
-        left: 0;
-        right: 0;
         bottom: 0;
-        top: 0;
+        height: 576px;
+        left: 0;
         margin: auto;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 290px;
         /****/
+
+        .login-header {
+            margin-bottom: 32px;
+        }
 
         input.ng-valid[required].ng-dirty {
             border-right: 5px solid #42A948;

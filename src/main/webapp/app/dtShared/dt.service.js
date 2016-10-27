@@ -9,36 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var platform_browser_1 = require('@angular/platform-browser');
-var app_service_1 = require('../shared/services/app.service');
+var core_2 = require('angular2-cookie/core');
 var bytesConverter_pipe_1 = require('../shared/pipes/bytesConverter.pipe');
 var constants_1 = require('../constants');
+var constants_2 = require('../constants');
 var DTService = (function () {
-    function DTService(_title, _appService) {
-        this._title = _title;
-        this._appService = _appService;
-        DTService._restMessageContent = {
+    function DTService(_cookieService) {
+        this._cookieService = _cookieService;
+        this._restMessageContent = {
             originCmp: '',
             originMethod: '',
             message: '',
-            dataSize: ''
+            datasize: ''
         };
-        DTService._bPrintMessage = true;
+        this._bPrintMessage = true;
     }
-    /**
-     * Set page title for the app
-     * @author DynTech
-     */
-    DTService.prototype.setPageTitle = function (title) {
-        this._title.setTitle(this._appService.getDefaultAppTitle() + title);
-    };
-    /**
-     * Get page title of the app
-     * @author DynTech
-     */
-    DTService.prototype.getPageTitle = function () {
-        return this._title.getTitle();
-    };
     /**
      * Transform given array of objects to usable array of specific objects
      * @author DynTech
@@ -54,34 +39,59 @@ var DTService = (function () {
         return JSON.parse(JSON.stringify(object));
     };
     /**
-     * Set state variable for printing console message
+     * Checks if two objects are equal
      * @author DynTech
      */
-    DTService.prototype.setPrintMessage = function (state) {
-        DTService._bPrintMessage = state;
+    DTService.prototype.equal = function (object1, object2) {
+        for (var obj1Prop in object1) {
+            switch (typeof (object1[obj1Prop])) {
+                case 'object':
+                    if (!object1[obj1Prop].equals(object2[obj1Prop])) {
+                        return false;
+                    }
+                    ;
+                    break;
+                case 'function':
+                    if (typeof (object2[obj1Prop]) == 'undefined' || (obj1Prop != 'equals' && object1[obj1Prop].toString() != object2[obj1Prop].toString())) {
+                        return false;
+                    }
+                    ;
+                    break;
+                default:
+                    if (object1[obj1Prop] != object2[obj1Prop]) {
+                        return false;
+                    }
+            }
+        }
+        for (var obj2Prop in object2) {
+            if (typeof (object1[obj2Prop]) == 'undefined') {
+                return false;
+            }
+        }
+        return true;
     };
     /**
      * Set company css
      * @author DynTech
      */
     DTService.prototype.setCompnayCSS = function (url) {
-        var tempCss = localStorage.setItem('companyCss', constants_1.COMPANY_CSS_ROUTE + url);
-        $('#company_css').attr('href', constants_1.COMPANY_CSS_ROUTE + url);
+        var Css = localStorage.setItem('companyCss', constants_2.COMPANY_CSS_ROUTE + url);
+        $('#company_css').attr('href', constants_2.COMPANY_CSS_ROUTE + url);
     };
     /**
      * Set init company css
      * @author DynTech
      */
     DTService.prototype.setInitCompanyCSS = function () {
-        var tempCss = localStorage.getItem('companyCss');
-        $('#company_css').attr('href', tempCss);
+        var Css = localStorage.getItem('companyCss');
+        $('#company_css').attr('href', Css);
     };
     /**
      * Set rest console message content
      * @author DynTech
      */
     DTService.prototype.setRestMessageContent = function (originCmp, originMethod, message) {
-        DTService._restMessageContent = {
+        this._restMessageContent = {
             originCmp: originCmp,
             originMethod: originMethod,
             message: message,
@@ -89,67 +99,78 @@ var DTService = (function () {
         };
     };
     /**
+     * Set token in cookies
+     * @author DynTech
+     */
+    DTService.prototype.setToken = function (token) {
+        this._cookieService.put(constants_1.TOKEN_COOKIE_NAME, token);
+    };
+    /**
+     * Set token in cookies
+     * @author DynTech
+     */
+    DTService.prototype.getToken = function () {
+        return this._cookieService.get(constants_1.TOKEN_COOKIE_NAME);
+    };
+    /**
+     * Set token in cookies
+     * @author DynTech
+     */
+    DTService.prototype.removeToken = function () {
+        this._cookieService.remove(constants_1.TOKEN_COOKIE_NAME);
+    };
+    /**
      * Print success message in console
      * @author DynTech
      */
-    DTService.restConsoleMessage = function (url, method, code, success, result) {
+    DTService.prototype.restConsoleMessage = function (url, method, code, success, res) {
         if (this._bPrintMessage && this._restMessageContent.originCmp && this._restMessageContent.originMethod) {
             url = url.split('?')[0];
-            var tempHeader = 'REST(' + ((new Date().getTime() - this._restMessageContent.time) / 1000).toFixed(2) + 's)';
-            var tempSize = new bytesConverter_pipe_1.BytesConverterPipe().transform(JSON.stringify(result).length);
-            var tempFirstRow = '%c ' + method + ': ' + url + ' - ' + (success ? 'SUCCESS' : 'FAIL') + '(' + code + ')' + ' - Size: ' + tempSize;
-            var tempSecondRow = '%c Origin: ' + this._restMessageContent.originCmp + ' -> ' + this._restMessageContent.originMethod;
-            var tempThirdRow = this._restMessageContent.message ? '%c Log message: ' + this._restMessageContent.message : '';
+            var header = '(' + ((new Date().getTime() - this._restMessageContent.time) / 1000).toFixed(2) + 's)';
+            var size = new bytesConverter_pipe_1.BytesConverterPipe().transform(JSON.stringify(res).length);
+            var firstRow = '%c ' + method + ': ' + url + ' | (' + code + ')' + ' | ' + size;
+            var secondRow = '%c Origin: ' + this._restMessageContent.originCmp + ' -> ' + this._restMessageContent.originMethod;
+            var thirdRow = this._restMessageContent.message ? '%c Log message: ' + this._restMessageContent.message : '';
             // Print top border
-            var tempTopBorder = '%c ';
-            var tempDifference = (tempFirstRow.length - 3 - tempHeader.length) / 2;
-            for (var i = 0; i < Math.floor(tempDifference); i++) {
-                tempTopBorder += '_';
+            var topBorder = '%c ';
+            var longerRow = firstRow.length > secondRow.length ? firstRow : secondRow;
+            var difference = (longerRow.length - 3 - header.length) / 2;
+            for (var i = 0; i < Math.floor(difference); i++) {
+                topBorder += '_';
             }
-            tempTopBorder += tempHeader;
-            for (var i = 0; i < Math.ceil(tempDifference); i++) {
-                tempTopBorder += '_';
+            topBorder += header;
+            for (var i = 0; i < Math.ceil(difference); i++) {
+                topBorder += '_';
             }
             if (success) {
-                console.info(tempTopBorder, 'color: #5FBA7D;');
+                console.info(topBorder, 'color: #5FBA7D;');
             }
             else {
-                console.error(tempTopBorder, 'color: #EF2B33;');
+                console.error(topBorder, 'color: #EF2B33;');
             }
             // Print connection details and call origin
             if (success) {
-                console.info(tempFirstRow, 'color: #5FBA7D;');
-                console.info(tempSecondRow, 'color: #5FBA7D;');
+                console.info(firstRow, 'color: #5FBA7D;');
+                console.info(secondRow, 'color: #5FBA7D;');
             }
             else {
-                console.error(tempFirstRow, 'color: #EF2B33;');
-                console.error(tempSecondRow, 'color: #EF2B33;');
+                console.error(firstRow, 'color: #EF2B33;');
+                console.error(secondRow, 'color: #EF2B33;');
             }
             // Print component message (optional)
-            if (tempThirdRow) {
+            if (thirdRow) {
                 if (success) {
-                    console.info(tempThirdRow, 'color: #5FBA7D;');
+                    console.info(thirdRow, 'color: #5FBA7D;');
                 }
                 else {
-                    console.error(tempThirdRow, 'color: #EF2B33;');
+                    console.error(thirdRow, 'color: #EF2B33;');
                 }
-            }
-            // Print bottom border
-            var tempBottomBorder = '%c ';
-            for (var i = 0; i < tempFirstRow.length - 3; i++) {
-                tempBottomBorder += '\u035E ';
-            }
-            if (success) {
-                console.info(tempBottomBorder, 'color: #5FBA7D;');
-            }
-            else {
-                console.error(tempBottomBorder, 'color: #EF2B33;');
             }
         }
     };
     DTService = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [platform_browser_1.Title, app_service_1.AppService])
+        __metadata('design:paramtypes', [core_2.CookieService])
     ], DTService);
     return DTService;
 }());

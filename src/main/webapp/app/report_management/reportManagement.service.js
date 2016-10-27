@@ -37,9 +37,8 @@ var ReportManagementService = (function () {
     ReportManagementService.prototype.printReport = function (reportData) {
         var params = encodeURI(JSON.stringify(reportData.amReportParameterses));
         var url = this._baseUrl + "reports/" + reportData.reportId + "/" + reportData.format + "/inline?parameters=" + params;
-        return this._http.get(url, { responseType: http_1.ResponseContentType.Blob }).map(function (res) {
-            return new Blob([res.blob()], { type: 'application/pdf' });
-        }).catch(this.handleError);
+        return this._http.get(url, { responseType: http_1.ResponseContentType.Blob })
+            .catch(this.handleError);
     };
     /**
      * Handles an error.

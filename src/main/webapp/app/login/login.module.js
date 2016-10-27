@@ -9,12 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var dt_service_1 = require('../dtShared/dt.service');
 var login_service_1 = require('../login/login.service');
 var login_cmp_1 = require('../login/login.cmp');
 var login_routes_1 = require('./login.routes');
 var utility_module_1 = require('../shared/modules/utility.module');
 var http_1 = require('@angular/http');
-var core_2 = require('angular2-cookie/core');
 var dt_httpInterceptor_1 = require('../dtShared/dt.httpInterceptor');
 var LoginModule = (function () {
     function LoginModule() {
@@ -32,11 +32,11 @@ var LoginModule = (function () {
                 login_service_1.LoginService,
                 {
                     provide: http_1.Http,
-                    useFactory: function (backend, defaultOptions, cookieService, dtService) {
-                        return new dt_httpInterceptor_1.DTHttpInterceptor(backend, defaultOptions, cookieService);
+                    useFactory: function (backend, defaultOptions, dtService) {
+                        return new dt_httpInterceptor_1.DTHttpInterceptor(backend, defaultOptions, dtService);
                     },
-                    deps: [http_1.XHRBackend, http_1.RequestOptions, core_2.CookieService]
-                },
+                    deps: [http_1.XHRBackend, http_1.RequestOptions, dt_service_1.DTService]
+                }
             ]
         }), 
         __metadata('design:paramtypes', [])

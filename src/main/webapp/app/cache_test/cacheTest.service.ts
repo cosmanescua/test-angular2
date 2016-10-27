@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable() 
 export class CacheTestService {
-    private _baseUrl: string = '';
+    private _baseUrl: string = 'rest/';
 
     constructor(private _http: Http){}
 
@@ -13,7 +13,7 @@ export class CacheTestService {
      * @author DynTech
      */
     testCache(): Observable<any> {
-        return this._http.get('testCache')
+        return this._http.get(this._baseUrl + 'testCache')
             .map((response: Response) => response.json());
     }
 
@@ -22,7 +22,7 @@ export class CacheTestService {
      * @author DynTech
      */
     clearCache(): Observable<any> {
-        return this._http.get('testCacheEvict')
+        return this._http.get(this._baseUrl + 'testCacheEvict')
             .map((response: Response) => response)
     }
 

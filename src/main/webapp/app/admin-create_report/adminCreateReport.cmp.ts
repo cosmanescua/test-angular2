@@ -11,6 +11,9 @@ import { AppService } from '../shared/services/app.service';
 
 import { TranslateService } from 'ng2-translate/ng2-translate';
 
+import { Alert } from '../shared/models';
+import { ChangingParameter } from './models';
+
 declare var $: JQueryStatic;
 
 @Component({
@@ -20,18 +23,20 @@ declare var $: JQueryStatic;
 
     encapsulation: ViewEncapsulation.None
 })
-export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
+export class AdminCreateReportCmp implements OnInit {
     reportProfile: any; // Report's full data
     bMoveMode: boolean; // State of dragging
-    currentChangingParameter: any; // Info about current changing parameters 
+    currentChangingParameter: ChangingParameter; // Info about current changing parameters 
     reportFile: any; // 
+    alertCreateReport: Alert;
+    bLoadingState: boolean;
 
     /*--------- Constructor --------*/
     constructor(private _dtService: DTService,
         private _changeDetectionRef: ChangeDetectorRef,
         private _dragulaService: DragulaService,
         private _adminCreateReportService: AdminCreateReportService,
-        private translate: TranslateService,
+        private _translateService: TranslateService,
         private _appService: AppService) {
         let vm = this;
         // Dragula config 
@@ -89,33 +94,17 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
             vm.bMoveMode = false;
         });
 
-
-
-
-
-
-
-        // this language will be used as a fallback when a translation isn't found in the current language
-        translate.setDefaultLang('prevod2');
-
-        // the lang to use, if the lang isn't available, it will use the current loader to get them
-        translate.use('prevod2');
     }
 
     /*--------- App logic --------*/
-
-    promenaJezika() {
-        console.log('click');
-
-        // this._appService.langChange('en');
-    }
-
     /**
      * Submit method for creating report
      * @author DynTech
      */
     createReportSubmit(reportProfileRef: any): void {
         var reader = new FileReader();
+        this.alertCreateReport.show = false;
+        this.bLoadingState = true;
 
         let vm = this;
 
@@ -130,12 +119,16 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
             vm._dtService.setRestMessageContent('AdminCreateReport', 'CreateReportSubmit');
             tempReportProfile.amReportBlobs.fileBlob = vm.fileByteToArray(bytes);
 
-            // console.log(JSON.stringify(tempReportProfile))
-
             vm._adminCreateReportService.createReport(tempReportProfile).subscribe(data => {
-
+                vm.alertCreateReport.message = 'Report successfully created';
+                vm.alertCreateReport.type = 'success';
+                vm.alertCreateReport.show = true;
+                vm.bLoadingState = false;
             }, error => {
-
+                vm.alertCreateReport.message = 'Report not created';
+                vm.alertCreateReport.type = 'danger';
+                vm.alertCreateReport.show = true;
+                vm.bLoadingState = false;
             })
         }
 
@@ -193,7 +186,7 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
     addField(fieldsMatrixRef: any, row: number): void {
         fieldsMatrixRef[row].push({
             name: '',
-            type: '',
+            type: 'String',
             description: '',
             minValue: null,
             maxValue: null,
@@ -262,7 +255,7 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
      * Check if given field is in edit mode
      * @author DynTech
      */
-    isFieldInEditMode(currentChangingParameterRef: any, row: number, column: number): boolean {
+    isFieldInEditMode(currentChangingParameterRef: ChangingParameter, row: number, column: number): boolean {
         return currentChangingParameterRef.y == row && currentChangingParameterRef.x == column && currentChangingParameterRef.bEditMode;
     }
 
@@ -388,13 +381,11 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
     /*--------- NG On Init ---------*/
     ngOnInit() {
         // Variables initialization
+        this.bLoadingState = false;
         this.bMoveMode = false;
+        this.alertCreateReport = new Alert(5000, true);
 
-        this.currentChangingParameter = {
-            y: null,
-            x: null,
-            bEditMode: false
-        }
+        this.currentChangingParameter = new ChangingParameter();
 
         this.reportProfile = {
             name: '',
@@ -406,61 +397,36 @@ export class AdminCreateReportCmp implements OnInit, DTViewCmpIf {
             amReportParameterses: [
                 [
                     {
-                        name: 'Name',
+                        name: '',
                         type: 'String',
-                        description: 'Your name',
-                        minValue: 0,
-                        maxValue: 50,
+                        description: '',
+                        minValue: null,
+                        maxValue: null,
                         isMandatory: true,
-                        defaultValue: ''
-                    }, {
-                        name: 'Surname',
-                        type: 'String',
-                        description: 'Your name',
-                        minValue: 0,
-                        maxValue: 50,
-                        isMandatory: false,
-                        defaultValue: ''
-                    }
-                ],
-                [
-                    {
-                        name: 'Age',
-                        type: 'Integer',
-                        description: 'Age',
-                        minValue: 0,
-                        maxValue: 50,
-                        isMandatory: true,
-                        defaultValue: ''
-                    }, {
-                        name: 'City',
-                        type: 'String',
-                        description: 'Your name',
-                        minValue: 0,
-                        maxValue: 50,
-                        isMandatory: false,
                         defaultValue: ''
                     }
                 ]
             ]
         }
 
+        this._appService.languageChanged.subscribe(lang => {
+            this._appService.changeLangTranslate(this._translateService, lang, true);
+        });
+
+        AppService.languageChangeCompletedEmit.subscribe(() => {            
+        });
+
         // Construct methods
-        this.__setInitPageTitle("Admin Report Upload");
-        this.__setInitCompanyCSS();
+        this._translateService.use(this._appService.getStoredLanguage()).toPromise().then(() => {
+            AppService.languageChangeCompleted();
+        });
+        
+        this._appService.pageLoaded('Create Report');
     }
 
     ngOnDestroy() { // On destroy
         this._dragulaService.destroy('bag-main');
-    }
 
-    /*--------- Interface imported --------*/
-
-    __setInitPageTitle(title: string) {
-        this._dtService.setPageTitle(title);
-    }
-
-    __setInitCompanyCSS() {
-        this._dtService.setInitCompanyCSS();
+        this._appService.refreshEmitters();
     }
 }

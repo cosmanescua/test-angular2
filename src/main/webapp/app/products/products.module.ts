@@ -23,7 +23,9 @@ import { UtilityModule } from '../shared/modules/utility.module';
         UtilityModule,
         ROUTING
     ],
-    declarations: [ProductsCmp],
+    declarations: [
+        ProductsCmp
+    ],
     providers: [
         ProductsService,
         DTService,

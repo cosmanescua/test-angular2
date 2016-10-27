@@ -7,11 +7,13 @@ import { ErrorLogService } from './errorLog.service';
 import { DTViewCmpIf } from '../dtShared/dt.viewCmpIF';
 import { DTService } from '../dtShared/dt.service';
 
+import { AppService } from '../shared/services/app.service';
+
 @Component({
     moduleId: module.id,
     templateUrl: 'errorLogTrace.cmp.html'
 })
-export class ErrorLogTraceCmp implements OnInit, DTViewCmpIf {
+export class ErrorLogTraceCmp implements OnInit {
     trace: string;
     loadingState: boolean;
 
@@ -19,7 +21,8 @@ export class ErrorLogTraceCmp implements OnInit, DTViewCmpIf {
     constructor(
         private _errorLogService: ErrorLogService,
         private _dtService: DTService,
-        private _activatedRoute: ActivatedRoute
+        private _activatedRoute: ActivatedRoute,
+        private _appService: AppService
     ) { }
 
 
@@ -31,8 +34,8 @@ export class ErrorLogTraceCmp implements OnInit, DTViewCmpIf {
     getTrace(id: number) {
         this.loadingState = true;
         this._dtService.setRestMessageContent('ErrorLogTraceCmp', 'getTrace()');
-        this._errorLogService.getLogById(id).subscribe((result: any) => {
-            this.trace = this.formatLogMessage(result.trace);
+        this._errorLogService.getLogById(id).toPromise().then((res: any) => {
+            this.trace = this.formatLogMessage(res.trace);
             this.loadingState = false;
         }, error => {
             this.loadingState = false;
@@ -75,11 +78,6 @@ export class ErrorLogTraceCmp implements OnInit, DTViewCmpIf {
         });
 
         // Construct methods
-        this.__setInitPageTitle('Error trace');
-    }
-
-    /*--------- Interface imported --------*/
-    __setInitPageTitle(title: string) {
-        this._dtService.setPageTitle(title);
+        this._appService.pageLoaded('Error trace');
     }
 }

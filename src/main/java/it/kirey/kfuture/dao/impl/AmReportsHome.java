@@ -11,9 +11,8 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmReportsHome;
-import it.kirey.kfuture.entity.AmErrorTraces;
 import it.kirey.kfuture.entity.AmReports;
 
 /**
@@ -22,15 +21,15 @@ import it.kirey.kfuture.entity.AmReports;
  * @see it.kirey.kfuture.gen.AmReports
  * @author Hibernate Tools
  */
-@Repository(value = IAmReportsHome.REPOSITORY_QUALIFIER)
-public class AmReportsHome implements IAmReportsHome {
+@Repository(value = "amReportsHome")
+public class AmReportsHome{
 
 	private static final Log log = LogFactory.getLog(AmReportsHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
+	@Transactional
 	public void persist(AmReports transientInstance) {
 		log.debug("persisting AmReports instance");
 		try {
@@ -42,7 +41,7 @@ public class AmReportsHome implements IAmReportsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachDirty(AmReports instance) {
 		log.debug("attaching dirty AmReports instance");
 		try {
@@ -54,7 +53,7 @@ public class AmReportsHome implements IAmReportsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmReports instance) {
 		log.debug("attaching clean AmReports instance");
 		try {
@@ -66,7 +65,7 @@ public class AmReportsHome implements IAmReportsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmReports persistentInstance) {
 		log.debug("deleting AmReports instance");
 		try {
@@ -78,7 +77,7 @@ public class AmReportsHome implements IAmReportsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReports merge(AmReports detachedInstance) {
 		log.debug("merging AmReports instance");
 		try {
@@ -91,7 +90,7 @@ public class AmReportsHome implements IAmReportsHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmReports findById(Integer id) {
 		log.debug("getting AmReports instance with id: " + id);
 		try {
@@ -109,6 +108,7 @@ public class AmReportsHome implements IAmReportsHome {
 		}
 	}
 
+	@Transactional
 	public List<AmReports> findByExample(AmReports instance) {
 		log.debug("finding AmReports instance by example");
 		try {
@@ -121,9 +121,9 @@ public class AmReportsHome implements IAmReportsHome {
 			throw re;
 		}
 	}
-
-	@Override
-	public List<AmReports> getAll() {
+	
+	@Transactional
+	public List<AmReports> findAll() {
 		return (List<AmReports>) this.sessionFactory.getCurrentSession().createCriteria(AmReports.class).list();
 	}
 }

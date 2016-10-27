@@ -29,9 +29,6 @@ import it.kirey.kfuture.service.IOrderServiceForEmail;
 @RequestMapping("/demo")
 public class DemoController {
 	
-	@Autowired
-	ILoggerService loggerService;
-
 	public DemoController(){}
 
 	@Autowired
@@ -48,8 +45,7 @@ public class DemoController {
 	public ResponseEntity<TestObject> getTestObject(@PathVariable(value = "id") int id) {
 
 		TestObject testObj = new TestObject();
-		testObj.setTestId(5);
-		
+		testObj.setId(5);
 		return new ResponseEntity<TestObject>(testObj, HttpStatus.OK);	
 		
 	}
@@ -148,18 +144,6 @@ public class DemoController {
 		orderService.sendOrderConfirmation(customer);
 		
 		return new ResponseEntity<String>("TEST Email OK", HttpStatus.OK);	
-	}
-	
-	/**
-	 * Test method for exception handling
-	 * @return
-	 * @throws Exception 
-	 */
-	@RequestMapping(value = "/exc", method = RequestMethod.GET)
-	public ResponseEntity<Object> handleException1() throws Exception {		
-		
-		loggerService.getAllTraces();
-		return new ResponseEntity<Object>("TEST OK", HttpStatus.OK);			
 	}
 	
 }

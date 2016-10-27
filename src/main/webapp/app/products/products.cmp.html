@@ -2,30 +2,37 @@
     <div id="products-wrapper">
         <div class="col-md-4 padding_sides-0">
             <div class="form-group">
-                <input type="text" class="form-control" [(ngModel)]="filters.name" (ngModelChange)="filterByName()" placeholder="Search by Name...">
+                <input type="text" class="form-control" [(ngModel)]="filters.nameGenericName" (ngModelChange)="filterByName()" placeholder="Search by Name..." [disabled]="isLoading">
             </div>
         </div>
 
         <div class="col-md-1 col-md-offset-7 padding_sides-0">
             <div class="form-group">
-                <select type="text" class="form-control" required [(ngModel)]="__pageSizeModel" (ngModelChange)="__onPageSizeChanged()">
+                <select type="text" class="form-control" required [(ngModel)]="__pageSizeModel" (ngModelChange)="__onPageSizeChanged()" [disabled]="isLoading">
                     <option *ngFor="let pageSize of pageSizes" [value]="pageSize">{{pageSize}}</option>
                 </select>
             </div>
         </div>
+        
+        <section *ngIf="isLoading">
+            <div id="overlay"> 
+                <i class="spin-normal" alt="Loading..."></i>
+            </div>
+        </section>
+        <div>
+            <p-dataTable [value]="productsToFilter">
+                <p-column field="nameGenericName" header="Name"></p-column>
+                <p-column field="id" header="Id">
+                    <template let-col let-car="rowData">
+                        <span>{{car[col.field] | date: 'dd.MM.yyyy.'}}</span>
+                    </template>
+                </p-column>
+                <p-column field="price" header="Price"></p-column>
+            </p-dataTable>
 
-        <p-dataTable [value]="products">
-            <p-column field="name" header="Name"></p-column>
-            <p-column field="dateProduct" header="Date">
-                <template let-col let-car="rowData">
-                    <span>{{car[col.field] | date: 'dd.MM.yyyy.'}}</span>
-                </template>
-            </p-column>
-            <p-column field="price" header="Price"></p-column>
-        </p-dataTable>
-
-        <div align="center ">
-            <pagination [totalItems]="__totalItems" maxSize="10" [ngModel]="__currentPage" [boundaryLinks]="true" [(itemsPerPage)]="__pageSize " (pageChanged)="__onPageChanged($event) "></pagination>
+            <div align="center">
+                <pagination [totalItems]="__totalItems" maxSize="10" [ngModel]="__currentPage" [boundaryLinks]="true" [(itemsPerPage)]="__pageSize " (pageChanged)="__onPageChanged($event) "></pagination>
+            </div>
         </div>
 
     </div>

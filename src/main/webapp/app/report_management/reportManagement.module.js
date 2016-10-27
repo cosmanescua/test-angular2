@@ -12,14 +12,17 @@ var core_1 = require('@angular/core');
 var forms_1 = require('@angular/forms');
 var http_1 = require('@angular/http');
 var primeng_1 = require('primeng/primeng');
-var reportManagement_cmp_1 = require('../report_management/reportManagement.cmp');
-var reportManagement_service_1 = require('../report_management/reportManagement.service');
+var ng2_translate_1 = require('ng2-translate/ng2-translate');
+var alert_1 = require('ng2-bootstrap/components/alert');
+var reportManagement_cmp_1 = require('./reportManagement.cmp');
+var reportManagement_service_1 = require('./reportManagement.service');
 var validation_service_1 = require('../shared/services/validation.service');
-var controlMessage_cmp_1 = require('../shared/controlMessage.cmp');
+var controlMessages_module_1 = require('../shared/modules/controlMessages.module');
 var capital_pipe_1 = require('../shared/pipes/capital.pipe');
-var core_2 = require('angular2-cookie/core');
+var reportFilter_pipe_1 = require('./pipes/reportFilter.pipe');
 var dt_httpInterceptor_1 = require('../dtShared/dt.httpInterceptor');
-var reportManagement_routes_1 = require('../report_management/reportManagement.routes');
+var dt_service_1 = require('../dtShared/dt.service');
+var reportManagement_routes_1 = require('./reportManagement.routes');
 var utility_module_1 = require('../shared/modules/utility.module');
 var ReportManagementModule = (function () {
     function ReportManagementModule() {
@@ -32,14 +35,20 @@ var ReportManagementModule = (function () {
                 primeng_1.DataScrollerModule,
                 primeng_1.GrowlModule,
                 primeng_1.MessagesModule,
-                primeng_1.SelectButtonModule,
+                alert_1.AlertModule,
                 reportManagement_routes_1.ROUTING,
-                utility_module_1.UtilityModule
+                utility_module_1.UtilityModule,
+                controlMessages_module_1.ControlMessageModule,
+                ng2_translate_1.TranslateModule.forRoot({
+                    provide: ng2_translate_1.TranslateLoader,
+                    useFactory: function (http) { return new ng2_translate_1.TranslateStaticLoader(http, 'rest/translations/reportManagement', ''); },
+                    deps: [http_1.Http]
+                })
             ],
             declarations: [
                 reportManagement_cmp_1.ReportManagementCmp,
                 capital_pipe_1.CapitalPipe,
-                controlMessage_cmp_1.ControlMessages
+                reportFilter_pipe_1.ReportFilterPipe
             ],
             providers: [
                 reportManagement_service_1.ReportManagementService,
@@ -47,11 +56,11 @@ var ReportManagementModule = (function () {
                 forms_1.Validators,
                 {
                     provide: http_1.Http,
-                    useFactory: function (backend, defaultOptions, cookieService) {
-                        return new dt_httpInterceptor_1.DTHttpInterceptor(backend, defaultOptions, cookieService);
+                    useFactory: function (backend, defaultOptions, dtService) {
+                        return new dt_httpInterceptor_1.DTHttpInterceptor(backend, defaultOptions, dtService);
                     },
-                    deps: [http_1.XHRBackend, http_1.RequestOptions, core_2.CookieService]
-                },
+                    deps: [http_1.XHRBackend, http_1.RequestOptions, dt_service_1.DTService]
+                }
             ],
         }), 
         __metadata('design:paramtypes', [])

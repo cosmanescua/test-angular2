@@ -2,7 +2,6 @@
 <html>
 
 <head>
-    <base href="/RoxanaDemo/">
     <title>KFuture</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -26,10 +25,8 @@
     <link rel="stylesheet" type="text/css" href="app/report_management/reportManagement.cmp.css">
     <link rel="stylesheet" type="text/css" href="app/error_log/errorLog.cmp.css">
     <link rel="stylesheet" type="text/css" href="app/cache_test/cacheTest.cmp.css">
-
-    
-
-    
+    <link rel="stylesheet" type="text/css" href="app/dtShared/global_loader/dt.globalLoader.cmp.css">
+    <link rel="stylesheet" type="text/css" href="app/products/product.cmp.css">
 
     <!-- JS -->
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
@@ -67,7 +64,6 @@
                 'ng2-translate': 'node_modules/ng2-translate',
                 'dragula': 'node_modules/dragula/dist',
                 'ng2-dragula': 'node_modules/ng2-dragula',
-                'ng2-file-upload':'node_modules/ng2-file-upload',
             };
             // packages tells the System loader how to load when no filename and/or no extension
             var packages = {
@@ -83,7 +79,6 @@
                 'ng2-translate': { main: 'ng2-translate.js', defaultExtension: 'js' },
                 'dragula': { main: 'dragula.js', defaultExtension: 'js' },
                 'ng2-dragula': { main: 'ng2-dragula.js', defaultExtension: 'js' },
-                'ng2-file-upload': { main: 'ng2-file-upload.js', defaultExtension: 'js' },
             };
             var ngPackageNames = [
                 'common',

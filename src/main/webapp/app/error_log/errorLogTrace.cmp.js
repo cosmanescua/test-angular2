@@ -12,12 +12,14 @@ var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var errorLog_service_1 = require('./errorLog.service');
 var dt_service_1 = require('../dtShared/dt.service');
+var app_service_1 = require('../shared/services/app.service');
 var ErrorLogTraceCmp = (function () {
     /*--------- Constructor --------*/
-    function ErrorLogTraceCmp(_errorLogService, _dtService, _activatedRoute) {
+    function ErrorLogTraceCmp(_errorLogService, _dtService, _activatedRoute, _appService) {
         this._errorLogService = _errorLogService;
         this._dtService = _dtService;
         this._activatedRoute = _activatedRoute;
+        this._appService = _appService;
     }
     /*------------- App logic ------------*/
     /**
@@ -28,8 +30,8 @@ var ErrorLogTraceCmp = (function () {
         var _this = this;
         this.loadingState = true;
         this._dtService.setRestMessageContent('ErrorLogTraceCmp', 'getTrace()');
-        this._errorLogService.getLogById(id).subscribe(function (result) {
-            _this.trace = _this.formatLogMessage(result.trace);
+        this._errorLogService.getLogById(id).toPromise().then(function (res) {
+            _this.trace = _this.formatLogMessage(res.trace);
             _this.loadingState = false;
         }, function (error) {
             _this.loadingState = false;
@@ -67,18 +69,14 @@ var ErrorLogTraceCmp = (function () {
             _this.getTrace(params['id']);
         });
         // Construct methods
-        this.__setInitPageTitle('Error trace');
-    };
-    /*--------- Interface imported --------*/
-    ErrorLogTraceCmp.prototype.__setInitPageTitle = function (title) {
-        this._dtService.setPageTitle(title);
+        this._appService.pageLoaded('Error trace');
     };
     ErrorLogTraceCmp = __decorate([
         core_1.Component({
             moduleId: module.id,
             templateUrl: 'errorLogTrace.cmp.html'
         }), 
-        __metadata('design:paramtypes', [errorLog_service_1.ErrorLogService, dt_service_1.DTService, router_1.ActivatedRoute])
+        __metadata('design:paramtypes', [errorLog_service_1.ErrorLogService, dt_service_1.DTService, router_1.ActivatedRoute, app_service_1.AppService])
     ], ErrorLogTraceCmp);
     return ErrorLogTraceCmp;
 }());

@@ -1,5 +1,5 @@
 export class Product{
-    private name: string;
+    public name: string;
     private price: number;
     private date: number;
 

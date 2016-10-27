@@ -1,0 +1,27 @@
+<div class="container">
+    <form [formGroup]="form" (ngSubmit)="submit(form)">
+        <!--<div class="form-group" [ngClass]="{'has-error': !form.controls[column.name].valid}">
+            <label [attr.for]="column.name">{{column.name | capital}}:</label>
+            <input class="form-control" [formControlName]="column.name" [type]="transformFieldType(column.type)" [placeholder]="column.name">
+            <control-messages [control]="form.controls[column.name]"></control-messages>
+        </div>-->
+        <div class="form-group" [ngClass]="{'has-error': fields!=null && fields['firstName']!=null}">
+            <label [attr.for]="firstName">First Name:</label>
+            <input class="form-control" formControlName="firstName" type="text" placeholder="John" aria-describedby="firstNameHelpBlock">
+            <!--<control-messages [control]="form.controls['firstName']"></control-messages>-->
+            <span *ngIf="fields!=null && fields['firstName']!=null" id="firstNameHelpBlock" class="help-block">{{fields.firstName}}</span>
+        </div>
+        <div class="form-group" [ngClass]="{'has-error': fields!=null && fields['age']!=null}">
+            <label [attr.for]="age">Age:</label>
+            <input class="form-control" formControlName="age" type="number" placeholder="25" aria-describedby="ageHelpBlock">
+            <!--<control-messages [control]="form.controls['age']"></control-messages>-->
+            <span *ngIf="fields!=null && fields['age']!=null" id="ageHelpBlock" class="help-block">{{fields.age}}</span>
+        </div>
+
+        <div class="container-fluid row clear-both">
+            <div class="col-md-4 col-md-offset-8 text-right">
+                <input type="submit" class="btn btn-primary" value="Send" [disabled]="!form.valid" />
+            </div>
+        </div>
+    </form>
+</div>

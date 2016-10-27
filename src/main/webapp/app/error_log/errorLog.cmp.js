@@ -12,12 +12,14 @@ var core_1 = require('@angular/core');
 var router_1 = require('@angular/router');
 var dt_service_1 = require('../dtShared/dt.service');
 var errorLog_service_1 = require('../error_log/errorLog.service');
+var app_service_1 = require('../shared/services/app.service');
 var ErrorLogCmp = (function () {
     /*--------- Constructor --------*/
-    function ErrorLogCmp(_errorLogService, _dtService, _router) {
+    function ErrorLogCmp(_errorLogService, _dtService, _router, _appService) {
         this._errorLogService = _errorLogService;
         this._dtService = _dtService;
         this._router = _router;
+        this._appService = _appService;
     }
     /*--------- App logic --------*/
     /**
@@ -29,8 +31,8 @@ var ErrorLogCmp = (function () {
         this.logs = [];
         this.loadingState = true;
         this._dtService.setRestMessageContent('ErrorLogCmp', 'getLogRest()');
-        this._errorLogService.getLog().subscribe(function (result) {
-            _this.logs = result;
+        this._errorLogService.getLog().toPromise().then(function (res) {
+            _this.logs = res;
             _this.loadingState = false;
         }, function (error) {
             _this.loadingState = false;
@@ -44,7 +46,7 @@ var ErrorLogCmp = (function () {
         var _this = this;
         this.loadingState = true;
         this._dtService.setRestMessageContent('ErrorLogCmp', 'causeException()');
-        this._errorLogService.causeException().subscribe(function (result) {
+        this._errorLogService.causeException().toPromise().then(function (res) {
             _this.loadingState = false;
         }, function (error) {
             _this.loadingState = true;
@@ -66,11 +68,7 @@ var ErrorLogCmp = (function () {
         // Methods execution
         this.getLogRest();
         // Construct methods
-        this.__setInitPageTitle('Error log');
-    };
-    /*--------- Interface imported --------*/
-    ErrorLogCmp.prototype.__setInitPageTitle = function (title) {
-        this._dtService.setPageTitle(title);
+        this._appService.pageLoaded('Error log');
     };
     ErrorLogCmp = __decorate([
         core_1.Component({
@@ -79,7 +77,7 @@ var ErrorLogCmp = (function () {
             // styleUrls: ['errorLog.cmp.css'],
             encapsulation: core_1.ViewEncapsulation.None
         }), 
-        __metadata('design:paramtypes', [errorLog_service_1.ErrorLogService, dt_service_1.DTService, router_1.Router])
+        __metadata('design:paramtypes', [errorLog_service_1.ErrorLogService, dt_service_1.DTService, router_1.Router, app_service_1.AppService])
     ], ErrorLogCmp);
     return ErrorLogCmp;
 }());

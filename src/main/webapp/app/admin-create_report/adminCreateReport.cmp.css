@@ -3,6 +3,13 @@
   #cmp-admin-create_report #admin-create_report-wrapper {
     height: 100%;
     position: relative; }
+  #cmp-admin-create_report .alert {
+    float: left;
+    font-size: 14px;
+    left: 20px;
+    margin-bottom: -14px;
+    position: relative;
+    top: -6px; }
 
 #report-settings .submit {
   padding-top: 25px; }

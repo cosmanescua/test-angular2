@@ -1,50 +1,50 @@
 <!--<div class="cmp-global_loader"></div>-->
 <div id="cmp-login" class="app_content-container-cmp box-full_size">
-    <div id="login-wrapper">
-        <form>
-            <div class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">
+	<div id="login-wrapper">
+		<h3 class="text-center login-header">Sign in</h3>
+		<form #form="ngForm">
+			<div class="form-group">
+				<div class="input-group">
+					<span class="input-group-addon" id="basic-addon1">
                     <span class="glyphicon glyphicon-user"></span>
-                    </span>
-                    <input type="text" class="form-control" name="username" placeholder="Username" [(ngModel)]="loginModel.username" [disabled]="bLoginSuccessful || bLoadingState"
-                        required>
-                </div>
-                <br>
-            </div>
-            <div class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">
+					</span>
+					<input type="text" class="form-control" name="username" placeholder="Username" [(ngModel)]="loginModel.username" [disabled]="bLoginSuccessful || bLoadingState || _appService.postLoginLoad" required minlength="4" autofocus>
+				</div>
+				<br>
+			</div>
+			<div class="form-group">
+				<div class="input-group">
+					<span class="input-group-addon" id="basic-addon1">
                     <span class="glyphicon glyphicon-lock"></span>
-                    </span>
-                    <input type="text" class="form-control" name="password" placeholder="Password" [(ngModel)]="loginModel.password" [disabled]="bLoginSuccessful || bLoadingState"
-                        required>
-                </div>
-            </div>
-            <div class="form-group text-center">
-                <button type="submit" class="btn btn-primary" (click)="login()" [disabled]="bLoadingState || bLoginSuccessful">Submit</button>
-            </div>
-            <div class="form-group">
-                <div class="text-center" *ngIf="bLoadingState">
-                    <img src="app/assets/images/loader.gif" width="54">
-                </div>
-                <div class="alert alert-success" role="alert" *ngIf="bLoginSuccessful && bLoginState">
-                    Login successful
-                </div>
-                <div class="alert alert-danger" role="alert" *ngIf="!bLoginSuccessful && bLoginState">
-                    Login failed
-                </div>
-            </div>
-            <div class="form-group" *ngIf="bLoginSuccessful && bLoginState && aCssList.length > 1">
-                <h4>Choose company display style</h4>
-                <select class="form-control" [(ngModel)]="selectedCompany" [ngModelOptions]="{standalone: true}">
+					</span>
+					<input type="password" class="form-control" name="password" placeholder="Password" [(ngModel)]="loginModel.password" [disabled]="bLoginSuccessful || bLoadingState || _appService.postLoginLoad"
+						required>
+				</div>
+			</div>
+			<div class="form-group text-center">
+				<button type="submit" class="btn btn-primary" (click)="login()" [disabled]="!form.valid || bLoadingState || bLoginSuccessful || _appService.postLoginLoad">Submit</button>
+			</div>
+			<div class="form-group">
+				<div class="text-center" *ngIf="bLoadingState || _appService.postLoginLoad">
+					<img src="app/assets/images/loader.gif" width="54">
+				</div>
+				<div class="alert alert-success" role="alert" *ngIf="bLoginSuccessful && bLoginState">
+					Login successful
+				</div>
+				<div class="alert alert-danger" role="alert" *ngIf="!bLoginSuccessful && bLoginState">
+					Login failed
+				</div>
+			</div>
+			<div class="form-group" *ngIf="bLoginSuccessful && bLoginState && aCssList.length > 1">
+				<h4>Choose company display style</h4>
+				<select class="form-control" [(ngModel)]="selectedCompany" [ngModelOptions]="{standalone: true}">
                     <option value="">-Select company-</option>
                     <option *ngFor="let css of this.aCssList" [value]="css.cssFile">{{css.companyName}}</option>
                 </select>
-            </div>
-            <div class="form-group text-center" *ngIf="bLoginSuccessful && bLoginState && aCssList.length > 1">
-                <button type="button" class="btn btn-primary" (click)="selectCompany(selectedCompany, true)" [disabled]="selectedCompany == ''">Submit</button>
-            </div>
-        </form>
-    </div>
+			</div>
+			<div class="form-group text-center" *ngIf="bLoginSuccessful && bLoginState && aCssList.length > 1">
+				<button type="button" class="btn btn-primary" (click)="selectCompany(selectedCompany, true)" [disabled]="selectedCompany == ''">Sign in</button>
+			</div>
+		</form>
+	</div>
 </div>

@@ -11,8 +11,8 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmResourceBundleHome;
 import it.kirey.kfuture.entity.AmResourceBundle;
 
 /**
@@ -21,15 +21,15 @@ import it.kirey.kfuture.entity.AmResourceBundle;
  * @see it.kirey.kfuture.gen.AmResourceBundle
  * @author Hibernate Tools
  */
-@Repository(value = IAmResourceBundleHome.REPOSITORY_QUALIFIER)
-public class AmResourceBundleHome implements IAmResourceBundleHome {
+@Repository(value = "amResourceBundleHome")
+public class AmResourceBundleHome {
 
 	private static final Log log = LogFactory.getLog(AmResourceBundleHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
+	@Transactional
 	public void persist(AmResourceBundle transientInstance) {
 		log.debug("persisting AmResourceBundle instance");
 		try {
@@ -41,6 +41,7 @@ public class AmResourceBundleHome implements IAmResourceBundleHome {
 		}
 	}
 
+	@Transactional
 	public void attachDirty(AmResourceBundle instance) {
 		log.debug("attaching dirty AmResourceBundle instance");
 		try {
@@ -52,6 +53,7 @@ public class AmResourceBundleHome implements IAmResourceBundleHome {
 		}
 	}
 
+	@Transactional
 	public void attachClean(AmResourceBundle instance) {
 		log.debug("attaching clean AmResourceBundle instance");
 		try {
@@ -63,6 +65,7 @@ public class AmResourceBundleHome implements IAmResourceBundleHome {
 		}
 	}
 
+	@Transactional
 	public void delete(AmResourceBundle persistentInstance) {
 		log.debug("deleting AmResourceBundle instance");
 		try {
@@ -74,6 +77,7 @@ public class AmResourceBundleHome implements IAmResourceBundleHome {
 		}
 	}
 
+	@Transactional
 	public AmResourceBundle merge(AmResourceBundle detachedInstance) {
 		log.debug("merging AmResourceBundle instance");
 		try {
@@ -86,6 +90,7 @@ public class AmResourceBundleHome implements IAmResourceBundleHome {
 		}
 	}
 
+	@Transactional
 	public AmResourceBundle findById(Integer id) {
 		log.debug("getting AmResourceBundle instance with id: " + id);
 		try {
@@ -103,6 +108,7 @@ public class AmResourceBundleHome implements IAmResourceBundleHome {
 		}
 	}
 
+	@Transactional
 	public List<AmResourceBundle> findByExample(AmResourceBundle instance) {
 		log.debug("finding AmResourceBundle instance by example");
 		try {

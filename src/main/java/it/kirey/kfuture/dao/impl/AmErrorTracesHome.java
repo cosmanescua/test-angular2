@@ -11,8 +11,8 @@ import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import it.kirey.kfuture.dao.IAmErrorTracesHome;
 import it.kirey.kfuture.entity.AmErrorTraces;
 
 /**
@@ -21,15 +21,15 @@ import it.kirey.kfuture.entity.AmErrorTraces;
  * @see it.kirey.kfuture.entity.AmErrorTraces
  * @author Hibernate Tools
  */
-@Repository(value = IAmErrorTracesHome.REPOSITORY_QUALIFIER)
-public class AmErrorTracesHome implements IAmErrorTracesHome {
+@Repository(value = "amErrorTracesHome")
+public class AmErrorTracesHome {
 
 	private static final Log log = LogFactory.getLog(AmErrorTracesHome.class);
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Override
+	@Transactional
 	public void persist(AmErrorTraces transientInstance) {
 		log.debug("persisting AmErrorTraces instance");
 		try {
@@ -41,7 +41,7 @@ public class AmErrorTracesHome implements IAmErrorTracesHome {
 		}
 	}
 	
-	@Override
+	@Transactional
 	public void attachDirty(AmErrorTraces instance) {
 		log.debug("attaching dirty AmErrorTraces instance");
 		try {
@@ -53,7 +53,7 @@ public class AmErrorTracesHome implements IAmErrorTracesHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void attachClean(AmErrorTraces instance) {
 		log.debug("attaching clean AmErrorTraces instance");
 		try {
@@ -65,7 +65,7 @@ public class AmErrorTracesHome implements IAmErrorTracesHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public void delete(AmErrorTraces persistentInstance) {
 		log.debug("deleting AmErrorTraces instance");
 		try {
@@ -77,7 +77,7 @@ public class AmErrorTracesHome implements IAmErrorTracesHome {
 		}
 	}
 
-	@Override
+	@Transactional
 	public AmErrorTraces merge(AmErrorTraces detachedInstance) {
 		log.debug("merging AmErrorTraces instance");
 		try {
@@ -90,7 +90,7 @@ public class AmErrorTracesHome implements IAmErrorTracesHome {
 		}
 	}
 	
-	@Override
+	@Transactional	
 	public AmErrorTraces findById(Integer id) {
 		log.debug("getting AmErrorTraces instance with id: " + id);
 		try {
@@ -108,6 +108,7 @@ public class AmErrorTracesHome implements IAmErrorTracesHome {
 		}
 	}
 	
+	@Transactional
 	public List<AmErrorTraces> findByExample(AmErrorTraces instance) {
 		log.debug("finding AmErrorTraces instance by example");
 		try {
@@ -121,8 +122,8 @@ public class AmErrorTracesHome implements IAmErrorTracesHome {
 		}
 	}
 
-	@Override
-	public List<AmErrorTraces> getAll() {
+	@Transactional
+	public List<AmErrorTraces> findAll() {
 		return (List<AmErrorTraces>) this.sessionFactory.getCurrentSession().createCriteria(AmErrorTraces.class).list();
 	}
 }
