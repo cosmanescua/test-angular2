@@ -10,6 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var products_service_1 = require('./products.service');
+var dt_pagination_model_1 = require('../dtShared/table/dt.pagination.model');
+var dt_sort_model_1 = require('../dtShared/table/dt.sort.model');
 var ProductsComponent = (function () {
     function ProductsComponent(_productsService) {
         this._productsService = _productsService;
@@ -26,20 +28,27 @@ var ProductsComponent = (function () {
         this._totalNrOfItems = 0;
     }
     ProductsComponent.prototype.ngOnInit = function () {
-        this.getAllProducts();
+        var pag = new dt_pagination_model_1.Pagination();
+        var sort = new dt_sort_model_1.Sort("name", "asc");
+        pag.setPage(this.currentPage);
+        pag.setPageSize(this.itemsPerPage);
+        pag.setSort(sort);
+        this.getProductsPaginated(pag);
     };
-    ProductsComponent.prototype.getAllProducts = function () {
+    ProductsComponent.prototype.getProductsPaginated = function (pag) {
         var _this = this;
-        this._productsService.getProducts().subscribe(function (data) { return _this.initPageElements(data.json()); });
+        this._productsService.getProductsPaginated(pag).subscribe(function (data) { return _this.initPageElements(data.json()); });
     };
     ProductsComponent.prototype.initPageElements = function (items) {
+        console.log("!!!!!!!!");
+        console.log(items);
         //when the component is initialized and the products are retrieved initialized the page paginator
-        this.products = items;
-        this._totalNrOfItems = this.products.length;
+        this.productsToDisplay = items.data;
+        this._totalNrOfItems = items.totalRows;
         //calculate the number of pages
         this.calculateNrOfPages();
         //determine which products must be displayed according to the number if items per page
-        this.determineProductsToDisplay();
+        //this.determineProductsToDisplay();
         //determine the state of the previous and next in the paginator
         this.determineNextPreviousState();
     };
@@ -49,10 +58,13 @@ var ProductsComponent = (function () {
         this.currentPage = 1;
         //update nr of items per page
         this.itemsPerPage = $event;
+        var pag = new dt_pagination_model_1.Pagination();
+        var sort = new dt_sort_model_1.Sort("name", "asc");
+        pag.setPage(this.currentPage);
+        pag.setPageSize(this.itemsPerPage);
+        pag.setSort(sort);
         //recalculate the number of pages
-        this.calculateNrOfPages();
-        this.determineProductsToDisplay();
-        this.determineNextPreviousState();
+        this.getProductsPaginated(pag);
     };
     //calculate the number of pages to display
     ProductsComponent.prototype.calculateNrOfPages = function () {
@@ -86,7 +98,12 @@ var ProductsComponent = (function () {
         if (selectedPage > 0 && selectedPage <= this.nrOfPages) {
             this.currentPage = selectedPage;
             this.determineNextPreviousState();
-            this.determineProductsToDisplay();
+            var pag = new dt_pagination_model_1.Pagination();
+            var sort = new dt_sort_model_1.Sort("name", "asc");
+            pag.setPage(this.currentPage);
+            pag.setPageSize(this.itemsPerPage);
+            pag.setSort(sort);
+            this.getProductsPaginated(pag);
             this.setPages();
         }
     };

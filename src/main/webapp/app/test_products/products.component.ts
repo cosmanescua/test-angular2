@@ -1,6 +1,9 @@
 import {Component,OnInit}  from '@angular/core';
 import {Product} from './product.model';
 import {ProductsService} from './products.service';
+import {Pagination} from '../dtShared/table/dt.pagination.model';
+import {Filter} from '../dtShared/table/dt.filter.model';
+import {Sort} from '../dtShared/table/dt.sort.model';
 @Component({
     templateUrl: 'app/test_products/products.component.html'
 })
@@ -35,25 +38,32 @@ export class ProductsComponent implements OnInit
 
     constructor(private _productsService: ProductsService){}
     ngOnInit(){
-        this.getAllProducts();
+        let pag=new Pagination();
+        let sort=new Sort("name","asc");
+        pag.setPage(this.currentPage);
+        pag.setPageSize(this.itemsPerPage);
+        pag.setSort(sort);
+        this.getProductsPaginated(pag);
     }
-    getAllProducts()
+    getProductsPaginated(pag:Pagination)
     {
-        this._productsService.getProducts().subscribe(
+        this._productsService.getProductsPaginated(pag).subscribe(
             data=>this.initPageElements(data.json())
         )
     }
     initPageElements(items)
     {
+        console.log("!!!!!!!!");
+        console.log(items);
         //when the component is initialized and the products are retrieved initialized the page paginator
-        this.products=items;
-        this._totalNrOfItems=this.products.length;
+        this.productsToDisplay=items.data;
+        this._totalNrOfItems=items.totalRows;
 
         //calculate the number of pages
         this.calculateNrOfPages();
 
         //determine which products must be displayed according to the number if items per page
-        this.determineProductsToDisplay();
+        //this.determineProductsToDisplay();
 
         //determine the state of the previous and next in the paginator
         this.determineNextPreviousState();
@@ -67,13 +77,14 @@ export class ProductsComponent implements OnInit
 
         //update nr of items per page
         this.itemsPerPage=$event;
+        let pag=new Pagination();
+        let sort=new Sort("name","asc");
+        pag.setPage(this.currentPage);
+        pag.setPageSize(this.itemsPerPage);
+        pag.setSort(sort);
 
         //recalculate the number of pages
-        this.calculateNrOfPages();
-
-        this.determineProductsToDisplay();
-        this.determineNextPreviousState();
-       
+        this.getProductsPaginated(pag);
     }
 
     //calculate the number of pages to display
@@ -119,7 +130,12 @@ export class ProductsComponent implements OnInit
         {
             this.currentPage=selectedPage;
             this.determineNextPreviousState();
-            this.determineProductsToDisplay();
+           let pag=new Pagination();
+            let sort=new Sort("name","asc");
+            pag.setPage(this.currentPage);
+            pag.setPageSize(this.itemsPerPage);
+            pag.setSort(sort);
+            this.getProductsPaginated(pag);
             this.setPages();
         }
     }

@@ -13,10 +13,10 @@ var http_1 = require('@angular/http');
 var ProductsService = (function () {
     function ProductsService(_http) {
         this._http = _http;
-        this.baseUri = "app/test_products/api/products.json";
+        this.baseUri = "products?pagination=";
     }
-    ProductsService.prototype.getProducts = function () {
-        return this._http.get(this.baseUri);
+    ProductsService.prototype.getProductsPaginated = function (pag) {
+        return this._http.get(this.baseUri + JSON.stringify(pag));
     };
     ProductsService = __decorate([
         core_1.Injectable(), 
