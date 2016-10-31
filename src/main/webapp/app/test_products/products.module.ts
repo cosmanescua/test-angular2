@@ -8,6 +8,7 @@ import { UtilityModule } from '../shared/modules/utility.module';
 import {ProductsService} from './products.service';
 import {DataTableModule,SharedModule} from 'primeng/primeng';
 import {DialogModule} from 'primeng/primeng';
+import { PaginationModule } from 'ng2-bootstrap/ng2-bootstrap';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import {DialogModule} from 'primeng/primeng';
         UtilityModule,
         DataTableModule,
         SharedModule,
-        DialogModule
+        DialogModule,
+        PaginationModule
 
     ],
     declarations: [

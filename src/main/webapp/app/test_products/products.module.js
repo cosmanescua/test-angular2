@@ -15,6 +15,7 @@ var utility_module_1 = require('../shared/modules/utility.module');
 var products_service_1 = require('./products.service');
 var primeng_1 = require('primeng/primeng');
 var primeng_2 = require('primeng/primeng');
+var ng2_bootstrap_1 = require('ng2-bootstrap/ng2-bootstrap');
 var TestProductsModule = (function () {
     function TestProductsModule() {
     }
@@ -25,7 +26,8 @@ var TestProductsModule = (function () {
                 utility_module_1.UtilityModule,
                 primeng_1.DataTableModule,
                 primeng_1.SharedModule,
-                primeng_2.DialogModule
+                primeng_2.DialogModule,
+                ng2_bootstrap_1.PaginationModule
             ],
             declarations: [
                 products_component_1.ProductsComponent
