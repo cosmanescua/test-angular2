@@ -14,6 +14,7 @@ var products_routes_1 = require('./products.routes');
 var utility_module_1 = require('../shared/modules/utility.module');
 var products_service_1 = require('./products.service');
 var primeng_1 = require('primeng/primeng');
+var primeng_2 = require('primeng/primeng');
 var TestProductsModule = (function () {
     function TestProductsModule() {
     }
@@ -23,7 +24,8 @@ var TestProductsModule = (function () {
                 products_routes_1.ROUTING,
                 utility_module_1.UtilityModule,
                 primeng_1.DataTableModule,
-                primeng_1.SharedModule
+                primeng_1.SharedModule,
+                primeng_2.DialogModule
             ],
             declarations: [
                 products_component_1.ProductsComponent

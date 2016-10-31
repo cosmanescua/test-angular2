@@ -7,6 +7,7 @@ import { ROUTING } from './products.routes';
 import { UtilityModule } from '../shared/modules/utility.module';
 import {ProductsService} from './products.service';
 import {DataTableModule,SharedModule} from 'primeng/primeng';
+import {DialogModule} from 'primeng/primeng';
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import {DataTableModule,SharedModule} from 'primeng/primeng';
         ROUTING,
         UtilityModule,
         DataTableModule,
-        SharedModule
+        SharedModule,
+        DialogModule
 
     ],
     declarations: [
