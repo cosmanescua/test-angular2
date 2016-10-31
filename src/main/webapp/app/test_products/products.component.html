@@ -2,7 +2,7 @@
     <div class="row">
         <div class="ui-widget-header ui-helper-clearfix" style="padding:4px 10px;border-bottom: 0 none">
             <i class="fa fa-search" style="float:left;margin:4px 4px 0 0"></i>
-            <input #gb type="text" pInputText size="50" style="float:left" placeholder="Search">
+            <input type="text" pInputText size="50" style="float:left" placeholder="Search" [(ngModel)]="filterValue" (ngModelChange)="filterValueChanged($event)" >
             <div style="float: right;">
                 Items per page
                 <select [ngModel]="itemsPerPage" (ngModelChange)="onItemSelectChange($event)" name="itemsPerPage">
@@ -14,8 +14,12 @@
                  </select>
             </div>
         </div>
-
-        <p-dataTable [value]="productsToDisplay" [globalFilter]="gb">
+        <div class="pageLoader" *ngIf="!loaderHidden">
+            <div class="row">
+                <img class="loaderImg" src="app/test_products/loader.gif">
+            </div>
+        </div>
+        <p-dataTable [value]="productsToDisplay">
             <p-column field="nameGenericName" header="Name"></p-column>
             <p-column field="id" header="Code"></p-column>
             <p-column field="date" header="Date"></p-column>
